@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PatiYuva - Hayvan Sahiplendirme</title>
+  <style>
+    /* Genel Stil */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      background: #fdfdfd;
+      color: #333;
+    }
+    header {
+      background: #ff914d;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+    }
+    nav a {
+      color: #fff;
+      margin: 0 1rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    section {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+    h2 {
+      margin-bottom: 1rem;
+      color: #444;
+    }
+
+    /* Hayvan Kartları */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .card-body {
+      padding: 1rem;
+    }
+    .card-body h3 {
+      margin: 0 0 0.5rem 0;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      margin-top: 0.5rem;
+      background: #ff914d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #e57b35;
+    }
+
+    /* Form */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 500px;
+    }
+    input, textarea {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #333;
+      color: #fff;
+    }
+
+    @media(max-width: 600px) {
+      nav {
+        display: flex;
+        flex-direction: column;
+      }
+      nav a {
+        margin: 0.5rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🐾 PatiYuva</h1>
+    <p>Hayvanlara yeni yuvalar buluyoruz</p>
+    <nav>
+      <a href="#ilanlar">İlanlar</a>
+      <a href="#form">Sahiplen</a>
+      <a href="#blog">Bilgilendirme</a>
+      <a href="#iletisim">İletişim</a>
+    </nav>
+  </header>
+
+  <!-- İlanlar -->
+  <section id="ilanlar">
+    <h2>💛 Sahiplendirilmeyi Bekleyen Dostlarımız</h2>
+    <div class="grid">
+      <div class="card">
+        <img src="https://placekitten.com/400/300" alt="Kedi">
+        <div class="card-body">
+          <h3>Mırmır</h3>
+          <p>2 yaşında, kısırlaştırılmış, sakin bir kedi.</p>
+          <button class="btn" onclick="selectAnimal('Mırmır')">Sahiplen</button>
+        </div>
+      </div>
+      <div class="card">
+        <img src="https://placedog.net/400/300?id=2" alt="Köpek">
+        <div class="card-body">
+          <h3>Karabaş</h3>
+          <p>1 yaşında, enerjik ve oyuncu.</p>
+          <button class="btn" onclick="selectAnimal('Karabaş')">Sahiplen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Form -->
+  <section id="form">
+    <h2>🐕 Sahiplenme Formu</h2>
+    <form id="adoptionForm">
+      <input type="text" id="name" placeholder="Adınız Soyadınız" required>
+      <input type="email" id="email" placeholder="E-posta" required>
+      <input type="tel" id="phone" placeholder="Telefon" required>
+      <textarea id="message" rows="4" placeholder="Hayvan bakımı deneyiminiz"></textarea>
+      <input type="hidden" id="selectedAnimal" value="">
+      <button type="submit" class="btn">Gönder</button>
+    </form>
+    <p id="formMsg"></p>
+  </section>
+
+  <!-- Blog -->
+  <section id="blog">
+    <h2>📖 Hayvan Bakımı Bilgilendirme</h2>
+    <article>
+      <h3>Kısırlaştırma Neden Önemli?</h3>
+      <p>Kısırlaştırma hem sokak hayvanlarının sayısının kontrolüne yardımcı olur hem de
+      dostlarımızın daha sağlıklı bir yaşam sürmesini sağlar.</p>
+    </article>
+  </section>
+
+  <!-- İletişim -->
+  <section id="iletisim">
+    <h2>📬 İletişim</h2>
+    <p>Email: <a href="mailto:patiyuva@example.com">patiyuva@example.com</a></p>
+    <p>Instagram: <a href="#">@patiyuva</a></p>
+  </section>
+
+  <footer>
+    <p>© 2025 PatiYuva | Tüm Hakları Saklıdır</p>
+  </footer>
+
+  <script>
+    // Hayvan seçme
+    function selectAnimal(name) {
+      document.getElementById('selectedAnimal').value = name;
+      document.getElementById('formMsg').innerText = name + " için formu doldurabilirsiniz.";
+      window.location.href = "#form";
+    }
+
+    // Form gönderme
+    document.getElementById("adoptionForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      if(name.length < 3){
+        alert("Lütfen adınızı doğru girin.");
+        return;
+      }
+      if(!email.includes("@")){
+        alert("Geçerli bir e-posta girin.");
+        return;
+      }
+      if(phone.length < 10){
+        alert("Telefon numarası geçersiz.");
+        return;
+      }
+      document.getElementById("formMsg").innerText = "Teşekkürler " + name + "! Başvurunuz alındı.";
+      document.getElementById("adoptionForm").reset();
+    });
+  </script>
+</body>
+</html>
