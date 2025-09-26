@@ -349,7 +349,7 @@ function handleNewsletterSubmit(e) {
         
         // Show success message
         showSuccessMessage(currentLanguage === 'tr' ? 
-            'Tercihlieriniz kaydedildi! Size uygun hayvanlar hakkında bilgilendirme alacaksınız.' :
+            'Tercihleriniz kaydedildi! Size uygun hayvanlar hakkında bilgilendirme alacaksınız.' :
             'Your preferences have been saved! You will receive notifications about suitable animals.');
         
         // Reset button

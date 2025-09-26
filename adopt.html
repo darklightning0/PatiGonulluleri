@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahiplen - Patiler İçin Sevgi</title>
+    <meta name="description" content="Sokak hayvanları ve barınak hayvanlarını sahiplenmek için tüm dostlarımızı keşfedin. Filtreleme ve sıralama seçenekleri ile size uygun arkadaşınızı bulun.">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/adopt.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <!-- Logo -->
+                <div class="logo">
+                    <img src="assets/logo.png" alt="Patiler İçin Sevgi Logo" class="logo-img">
+                    <span class="logo-text">Patiler İçin Sevgi</span>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="nav" role="navigation">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link" data-tr="Anasayfa" data-en="Home">Anasayfa</a></li>
+                        <li><a href="hakkimizda.html" class="nav-link" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="adopt.html" class="nav-link active" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="makaleler.html" class="nav-link" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="iletisim.html" class="nav-link" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                    
+                    <!-- Language Toggle -->
+                    <div class="language-toggle">
+                        <button class="lang-btn active" data-lang="tr">TR</button>
+                        <button class="lang-btn" data-lang="en">EN</button>
+                    </div>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" aria-label="Toggle mobile menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="adopt-main">
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" data-tr="Anasayfa" data-en="Home">Anasayfa</a>
+                    <span class="separator">/</span>
+                    <span data-tr="Sahiplen" data-en="Adopt">Sahiplen</span>
+                </div>
+                
+                <h1 class="page-title" data-tr="Sahiplenmeye Hazır Dostlarımız" data-en="Our Friends Ready for Adoption">
+                    Sahiplenmeye Hazır Dostlarımız
+                </h1>
+                
+                <p class="page-description" data-tr="Sıcak yuvalarını bekleyen güzel dostlarımızı keşfedin. Filtreleme ve sıralama seçenekleri ile size en uygun arkadaşınızı bulabilirsiniz. Her hayvanın kendine özel bir hikayesi var ve onlar da sizin gibi sevgi dolu bir aile arıyorlar." data-en="Discover our beautiful friends waiting for their warm homes. You can find the most suitable companion for you with filtering and sorting options. Every animal has its own unique story and they are also looking for a loving family like you.">
+                    Sıcak yuvalarını bekleyen güzel dostlarımızı keşfedin. Filtreleme ve sıralama seçenekleri ile size en uygun arkadaşınızı bulabilirsiniz. Her hayvanın kendine özel bir hikayesi var ve onlar da sizin gibi sevgi dolu bir aile arıyorlar.
+                </p>
+
+                <!-- Results Summary -->
+                <div class="results-summary">
+                    <span class="result-count">
+                        <span id="total-pets">24</span> 
+                        <span data-tr="hayvan listeleniyor" data-en="animals listed">hayvan listeleniyor</span>
+                    </span>
+                    <span class="last-updated" data-tr="Son güncelleme: Bugün" data-en="Last updated: Today">
+                        Son güncelleme: Bugün
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Area -->
+        <section class="content-area">
+            <div class="container">
+                <div class="content-grid">
+                    <!-- Sidebar Filters -->
+                    <aside class="filters-sidebar">
+                        <div class="filters-container">
+                            <h3 class="filters-title" data-tr="Filtreler" data-en="Filters">Filtreler</h3>
+                            
+                            <!-- Animal Type Filter -->
+                            <div class="filter-group">
+                                <h4 class="filter-label" data-tr="Hayvan Türü" data-en="Animal Type">Hayvan Türü</h4>
+                                <div class="filter-options">
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="animalType" value="all" checked>
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Tümü" data-en="All">Tümü</span>
+                                        <span class="count">(24)</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="animalType" value="dog">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Köpek" data-en="Dog">Köpek</span>
+                                        <span class="count">(15)</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="animalType" value="cat">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Kedi" data-en="Cat">Kedi</span>
+                                        <span class="count">(8)</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="animalType" value="other">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Diğer" data-en="Other">Diğer</span>
+                                        <span class="count">(1)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Age Filter -->
+                            <div class="filter-group">
+                                <h4 class="filter-label" data-tr="Yaş" data-en="Age">Yaş</h4>
+                                <div class="filter-options">
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="age" value="young">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Genç (0-2 yaş)" data-en="Young (0-2 years)">Genç (0-2 yaş)</span>
+                                        <span class="count">(8)</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="age" value="adult">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Yetişkin (2-7 yaş)" data-en="Adult (2-7 years)">Yetişkin (2-7 yaş)</span>
+                                        <span class="count">(12)</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="age" value="senior">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Yaşlı (7+ yaş)" data-en="Senior (7+ years)">Yaşlı (7+ yaş)</span>
+                                        <span class="count">(4)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Size Filter -->
+                            <div class="filter-group">
+                                <h4 class="filter-label" data-tr="Boyut" data-en="Size">Boyut</h4>
+                                <div class="filter-options">
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="size" value="small">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Küçük" data-en="Small">Küçük</span>
+                                        <span class="count">(6)</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="size" value="medium">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Orta" data-en="Medium">Orta</span>
+                                        <span class="count">(10)</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="size" value="large">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Büyük" data-en="Large">Büyük</span>
+                                        <span class="count">(8)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Gender Filter -->
+                            <div class="filter-group">
+                                <h4 class="filter-label" data-tr="Cinsiyet" data-en="Gender">Cinsiyet</h4>
+                                <div class="filter-options">
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="gender" value="male">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Erkek" data-en="Male">Erkek</span>
+                                        <span class="count">(13)</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="gender" value="female">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Dişi" data-en="Female">Dişi</span>
+                                        <span class="count">(11)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Health Status Filter -->
+                            <div class="filter-group">
+                                <h4 class="filter-label" data-tr="Sağlık Durumu" data-en="Health Status">Sağlık Durumu</h4>
+                                <div class="filter-options">
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="health" value="vaccinated">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Aşılı" data-en="Vaccinated">Aşılı</span>
+                                        <span class="count">(20)</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="health" value="sterilized">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Kısırlaştırılmış" data-en="Sterilized">Kısırlaştırılmış</span>
+                                        <span class="count">(18)</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="checkbox" name="health" value="microchipped">
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Çipli" data-en="Microchipped">Çipli</span>
+                                        <span class="count">(16)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Clear Filters Button -->
+                            <button class="clear-filters-btn" data-tr="Filtreleri Temizle" data-en="Clear Filters">
+                                Filtreleri Temizle
+                            </button>
+                        </div>
+                    </aside>
+
+                    <!-- Main Content -->
+                    <div class="main-content">
+                        <!-- Sort Controls -->
+                        <div class="sort-controls">
+                            <div class="sort-options">
+                                <label for="sort-select" data-tr="Sırala:" data-en="Sort by:">Sırala:</label>
+                                <select id="sort-select" name="sortBy">
+                                    <option value="newest" data-tr="En Yeniler" data-en="Newest First">En Yeniler</option>
+                                    <option value="oldest" data-tr="En Eskiler" data-en="Oldest First">En Eskiler</option>
+                                    <option value="age-asc" data-tr="Yaş (Küçükten Büyüğe)" data-en="Age (Young to Old)">Yaş (Küçükten Büyüğe)</option>
+                                    <option value="age-desc" data-tr="Yaş (Büyükten Küçüğe)" data-en="Age (Old to Young)">Yaş (Büyükten Küçüğe)</option>
+                                    <option value="name-asc" data-tr="İsim (A-Z)" data-en="Name (A-Z)">İsim (A-Z)</option>
+                                    <option value="name-desc" data-tr="İsim (Z-A)" data-en="Name (Z-A)">İsim (Z-A)</option>
+                                </select>
+                            </div>
+
+                            <div class="view-options">
+                                <button class="view-btn active" data-view="grid" title="Izgara Görünümü" aria-label="Grid view">
+                                    <i class="fas fa-th"></i>
+                                </button>
+                                <button class="view-btn" data-view="list" title="Liste Görünümü" aria-label="List view">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Pet Grid -->
+                        <div id="pets-container" class="pets-container grid-view">
+                            <!-- Pet cards will be dynamically inserted here -->
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pagination">
+                            <button class="page-btn prev-btn" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                                <span data-tr="Önceki" data-en="Previous">Önceki</span>
+                            </button>
+                            
+                            <div class="page-numbers">
+                                <button class="page-btn page-number active" data-page="1">1</button>
+                                <button class="page-btn page-number" data-page="2">2</button>
+                                <button class="page-btn page-number" data-page="3">3</button>
+                            </div>
+                            
+                            <button class="page-btn next-btn">
+                                <span data-tr="Sonraki" data-en="Next">Sonraki</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section footer-brand">
+                    <div class="logo">
+                        <img src="assets/logo.png" alt="Patiler İçin Sevgi Logo" class="logo-img">
+                        <span class="logo-text">Patiler İçin Sevgi</span>
+                    </div>
+                    <p class="footer-description" data-tr="Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş." data-en="A volunteer organization working to ensure every animal finds a loving home.">
+                        Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Hızlı Bağlantılar" data-en="Quick Links">Hızlı Bağlantılar</h4>
+                    <ul class="footer-links">
+                        <li><a href="hakkimizda.html" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="adopt.html" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="makaleler.html" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="iletisim.html" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="İletişim" data-en="Contact">İletişim</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> info@patilericsevgi.org</p>
+                        <p><i class="fas fa-phone"></i> +90 (258) 123 45 67</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Denizli, Türkiye</p>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Yasal" data-en="Legal">Yasal</h4>
+                    <ul class="footer-links">
+                        <li><a href="gizlilik.html" data-tr="Gizlilik Sözleşmesi" data-en="Privacy Policy">Gizlilik Sözleşmesi</a></li>
+                        <li><a href="kullanim.html" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a></li>
+                        <li><a href="kvkk.html" data-tr="KVKK Aydınlatma Metni" data-en="KVKK Disclosure Text">KVKK Aydınlatma Metni</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p data-tr="© 2024 Patiler İçin Sevgi. Tüm hakları saklıdır." data-en="© 2024 Patiler İçin Sevgi. All rights reserved.">&copy; 2024 Patiler İçin Sevgi. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+    <script src="js/adopt.js"></script>
+</body>
+</html>
