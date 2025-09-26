@@ -1,71 +1,316 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>PatiYuva - Hayvan Sahiplendirme</title>
-<link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sokak hayvanları ve barınak hayvanları için sevgi dolu yuvalar buluyoruz. Bir canın hayatına dokunun.">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-<header class="site-header">
-<div class="container header-inner">
-<a class="brand" href="/">
-<img src="assets/logo.png" alt="PatiYuva Logo" id="logo">
-</a>
-<nav class="main-nav" aria-label="Ana navigasyon">
-<button id="langToggle" class="lang-toggle" aria-label="Dil değiştir">EN</button>
-<ul>
-<li><a href="#about" data-i18n="about">Hakkımızda</a></li>
-<li><a href="#adopt" data-i18n="adopt">Sahiplendir</a></li>
-<li><a href="#articles" data-i18n="articles">Makaleler</a></li>
-<li><a href="#contact" data-i18n="contact">İletişim</a></li>
-</ul>
-</nav>
-<button class="menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
-</div>
-</header>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <!-- Logo -->
+                <div class="logo">
+                    <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                    <span class="logo-text">Pati Gönüllüleri</span>
+                </div>
 
+                <!-- Navigation -->
+                <nav class="nav" role="navigation">
+                    <ul class="nav-list">
+                        <li><a href="#" class="nav-link active" data-tr="Anasayfa" data-en="Home">Anasayfa</a></li>
+                        <li><a href="hakkimizda.html" class="nav-link" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="sahiplen.html" class="nav-link" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="makaleler.html" class="nav-link" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="iletisim.html" class="nav-link" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                    
+                    <!-- Language Toggle -->
+                    <div class="language-toggle">
+                        <button class="lang-btn active" data-lang="tr">TR</button>
+                        <button class="lang-btn" data-lang="en">EN</button>
+                    </div>
+                </nav>
 
-<main>
-<!-- HERO -->
-<section class="hero" id="home">
-<img src="assets/hero.jpg" alt="Mutlu bir köpek" class="hero-img">
-<div class="hero-content container">
-<h1 data-i18n="slogan">Her patinin bir yuvası olmalı</h1>
-<p data-i18n="subSlogan">Sokakta ya da barınakta bekleyen dostlarımıza yeni bir hayat sunmak için buradayız.</p>
-<div class="hero-ctas">
-<a class="btn primary" href="#adopt" data-i18n="ctaAdopt">Sahiplen</a>
-<a class="btn" href="#signup" data-i18n="ctaSignup">Eşleşme listesine katıl</a>
-</div>
-</div>
-</section>
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" aria-label="Toggle mobile menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
 
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-background">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title" data-tr="Her Canın Sevgi Dolu Bir Yuva Hakkı Var" data-en="Every Life Deserves a Loving Home">
+                        Her Canın Sevgi Dolu Bir Yuva Hakkı Var
+                    </h1>
+                    <p class="hero-subtitle" data-tr="Sokak hayvanları ve barınak hayvanlarına yeni bir başlangıç vermenin zamanı geldi. Onların hikayesi sizinle devam etsin." data-en="It's time to give street animals and shelter animals a fresh start. Let their story continue with you.">
+                        Sokak hayvanları ve barınak hayvanlarına yeni bir başlangıç vermenin zamanı geldi. Onların hikayesi sizinle devam etsin.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="sahiplen.html" class="btn btn-primary" data-tr="Sahiplen" data-en="Adopt Now">Sahiplen</a>
+                        <a href="#adoptable-pets" class="btn btn-secondary" data-tr="Keşfet" data-en="Discover">Keşfet</a>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-<!-- READY TO ADOPT -->
-<section class="section container" id="adopt">
-<h2 data-i18n="readyToAdopt">Sahiplenilmeyi Bekleyenler</h2>
-<div class="cards" id="petGrid">
-<!-- Pet cards populated in JS or can be server rendered -->
-<article class="pet-card">
-<img src="assets/pet1.jpg" alt="Mırmır"/>
-<div class="card-body">
-<h3 class="pet-name">Mırmır</h3>
-<p class="pet-meta">Kedi • 2 yaş • Sakin</p>
-<p class="pet-desc">Sevecen, iç mekana uyumlu. Kısırlaştırılmış ve aşılı.</p>
-<div class="card-actions">
-<button class="btn ghost" data-action="view" data-pet="Mırmır" data-i18n="view">İncele</button>
-<button class="btn primary" data-action="adopt" data-pet="Mırmır" data-i18n="apply">Sahiplenmek istiyorum</button>
-</div>
-</div>
-</article>
+        <!-- Adoptable Pets Section -->
+        <section id="adoptable-pets" class="adoptable-pets">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title" data-tr="Sahiplenmeye Hazır" data-en="Ready for Adoption">Sahiplenmeye Hazır</h2>
+                    <p class="section-subtitle" data-tr="Bu güzel dostlarımız sıcak yuvalarını bekliyorlar" data-en="These beautiful friends are waiting for their warm homes">
+                        Bu güzel dostlarımız sıcak yuvalarını bekliyorlar
+                    </p>
+                </div>
 
+                <div class="pets-grid">
+                    <!-- Pet Card 1 -->
+                    <div class="pet-card">
+                        <div class="pet-image">
+                            <img src="https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Pamuk - Sevimli Golden Retriever">
+                            <div class="pet-badge">
+                                <span data-tr="Köpek" data-en="Dog">Köpek</span>
+                            </div>
+                        </div>
+                        <div class="pet-info">
+                            <h3 class="pet-name">Pamuk</h3>
+                            <p class="pet-description" data-tr="3 yaşında, oyuncu ve çok sevecen. Çocuklarla çok iyi anlaşıyor." data-en="3 years old, playful and very affectionate. Gets along great with children.">
+                                3 yaşında, oyuncu ve çok sevecen. Çocuklarla çok iyi anlaşıyor.
+                            </p>
+                            <div class="pet-details">
+                                <span class="pet-age" data-tr="3 Yaş" data-en="3 Years">3 Yaş</span>
+                                <span class="pet-size" data-tr="Büyük" data-en="Large">Büyük</span>
+                            </div>
+                            <a href="sahiplen.html?pet=pamuk" class="btn btn-outline" data-tr="Daha Fazla" data-en="Learn More">Daha Fazla</a>
+                        </div>
+                    </div>
 
-<article class="pet-card">
-<img src="assets/pet2.jpg" alt="Karabaş"/>
-<div class="card-body">
-<h3 class="pet-name">Karabaş</h3>
-<p class="pet-meta">Köpek • 1 yaş • Aktif</p>
-<p class="pet-desc">Oyuncu, eğitim alabilir. Aktif ailelere uygun.</p>
-<div class="card-actions">
-<button class="btn ghost" data-action="view" data-pet="Karabaş">İncele</button>
+                    <!-- Pet Card 2 -->
+                    <div class="pet-card">
+                        <div class="pet-image">
+                            <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Luna - Şirin Kedi">
+                            <div class="pet-badge">
+                                <span data-tr="Kedi" data-en="Cat">Kedi</span>
+                            </div>
+                        </div>
+                        <div class="pet-info">
+                            <h3 class="pet-name">Luna</h3>
+                            <p class="pet-description" data-tr="2 yaşında, sakin ve uysal. Kucakta sevgi almayı çok seviyor." data-en="2 years old, calm and gentle. Loves being cuddled and receiving affection.">
+                                2 yaşında, sakin ve uysal. Kucakta sevgi almayı çok seviyor.
+                            </p>
+                            <div class="pet-details">
+                                <span class="pet-age" data-tr="2 Yaş" data-en="2 Years">2 Yaş</span>
+                                <span class="pet-size" data-tr="Orta" data-en="Medium">Orta</span>
+                            </div>
+                            <a href="sahiplen.html?pet=luna" class="btn btn-outline" data-tr="Daha Fazla" data-en="Learn More">Daha Fazla</a>
+                        </div>
+                    </div>
+
+                    <!-- Pet Card 3 -->
+                    <div class="pet-card">
+                        <div class="pet-image">
+                            <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Karamel - Tatlı Kedi">
+                            <div class="pet-badge">
+                                <span data-tr="Kedi" data-en="Cat">Kedi</span>
+                            </div>
+                        </div>
+                        <div class="pet-info">
+                            <h3 class="pet-name">Karamel</h3>
+                            <p class="pet-description" data-tr="1 yaşında, enerjik ve meraklı. Yeni maceralara hazır küçük kaşif." data-en="1 year old, energetic and curious. A little explorer ready for new adventures.">
+                                1 yaşında, enerjik ve meraklı. Yeni maceralara hazır küçük kaşif.
+                            </p>
+                            <div class="pet-details">
+                                <span class="pet-age" data-tr="1 Yaş" data-en="1 Year">1 Yaş</span>
+                                <span class="pet-size" data-tr="Küçük" data-en="Small">Küçük</span>
+                            </div>
+                            <a href="sahiplen.html?pet=karamel" class="btn btn-outline" data-tr="Daha Fazla" data-en="Learn More">Daha Fazla</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-footer">
+                    <a href="sahiplen.html" class="btn btn-primary" data-tr="Tüm Hayvanları Gör" data-en="See All Animals">Tüm Hayvanları Gör</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <div class="features-grid">
+                    <!-- Newsletter Section -->
+                    <div class="feature-card newsletter-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3 data-tr="Size Uygun Dostları Keşfedin" data-en="Discover Perfect Companions for You">Size Uygun Dostları Keşfedin</h3>
+                        <p data-tr="Tercihlerinevöre en uygun hayvan arkadaşlarınızı bulmanızda yardımcı olalım." data-en="Let us help you find the most suitable animal friends according to your preferences.">
+                            Tercihlerinize göre en uygun hayvan arkadaşlarınızı bulmanızda yardımcı olalım.
+                        </p>
+                        
+                        <form class="newsletter-form" id="newsletter-form">
+                            <div class="form-group">
+                                <label for="email" data-tr="E-posta Adresiniz" data-en="Your Email Address">E-posta Adresiniz</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            
+                            <div class="preferences-grid">
+                                <div class="form-group">
+                                    <label for="animal-type" data-tr="Tercih Ettiğiniz Hayvan" data-en="Preferred Animal">Tercih Ettiğiniz Hayvan</label>
+                                    <select id="animal-type" name="animalType">
+                                        <option value="any" data-tr="Fark Etmez" data-en="No Preference">Fark Etmez</option>
+                                        <option value="cat" data-tr="Kedi" data-en="Cat">Kedi</option>
+                                        <option value="dog" data-tr="Köpek" data-en="Dog">Köpek</option>
+                                        <option value="other" data-tr="Diğer" data-en="Other">Diğer</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="size" data-tr="Tercih Ettiğiniz Boyut" data-en="Preferred Size">Tercih Ettiğiniz Boyut</label>
+                                    <select id="size" name="size">
+                                        <option value="any" data-tr="Fark Etmez" data-en="No Preference">Fark Etmez</option>
+                                        <option value="small" data-tr="Küçük" data-en="Small">Küçük</option>
+                                        <option value="medium" data-tr="Orta" data-en="Medium">Orta</option>
+                                        <option value="large" data-tr="Büyük" data-en="Large">Büyük</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="age" data-tr="Tercih Ettiğiniz Yaş" data-en="Preferred Age">Tercih Ettiğiniz Yaş</label>
+                                    <select id="age" name="age">
+                                        <option value="any" data-tr="Fark Etmez" data-en="No Preference">Fark Etmez</option>
+                                        <option value="young" data-tr="Genç (0-2 yaş)" data-en="Young (0-2 years)">Genç (0-2 yaş)</option>
+                                        <option value="adult" data-tr="Yetişkin (2-7 yaş)" data-en="Adult (2-7 years)">Yetişkin (2-7 yaş)</option>
+                                        <option value="senior" data-tr="Yaşlı (7+ yaş)" data-en="Senior (7+ years)">Yaşlı (7+ yaş)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" data-tr="Bildirimlerimi Başlat" data-en="Start My Notifications">Bildirimlerimi Başlat</button>
+                        </form>
+                    </div>
+
+                    <!-- Mission Section -->
+                    <div class="feature-card mission-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-paw"></i>
+                        </div>
+                        <h3 data-tr="Misyonumuz" data-en="Our Mission">Misyonumuz</h3>
+                        <p data-tr="Sokakta yaşam mücadelesi veren her canın sıcak bir yuva bulması için çalışıyoruz. Her hayvan sevgi, bakım ve güvenlik hakkına sahiptir. Onları bekleyen ailelerle buluşturmak ve farkındalık yaratmak bizim en büyük amacımız." data-en="We work to ensure that every soul struggling to survive on the streets finds a warm home. Every animal has the right to love, care and safety. Our greatest goal is to bring them together with the families waiting for them and to create awareness.">
+                            Sokakta yaşam mücadelesi veren her canın sıcak bir yuva bulması için çalışıyoruz. Her hayvan sevgi, bakım ve güvenlik hakkına sahiptir. Onları bekleyen ailelerle buluşturmak ve farkındalık yaratmak bizim en büyük amacımız.
+                        </p>
+                        <div class="mission-stats">
+                            <div class="stat">
+                                <span class="stat-number">250+</span>
+                                <span class="stat-label" data-tr="Sahiplendirme" data-en="Adoptions">Sahiplendirme</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number">500+</span>
+                                <span class="stat-label" data-tr="Kurtarılan Hayvan" data-en="Rescued Animals">Kurtarılan Hayvan</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Articles Section -->
+                    <div class="feature-card articles-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h3 data-tr="Güncel Makaleler" data-en="Latest Articles">Güncel Makaleler</h3>
+                        <div class="article-preview">
+                            <article class="mini-article">
+                                <h4 data-tr="Yeni Sahiplenilen Kediler İçin İlk Hafta Rehberi" data-en="First Week Guide for Newly Adopted Cats">Yeni Sahiplenilen Kediler İçin İlk Hafta Rehberi</h4>
+                                <p data-tr="Yeni evine gelen kediler için adaptasyon süreci..." data-en="The adaptation process for cats coming to their new home...">Yeni evine gelen kediler için adaptasyon süreci...</p>
+                            </article>
+                            <article class="mini-article">
+                                <h4 data-tr="Sokak Hayvanlarına Nasıl Yardım Edebiliriz?" data-en="How Can We Help Street Animals?">Sokak Hayvanlarına Nasıl Yardım Edebiliriz?</h4>
+                                <p data-tr="Basit adımlarla hayvan dostlarımızın hayatlarını kolaylaştırabiliriz..." data-en="We can make life easier for our animal friends with simple steps...">Basit adımlarla hayvan dostlarımızın hayatlarını kolaylaştırabiliriz...</p>
+                            </article>
+                        </div>
+                        <a href="makaleler.html" class="btn btn-outline" data-tr="Tüm Makaleleri Oku" data-en="Read All Articles">Tüm Makaleleri Oku</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section footer-brand">
+                    <div class="logo">
+                        <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                    </div>
+                    <p class="footer-description" data-tr="Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş." data-en="A volunteer organization working to ensure every animal finds a loving home.">
+                        Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Hızlı Bağlantılar" data-en="Quick Links">Hızlı Bağlantılar</h4>
+                    <ul class="footer-links">
+                        <li><a href="hakkimizda.html" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="sahiplen.html" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="makaleler.html" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="iletisim.html" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="İletişim" data-en="Contact">İletişim</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> iletisim@patigonulluleri.com</p>
+                        <p><i class="fas fa-phone"></i> +90 (258) 123 45 67</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Denizli, Türkiye</p>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Yasal" data-en="Legal">Yasal</h4>
+                    <ul class="footer-links">
+                        <li><a href="gizlilik.html" data-tr="Gizlilik Sözleşmesi" data-en="Privacy Policy">Gizlilik Sözleşmesi</a></li>
+                        <li><a href="kullanim.html" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a></li>
+                        <li><a href="kvkk.html" data-tr="KVKK Aydınlatma Metni" data-en="KVKK Disclosure Text">KVKK Aydınlatma Metni</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p data-tr="© 2025 Pati Gönüllüleri. Tüm hakları saklıdır." data-en="© 2025 Pati Volunteers. All rights reserved.">&copy; 2025 Pati Gönüllüleri. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+</body>
 </html>
