@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pamuk - Sahiplendirme İlanı - Pati Gönüllüleri</title>
+    <meta name="description" content="Pamuk adlı Golden Retriever köpeğimizi sahiplenmek için detaylı bilgiler, fotoğraflar ve iletişim bilgileri.">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/adopt.css"> <!-- Added this line to import pet card styles -->
+    <link rel="stylesheet" href="css/pet-detail.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <!-- Logo -->
+                <div class="logo">
+                    <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                    <span class="logo-text">Pati Gönüllüleri</span>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="nav" role="navigation">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link" data-tr="Anasayfa" data-en="Home">Anasayfa</a></li>
+                        <li><a href="hakkimizda.html" class="nav-link" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="adopt.html" class="nav-link" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="makaleler.html" class="nav-link" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="iletisim.html" class="nav-link" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                    
+                    <!-- Language Toggle -->
+                    <div class="language-toggle">
+                        <button class="lang-btn active" data-lang="tr">TR</button>
+                        <button class="lang-btn" data-lang="en">EN</button>
+                    </div>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" aria-label="Toggle mobile menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pet-detail-main">
+        <!-- Breadcrumb -->
+        <section class="breadcrumb-section">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" data-tr="Anasayfa" data-en="Home">Anasayfa</a>
+                    <span class="separator">/</span>
+                    <a href="adopt.html" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a>
+                    <span class="separator">/</span>
+                    <span id="pet-name-breadcrumb">Pamuk</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pet Detail Content -->
+        <section class="pet-detail-content">
+            <div class="container">
+                <div class="detail-grid">
+                    <!-- Left Column - Images and Pet Information -->
+                    <div class="images-and-info">
+                        <!-- Images Section -->
+                        <div class="images-section">
+                            <div class="main-image-container">
+                                <img id="main-image" src="https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Pamuk" class="main-image">
+                                <div class="image-navigation">
+                                    <button class="nav-btn prev-btn" id="prev-image">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button class="nav-btn next-btn" id="next-image">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <div class="image-counter">
+                                    <span id="current-image-num">1</span> / <span id="total-images">4</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Image Thumbnails -->
+                            <div class="thumbnails-container" id="thumbnails-container">
+                                <!-- Thumbnails will be loaded dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Pet Information -->
+                        <div class="pet-info-section">
+                            <div class="pet-header">
+                                <div class="pet-title-area">
+                                    <h1 id="pet-name" class="pet-title"></h1>
+                                    <div class="pet-badges">
+                                        <span id="urgent-badge" class="urgent-badge hidden" data-tr="ACİL SAHİPLENDİRME" data-en="URGENT ADOPTION">ACİL SAHİPLENDİRME</span>
+                                        <span id="pet-type-badge" class="type-badge" data-tr="Köpek" data-en="Dog">Köpek</span>
+                                    </div>
+                                </div>
+                                <div class="pet-actions">
+                                    <button class="action-btn share-btn" title="Paylaş" aria-label="Share">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Pet Quick Info -->
+                            <div class="quick-info-grid">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-paw"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-tr="Cins" data-en="Breed">Cins</span>
+                                        <span id="pet-breed" class="info-value"></span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-birthday-cake"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-tr="Yaş" data-en="Age">Yaş</span>
+                                        <span id="pet-age" class="info-value"></span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-ruler-vertical"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-tr="Boyut" data-en="Size">Boyut</span>
+                                        <span id="pet-size" class="info-value"></span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-venus-mars"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-tr="Cinsiyet" data-en="Gender">Cinsiyet</span>
+                                        <span id="pet-gender" class="info-value"></span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-tr="Konum" data-en="Location">Konum</span>
+                                        <span id="pet-location" class="info-value"></span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label" data-tr="İlan Tarihi" data-en="Listed Date">İlan Tarihi</span>
+                                        <span id="pet-date" class="info-value"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Health Information -->
+                            <div class="health-section">
+                                <h3 class="section-title" data-tr="Sağlık Bilgileri" data-en="Health Information">Sağlık Bilgileri</h3>
+                                <div id="health-tags" class="health-tags">
+                                    <!-- Health tags will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="description-section">
+                                <h3 class="section-title" data-tr="Açıklama" data-en="Description">Açıklama</h3>
+                                <div id="pet-description" class="description-content">
+                                    <!-- Description will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Special Needs / Notes -->
+                            <div class="special-notes-section">
+                                <h3 class="section-title" data-tr="Özel Notlar" data-en="Special Notes">Özel Notlar</h3>
+                                <div class="notes-content" id="special-notes-container">
+                                    <!-- Special notes will be loaded dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Contact & Owner Info -->
+                    <div class="contact-section">
+                        <div class="contact-card">
+                            <div class="contact-header">
+                                <h3 data-tr="İletişim" data-en="Contact">İletişim</h3>
+                                <div class="trust-indicators">
+                                    <span class="trust-badge verified">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span data-tr="Doğrulanmış" data-en="Verified">Doğrulanmış</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Current Caretaker Info -->
+                            <div class="caretaker-info">
+                                <div class="caretaker-avatar">
+                                    <img src="" alt="" class="avatar-img">
+                                    <div class="online-status"></div>
+                                </div>
+                                <div class="caretaker-details">
+                                    <h4 class="caretaker-name"></h4>
+                                    <div class="caretaker-role" data-tr="Geçici Bakıcı" data-en="Foster Caretaker"></div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Methods -->
+                            <div class="contact-methods">
+                                <button class="contact-btn primary" id="call-btn">
+                                    <i class="fas fa-phone"></i>
+                                    <span data-tr="Ara" data-en="Call">Ara</span>
+                                    <small data-tr="Hemen görüş" data-en="Talk now">Hemen görüş</small>
+                                </button>
+                                
+                                <button class="contact-btn secondary" id="whatsapp-btn">
+                                    <i class="fab fa-whatsapp"></i>
+                                    <span>WhatsApp</span>
+                                    <small data-tr="Mesaj gönder" data-en="Send message">Mesaj gönder</small>
+                                </button>
+                                
+                                <button class="contact-btn secondary" id="message-btn">
+                                    <i class="fas fa-envelope"></i>
+                                    <span data-tr="E-Posta" data-en="EMail">E-Posta</span>
+                                    <small data-tr="E-Posta gönder" data-en="Send Email">E-Posta gönder</small>
+                                </button>
+                            </div>
+
+                            <!-- Phone Number (Initially Hidden) -->
+                            <div id="phone-number" class="phone-number hidden">
+                                <div class="phone-display">
+                                    <i class="fas fa-phone"></i>
+                                    <span class="phone-text"></span>
+                                    <button class="copy-btn" title="Kopyala">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <small class="phone-note" data-tr="09:00 - 21:00 saatleri arasında arayabilirsiniz" data-en="You can call between 09:00 - 21:00">
+                                    09:00 - 21:00 saatleri arasında arayabilirsiniz
+                                </small>
+                            </div>
+
+                            <!-- Safety Notice -->
+                            <div class="safety-notice">
+                                <div class="notice-header">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span data-tr="Güvenlik Uyarısı" data-en="Safety Notice">Güvenlik Uyarısı</span>
+                                </div>
+                                <ul class="safety-tips">
+                                    <li data-tr="Hayvanların para karşılığı satılması yasaktır" data-en="The sale of animals for money is prohibited">Hayvanların para karşılığı satılması yasaktır</li>
+                                    <li data-tr="İlk görüşmeyi güvenli bir yerde yapın" data-en="Have the first meeting in a safe place">İlk görüşmeyi güvenli bir yerde yapın</li>
+                                    <li data-tr="Şüpheli durumları bize bildirin" data-en="Report suspicious situations to us">Şüpheli durumları bize bildirin</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Application Form -->
+                        <div class="application-card">
+                            <h3 class="card-title" data-tr="Sahiplenme Başvurusu" data-en="Adoption Application">Sahiplenme Başvurusu</h3>
+                            <p class="card-subtitle" data-tr="Hızlı başvuru formu ile ilgilendiğinizi belirtin" data-en="Express your interest with a quick application form">
+                                Hızlı başvuru formu ile ilgilendiğinizi belirtin
+                            </p>
+                            
+                            <form class="application-form" id="adoption-application-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="applicant-name" data-tr="Adınız Soyadınız" data-en="Your Name">Adınız Soyadınız</label>
+                                        <input type="text" id="applicant-name" name="name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="applicant-phone" data-tr="Telefon" data-en="Phone">Telefon</label>
+                                        <input type="tel" id="applicant-phone" name="phone" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="applicant-email" data-tr="E-posta" data-en="Email">E-posta</label>
+                                    <input type="email" id="applicant-email" name="email" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="living-situation" data-tr="Yaşam Durumunuz" data-en="Living Situation">Yaşam Durumunuz</label>
+                                    <select id="living-situation" name="livingSituation" required>
+                                        <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
+                                        <option value="apartment" data-tr="Apartman dairesi" data-en="Apartment">Apartman dairesi</option>
+                                        <option value="house-with-garden" data-tr="Bahçeli ev" data-en="House with garden">Bahçeli ev</option>
+                                        <option value="house-no-garden" data-tr="Bahçesiz ev" data-en="House without garden">Bahçesiz ev</option>
+                                        <option value="farm" data-tr="Çiftlik/Köy evi" data-en="Farm/Village house">Çiftlik/Köy evi</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="experience" data-tr="Hayvan Bakım Deneyiminiz" data-en="Animal Care Experience">Hayvan Bakım Deneyiminiz</label>
+                                    <select id="experience" name="experience" required>
+                                        <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
+                                        <option value="first-time" data-tr="İlk defa hayvan sahipleneceğim" data-en="First time adopting">İlk defa hayvan sahipleneceğim</option>
+                                        <option value="some-experience" data-tr="Daha önce hayvan besledim" data-en="I've had pets before">Daha önce hayvan besledim</option>
+                                        <option value="experienced" data-tr="Çok deneyimliyim" data-en="Very experienced">Çok deneyimliyim</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="additional-notes" data-tr="Ek Notlar" data-en="Additional Notes">Ek Notlar</label>
+                                    <textarea id="additional-notes" name="notes" rows="3" placeholder="Kendiniz ve yaşam durumunuz hakkında kısa bilgi verin..."></textarea>
+                                </div>
+                                
+                                <div class="form-group checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="agreement" name="agreement" required>
+                                        <span class="checkmark"></span>
+                                        <span data-tr="Sahiplendirme koşullarını kabul ediyorum" data-en="I accept the adoption conditions">Sahiplendirme koşullarını kabul ediyorum</span>
+                                    </label>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span data-tr="Başvuru Gönder" data-en="Send Application">Başvuru Gönder</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Similar Pets Section -->
+        <section class="similar-pets-section">
+            <div class="container">
+                <h2 class="section-title" data-tr="Benzer Dostlarımız" data-en="Similar Friends">Benzer Dostlarımız</h2>
+                <div class="similar-pets-grid" id="similar-pets-container">
+                    <!-- Similar pets will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Message Modal -->
+    <div id="message-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-tr="Mesaj Gönder" data-en="Send Message">Mesaj Gönder</h3>
+                <button class="close-modal" id="close-message-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="message-form" class="message-form">
+                    <div class="form-group">
+                        <label for="message-name" data-tr="Adınız" data-en="Your Name">Adınız</label>
+                        <input type="text" id="message-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message-phone" data-tr="Telefon (İsteğe bağlı)" data-en="Phone (Optional)">Telefon (İsteğe bağlı)</label>
+                        <input type="tel" id="message-phone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="message-email" data-tr="E-posta" data-en="Email">E-posta</label>
+                        <input type="email" id="message-email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message-text" data-tr="Mesajınız" data-en="Your Message">Mesajınız</label>
+                        <textarea id="message-text" name="message" rows="4" required placeholder="Merhaba, Pamuk hakkında daha fazla bilgi alabilir miyim?"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i>
+                        <span data-tr="Mesajı Gönder" data-en="Send Message">Mesajı Gönder</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section footer-brand">
+                    <div class="logo">
+                        <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                        <span class="logo-text">Pati Gönüllüleri</span>
+                    </div>
+                    <p class="footer-description" data-tr="Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş." data-en="A volunteer organization working to ensure every animal finds a loving home.">
+                        Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Hızlı Bağlantılar" data-en="Quick Links">Hızlı Bağlantılar</h4>
+                    <ul class="footer-links">
+                        <li><a href="hakkimizda.html" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="adopt.html" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="makaleler.html" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="iletisim.html" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="İletişim" data-en="Contact">İletişim</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> info@patilericsevgi.org</p>
+                        <p><i class="fas fa-phone"></i> +90 (258) 123 45 67</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Denizli, Türkiye</p>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Yasal" data-en="Legal">Yasal</h4>
+                    <ul class="footer-links">
+                        <li><a href="gizlilik.html" data-tr="Gizlilik Sözleşmesi" data-en="Privacy Policy">Gizlilik Sözleşmesi</a></li>
+                        <li><a href="kullanim.html" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a></li>
+                        <li><a href="kvkk.html" data-tr="KVKK Aydınlatma Metni" data-en="KVKK Disclosure Text">KVKK Aydınlatma Metni</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p data-tr="© 2024 Pati Gönüllüleri. Tüm hakları saklıdır." data-en="© 2024 Pati Gönüllüleri. All rights reserved.">&copy; 2024 Pati Gönüllüleri. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/pets-data.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/pet-detail.js"></script>
+</body>
+</html>
+

@@ -4,141 +4,6 @@
  */
 
 // ===================
-// MOCK DATA
-// ===================
-
-const mockPetsData = [
-    {
-        id: 1,
-        name: "Pamuk",
-        type: "dog",
-        breed: "Golden Retriever",
-        age: 3,
-        ageGroup: "adult",
-        size: "large",
-        gender: "male",
-        description: "3 yaşında, oyuncu ve çok sevecen. Çocuklarla çok iyi anlaşıyor ve bahçeli evlerde mutlu olur.",
-        image: "https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-        health: ["vaccinated", "sterilized", "microchipped"],
-        urgent: false,
-        dateAdded: "2024-01-15",
-        location: "Denizli"
-    },
-    {
-        id: 2,
-        name: "Luna",
-        type: "cat",
-        breed: "Tekir",
-        age: 2,
-        ageGroup: "adult",
-        size: "medium",
-        gender: "female",
-        description: "2 yaşında, sakin ve uysal. Kucakta sevgi almayı çok seviyor, apartman dairesine uygun.",
-        image: "https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-        health: ["vaccinated", "sterilized"],
-        urgent: false,
-        dateAdded: "2024-01-20",
-        location: "Denizli"
-    },
-    {
-        id: 3,
-        name: "Karamel",
-        type: "cat",
-        breed: "Sarman",
-        age: 1,
-        ageGroup: "young",
-        size: "small",
-        gender: "female",
-        description: "1 yaşında, enerjik ve meraklı. Yeni maceralara hazır küçük kaşif, genç sahipler için ideal.",
-        image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-        health: ["vaccinated"],
-        urgent: true,
-        dateAdded: "2024-02-01",
-        location: "Denizli"
-    },
-    {
-        id: 4,
-        name: "Max",
-        type: "dog",
-        breed: "Kangal Karması",
-        age: 5,
-        ageGroup: "adult",
-        size: "large",
-        gender: "male",
-        description: "5 yaşında, sadık ve koruyucu. Ailesine çok bağlı, bahçeli evler için uygun.",
-        image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-        health: ["vaccinated", "sterilized", "microchipped"],
-        urgent: false,
-        dateAdded: "2024-01-10",
-        location: "Denizli"
-    },
-    {
-        id: 5,
-        name: "Minnak",
-        type: "cat",
-        breed: "Van Kedisi",
-        age: 4,
-        ageGroup: "adult",
-        size: "medium",
-        gender: "female",
-        description: "4 yaşında, zarif ve sevecen. Sessiz ortamları seviyor, sakin aileler için uygun.",
-        image: "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-        health: ["vaccinated", "sterilized"],
-        urgent: false,
-        dateAdded: "2024-01-25",
-        location: "Denizli"
-    },
-    {
-        id: 6,
-        name: "Rocky",
-        type: "dog",
-        breed: "Pitbull Karması",
-        age: 6,
-        ageGroup: "adult",
-        size: "medium",
-        gender: "male",
-        description: "6 yaşında, güçlü ve sadık. Deneyimli köpek sahipleri için uygun, çok sevecen.",
-        image: "https://images.unsplash.com/photo-1583512603805-3cc6b41f3edb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-        health: ["vaccinated", "sterilized", "microchipped"],
-        urgent: false,
-        dateAdded: "2024-02-05",
-        location: "Denizli"
-    },
-    {
-        id: 7,
-        name: "Pıtır",
-        type: "cat",
-        breed: "Siyah Kedi",
-        age: 8,
-        ageGroup: "senior",
-        size: "small",
-        gender: "male",
-        description: "8 yaşında, yaşlı ama hala oyuncu. Sakin bir yuva arıyor, çok akıllı ve uysal.",
-        image: "https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-        health: ["vaccinated"],
-        urgent: true,
-        dateAdded: "2024-01-30",
-        location: "Denizli"
-    },
-    {
-        id: 8,
-        name: "Bella",
-        type: "dog",
-        breed: "Labrador Karması",
-        age: 2,
-        ageGroup: "adult",
-        size: "medium",
-        gender: "female",
-        description: "2 yaşında, çok enerjik ve oyuncu. Çocukları seviyor, aktif aileler için perfect.",
-        image: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-        health: ["vaccinated", "sterilized"],
-        urgent: false,
-        dateAdded: "2024-02-10",
-        location: "Denizli"
-    }
-];
-
-// ===================
 // GLOBAL VARIABLES
 // ===================
 
@@ -154,7 +19,7 @@ let currentSort = 'newest';
 let currentView = 'grid';
 let currentPage = 1;
 const itemsPerPage = 6;
-let filteredPets = [...mockPetsData];
+let filteredPets = [];
 
 // ===================
 // INITIALIZATION
@@ -164,10 +29,30 @@ document.addEventListener('DOMContentLoaded', () => {
     initAdoptPage();
 });
 
+document.getElementById('pets-container').addEventListener('click', (e) => {
+    const petCard = e.target.closest('.adopt-pet-card');
+    if (petCard) {
+        const petId = petCard.dataset.petId;
+        if (petId) {
+            window.location.href = `pet-detail.html?id=${petId}`;
+        }
+    }
+});
+
 function initAdoptPage() {
     console.log('🐾 Initializing Adopt Page');
     
+    // Check if PETS_DATA is available
+    if (typeof PETS_DATA === 'undefined') {
+        console.error('PETS_DATA not found. Make sure pets-data.js is loaded.');
+        return;
+    }
+    
+    // Initialize with centralized data
+    filteredPets = [...PETS_DATA];
+    
     // Initialize components
+    updateFilterCounts(); // Update counts first
     initFilters();
     initSorting();
     initViewToggle();
@@ -179,6 +64,80 @@ function initAdoptPage() {
     updateResultCount();
     
     console.log('✅ Adopt Page Initialized');
+}
+
+// ===================
+// FILTER COUNTS CALCULATION
+// ===================
+
+function updateFilterCounts() {
+    const filterCounts = calculateFilterCounts();
+    
+    // Update animal type counts
+    updateFilterCountDisplay('animalType', 'all', PETS_DATA.length);
+    updateFilterCountDisplay('animalType', 'dog', filterCounts.animalType.dog || 0);
+    updateFilterCountDisplay('animalType', 'cat', filterCounts.animalType.cat || 0);
+    updateFilterCountDisplay('animalType', 'other', filterCounts.animalType.other || 0);
+    
+    // Update age counts
+    updateFilterCountDisplay('age', 'young', filterCounts.age.young || 0);
+    updateFilterCountDisplay('age', 'adult', filterCounts.age.adult || 0);
+    updateFilterCountDisplay('age', 'senior', filterCounts.age.senior || 0);
+    
+    // Update size counts
+    updateFilterCountDisplay('size', 'small', filterCounts.size.small || 0);
+    updateFilterCountDisplay('size', 'medium', filterCounts.size.medium || 0);
+    updateFilterCountDisplay('size', 'large', filterCounts.size.large || 0);
+    
+    // Update gender counts
+    updateFilterCountDisplay('gender', 'male', filterCounts.gender.male || 0);
+    updateFilterCountDisplay('gender', 'female', filterCounts.gender.female || 0);
+    
+    // Update health counts
+    updateFilterCountDisplay('health', 'vaccinated', filterCounts.health.vaccinated || 0);
+    updateFilterCountDisplay('health', 'sterilized', filterCounts.health.sterilized || 0);
+    updateFilterCountDisplay('health', 'microchipped', filterCounts.health.microchipped || 0);
+}
+
+function calculateFilterCounts() {
+    const counts = {
+        animalType: {},
+        age: {},
+        size: {},
+        gender: {},
+        health: {}
+    };
+    
+    PETS_DATA.forEach(pet => {
+        // Count animal types
+        counts.animalType[pet.type] = (counts.animalType[pet.type] || 0) + 1;
+        
+        // Count age groups
+        counts.age[pet.ageGroup] = (counts.age[pet.ageGroup] || 0) + 1;
+        
+        // Count sizes
+        counts.size[pet.size] = (counts.size[pet.size] || 0) + 1;
+        
+        // Count genders
+        counts.gender[pet.gender] = (counts.gender[pet.gender] || 0) + 1;
+        
+        // Count health attributes
+        pet.health.forEach(healthAttr => {
+            counts.health[healthAttr] = (counts.health[healthAttr] || 0) + 1;
+        });
+    });
+    
+    return counts;
+}
+
+function updateFilterCountDisplay(filterType, filterValue, count) {
+    const filterOption = document.querySelector(`input[name="${filterType}"][value="${filterValue}"]`);
+    if (filterOption) {
+        const countSpan = filterOption.parentElement.querySelector('.count');
+        if (countSpan) {
+            countSpan.textContent = `(${count})`;
+        }
+    }
 }
 
 // ===================
@@ -279,7 +238,7 @@ function clearAllFilters() {
 
 function applyFiltersAndSort() {
     // Start with all pets
-    filteredPets = [...mockPetsData];
+    filteredPets = [...PETS_DATA];
     
     // Apply filters
     filteredPets = filteredPets.filter(pet => {
@@ -321,6 +280,35 @@ function applyFiltersAndSort() {
     
     // Render pets
     renderPets();
+}
+
+function loadSimilarPets() {
+    if (!currentPet) return;
+    
+    // Find similar pets (same type, excluding current pet)
+    const similarPets = PETS_DATA.filter(pet => 
+        pet.id !== currentPet.id && 
+        pet.type === currentPet.type
+    ).slice(0, 3); // Show max 3 similar pets
+    
+    const container = document.getElementById('similar-pets-container');
+    if (!container) return;
+    
+    if (similarPets.length === 0) {
+        container.innerHTML = '<p>Benzer hayvan bulunamadı.</p>';
+        return;
+    }
+    
+    container.innerHTML = similarPets.map(pet => createSimilarPetCard(pet)).join('');
+    
+    // Add click handlers
+    const petCards = container.querySelectorAll('.similar-pet-card');
+    petCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const petId = card.dataset.petId;
+            window.location.href = `pet-detail.html?id=${petId}`;
+        });
+    });
 }
 
 function applySorting() {
@@ -659,6 +647,7 @@ function initPagination() {
     });
 }
 
+// Update pagination function to use the new renderer
 function updatePagination() {
     const totalPages = Math.ceil(filteredPets.length / itemsPerPage);
     const prevBtn = document.querySelector('.prev-btn');
@@ -718,7 +707,7 @@ function updatePagination() {
                 const page = parseInt(e.target.dataset.page);
                 if (page !== currentPage) {
                     currentPage = page;
-                    renderPets();
+                    renderPets(); // Use the new function
                     // Scroll to top of results
                     document.querySelector('.main-content').scrollIntoView({ 
                         behavior: 'smooth', 
@@ -728,6 +717,36 @@ function updatePagination() {
             });
         });
     }
+}
+
+// Update the view change handler
+function handleViewChange(event) {
+    const button = event.currentTarget;
+    const view = button.dataset.view;
+    
+    if (view !== currentView) {
+        currentView = view;
+        
+        // Update button states
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        button.classList.add('active');
+        
+        // Update container class
+        const container = document.getElementById('pets-container');
+        container.className = `pets-container ${view}-view`;
+        
+        // Re-render pets with new view and event listeners
+        renderPets();
+    }
+}
+
+// Update sort change handler
+function handleSortChange(event) {
+    currentSort = event.target.value;
+    applyFiltersAndSort(); // This will call renderPets
+    resetPagination();
 }
 
 function resetPagination() {
