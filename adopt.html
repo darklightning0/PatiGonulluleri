@@ -85,28 +85,6 @@
                 </div>
             </div>
         </section>
-        <section class="mobile-controls-bar" id="mobile-controls-bar">
-            <button class="filter-btn" id="mobile-filter-btn">
-                <i class="fas fa-filter"></i>
-                <span data-tr="Filtreler" data-en="Filters">Filtreler</span>
-            </button>
-            <select id="mobile-sort-select" name="sortBy">
-                <option value="newest" data-tr="En Yeniler" data-en="Newest First">En Yeniler</option>
-                <option value="oldest" data-tr="En Eskiler" data-en="Oldest First">En Eskiler</option>
-                <option value="age-asc" data-tr="Yaş (Küçükten Büyüğe)" data-en="Age (Young to Old)">Yaş (Küçükten Büyüğe)</option>
-                <option value="age-desc" data-tr="Yaş (Büyükten Küçüğe)" data-en="Age (Old to Young)">Yaş (Büyükten Küçüğe)</option>
-                <option value="name-asc" data-tr="İsim (A-Z)" data-en="Name (A-Z)">İsim (A-Z)</option>
-                <option value="name-desc" data-tr="İsim (Z-A)" data-en="Name (Z-A)">İsim (Z-A)</option>
-            </select>
-            <div class="view-options">
-                <button class="view-btn active" data-view="grid" title="Izgara Görünümü" aria-label="Grid view">
-                    <i class="fas fa-th"></i>
-                </button>
-                <button class="view-btn" data-view="list" title="Liste Görünümü" aria-label="List view">
-                    <i class="fas fa-list"></i>
-                </button>
-            </div>
-        </section>
 
         <!-- Content Area -->
         <section class="content-area">
@@ -358,26 +336,6 @@
             </div>
         </div>
     </footer>
-
-    <div id="mobile-filter-modal" class="filter-modal">
-    <div class="modal-header">
-        <span data-tr="Filtreler" data-en="Filters">Filtreler</span>
-        <button class="close-btn" id="close-filter-modal">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    <div class="modal-content">
-        <!-- Clone the filters-container content here via JS -->
-    </div>
-    <div class="modal-footer">
-        <button class="clear-btn" id="mobile-clear-filters">
-            <span data-tr="Temizle" data-en="Clear All">Temizle</span>
-        </button>
-        <button class="apply-btn" id="apply-mobile-filters">
-            <span id="mobile-filter-count">Sonuçları Göster (0)</span>
-        </button>
-    </div>
-</div>
 
     <!-- JavaScript -->
     <script src="js/pets-data.js"></script>
