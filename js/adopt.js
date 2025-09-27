@@ -26,8 +26,79 @@ let filteredPets = [];
 // ===================
 
 document.addEventListener('DOMContentLoaded', () => {
+
     initAdoptPage();
+    // Mobile controls bar logic
+    if (window.innerWidth <= 768) {
+        // Hide desktop sort-controls, show mobile bar
+        document.querySelector('.sort-controls').style.display = 'none';
+        document.getElementById('mobile-controls-bar').style.display = 'flex';
+        
+        // Mobile filter button opens modal (see below)
+        document.getElementById('mobile-filter-btn').addEventListener('click', function() {
+            document.getElementById('mobile-filter-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Mobile sort select mirrors desktop
+        document.getElementById('mobile-sort-select').addEventListener('change', function(e) {
+            document.getElementById('sort-select').value = e.target.value;
+            document.getElementById('sort-select').dispatchEvent(new Event('change'));
+        });
+
+        // View toggle mirrors desktop
+        document.querySelectorAll('.mobile-controls-bar .view-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                handleViewChange(e);
+            });
+        });
+    }
 });
+
+document.getElementById('close-filter-modal').addEventListener('click', () => {
+    document.getElementById('mobile-filter-modal').classList.remove('open');
+    document.body.style.overflow = '';
+});
+document.getElementById('apply-mobile-filters').addEventListener('click', () => {
+    // Apply filters: sync modal checkboxes with sidebar
+    syncMobileFiltersToSidebar();
+    document.getElementById('mobile-filter-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    applyFiltersAndSort();
+    updateResultCount();
+});
+document.getElementById('mobile-clear-filters').addEventListener('click', () => {
+    clearAllFilters();
+    updateMobileFilterCount();
+});
+
+// Clone filters to modal
+function cloneFiltersToModal() {
+    const sidebar = document.querySelector('.filters-container');
+    const modalContent = document.querySelector('.filter-modal .modal-content');
+    modalContent.innerHTML = sidebar.innerHTML;
+    // Add event listeners for filter checkboxes in modal
+    modalContent.querySelectorAll('.filter-option input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', updateMobileFilterCount);
+    });
+}
+document.getElementById('mobile-filter-btn').addEventListener('click', cloneFiltersToModal);
+
+function updateMobileFilterCount() {
+    // Count pets matching modal filters (simulate logic)
+    // Use currentFilters logic or duplicate it for modal
+    let count = filteredPets.length;
+    document.getElementById('mobile-filter-count').textContent = `Sonuçları Göster (${count})`;
+}
+
+function syncMobileFiltersToSidebar() {
+    // Copy checked status from modal checkboxes to sidebar checkboxes
+    const modalChecks = document.querySelectorAll('.filter-modal .filter-option input[type="checkbox"]');
+    modalChecks.forEach(cb => {
+        let sidebarCb = document.querySelector(`.filters-container input[name="${cb.name}"][value="${cb.value}"]`);
+        if (sidebarCb) sidebarCb.checked = cb.checked;
+    });
+}
 
 document.getElementById('pets-container').addEventListener('click', (e) => {
     const petCard = e.target.closest('.adopt-pet-card');
