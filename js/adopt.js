@@ -99,6 +99,114 @@ function updateFilterCounts() {
     updateFilterCountDisplay('health', 'microchipped', filterCounts.health.microchipped || 0);
 }
 
+function initDesktopFilters() {
+    const desktopContainer = document.querySelector('.filters-sidebar-desktop');
+    desktopContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', handleFilterChange);
+    });
+    desktopContainer.querySelector('.clear-filters-btn').addEventListener('click', clearAllFilters);
+    desktopContainer.querySelector('.apply-filters-btn').addEventListener('click', applyAndCloseFilters);
+}
+
+function initMobileFilters() {
+    const mobileContainer = document.querySelector('.filters-sidebar-mobile');
+    const openBtn = document.querySelector('.mobile-filter-btn');
+    const closeBtn = mobileContainer.querySelector('.mobile-close-filter-btn');
+    const overlay = document.querySelector('.filter-modal-overlay');
+
+    openBtn.addEventListener('click', toggleMobileFilterModal);
+    closeBtn.addEventListener('click', toggleMobileFilterModal);
+    overlay.addEventListener('click', toggleMobileFilterModal);
+
+    mobileContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', handleFilterChange);
+    });
+    mobileContainer.querySelector('.clear-filters-btn').addEventListener('click', clearAllFilters);
+    mobileContainer.querySelector('.apply-filters-btn').addEventListener('click', applyAndCloseFilters);
+}
+
+
+function handleFilterChange(event) {
+    const checkbox = event.target;
+    const filterType = checkbox.name;
+    const filterValue = checkbox.value;
+
+    const isChecked = checkbox.checked;
+
+    // Sync the other checkbox
+    const otherCheckbox = document.querySelector(`input[name="${filterType}"][value="${filterValue}"]:not(#${checkbox.id})`);
+    if (otherCheckbox) otherCheckbox.checked = isChecked;
+
+    if (isChecked) {
+        if (!currentFilters[filterType].includes(filterValue)) {
+            currentFilters[filterType].push(filterValue);
+        }
+    } else {
+        currentFilters[filterType] = currentFilters[filterType].filter(val => val !== filterValue);
+    }
+}
+
+function clearAllFilters() {
+    currentFilters = { animalType: [], age: [], size: [], gender: [], health: [] };
+    document.querySelectorAll('.filter-option input[type="checkbox"]').forEach(cb => cb.checked = false);
+    // On mobile, we might want to apply immediately or wait for "Apply"
+}
+
+function applyAndCloseFilters() {
+    applyFiltersAndSort();
+    updateResultCount();
+    resetPagination();
+    if (window.innerWidth <= 768) {
+        toggleMobileFilterModal();
+    }
+}
+
+function toggleMobileFilterModal() {
+    document.querySelector('.filter-modal-overlay').classList.toggle('hidden');
+    document.querySelector('.filters-sidebar-mobile').classList.toggle('hidden');
+    document.body.style.overflow = document.querySelector('.filters-sidebar-mobile').classList.contains('hidden') ? '' : 'hidden';
+}
+
+function applyFiltersAndSort() {
+    // Start with all pets
+    filteredPets = [...PETS_DATA];
+    
+    // Apply filters from the currentFilters object
+    Object.keys(currentFilters).forEach(filterType => {
+        const selectedValues = currentFilters[filterType];
+        if (selectedValues.length > 0) {
+            filteredPets = filteredPets.filter(pet => {
+                if(filterType === 'health') {
+                    return selectedValues.every(val => pet.health.includes(val));
+                }
+                return selectedValues.includes(pet[filterType]);
+            });
+        }
+    });
+    
+    applySorting();
+    renderPets();
+}
+// ===================
+// SORTING FUNCTIONALITY
+// ===================
+
+function initSorting() {
+    const sortSelect = document.getElementById('sort-select');
+    const mobileSortSelect = document.getElementById('mobile-sort-select');
+
+    sortSelect.addEventListener('change', (e) => {
+        currentSort = e.target.value;
+        mobileSortSelect.value = currentSort; // Sync
+        applyFiltersAndSort();
+    });
+    mobileSortSelect.addEventListener('change', (e) => {
+        currentSort = e.target.value;
+        sortSelect.value = currentSort; // Sync
+        applyFiltersAndSort();
+    });
+}
+
 function calculateFilterCounts() {
     const counts = {
         animalType: {},

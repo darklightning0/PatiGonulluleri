@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahiplen - Patiler İçin Sevgi</title>
+    <title>Sahiplen - Pati Gönüllüleri</title>
     <meta name="description" content="Sokak hayvanları ve barınak hayvanlarını sahiplenmek için tüm dostlarımızı keşfedin. Filtreleme ve sıralama seçenekleri ile size uygun arkadaşınızı bulun.">
     
     <!-- CSS -->
@@ -23,8 +23,8 @@
             <div class="nav-wrapper">
                 <!-- Logo -->
                 <div class="logo">
-                    <img src="assets/logo.png" alt="Patiler İçin Sevgi Logo" class="logo-img">
-                    <span class="logo-text">Patiler İçin Sevgi</span>
+                    <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                    <span class="logo-text">Pati Gönüllüleri</span>
                 </div>
 
                 <!-- Navigation -->
@@ -253,6 +253,22 @@
                             </div>
                         </div>
 
+                        <div class="mobile-controls">
+                             <button class="mobile-filter-btn">
+                                <i class="fas fa-filter"></i>
+                                <span data-tr="Filtrele" data-en="Filter">Filtrele</span>
+                            </button>
+                            <div class="mobile-sort">
+                                <label for="mobile-sort-select" data-tr="Sırala:" data-en="Sort by:">Sırala:</label>
+                                <select id="mobile-sort-select" name="sortBy">
+                                    <option value="newest" data-tr="En Yeniler" data-en="Newest First">En Yeniler</option>
+                                    <option value="oldest" data-tr="En Eskiler" data-en="Oldest First">En Eskiler</option>
+                                    <option value="age-asc" data-tr="Yaş (Artan)" data-en="Age (Asc)">Yaş (Artan)</option>
+                                    <option value="age-desc" data-tr="Yaş (Azalan)" data-en="Age (Desc)">Yaş (Azalan)</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <!-- Pet Grid -->
                         <div id="pets-container" class="pets-container grid-view">
                             <!-- Pet cards will be dynamically inserted here -->
@@ -280,6 +296,12 @@
                 </div>
             </div>
         </section>
+        <div class="filter-modal-overlay hidden"></div>
+        <aside class="filters-sidebar-mobile hidden">
+            <div class="filters-container">
+                <!-- Filter content will be injected by JS -->
+            </div>
+        </aside>
     </main>
 
     <!-- Footer -->
@@ -288,8 +310,8 @@
             <div class="footer-content">
                 <div class="footer-section footer-brand">
                     <div class="logo">
-                        <img src="assets/logo.png" alt="Patiler İçin Sevgi Logo" class="logo-img">
-                        <span class="logo-text">Patiler İçin Sevgi</span>
+                        <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                        <span class="logo-text">Pati Gönüllüleri</span>
                     </div>
                     <p class="footer-description" data-tr="Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş." data-en="A volunteer organization working to ensure every animal finds a loving home.">
                         Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş.
@@ -332,7 +354,7 @@
             </div>
 
             <div class="footer-bottom">
-                <p data-tr="© 2024 Patiler İçin Sevgi. Tüm hakları saklıdır." data-en="© 2024 Patiler İçin Sevgi. All rights reserved.">&copy; 2024 Patiler İçin Sevgi. Tüm hakları saklıdır.</p>
+                <p data-tr="© 2024 Pati Gönüllüleri. Tüm hakları saklıdır." data-en="© 2024 Pati Gönüllüleri. All rights reserved.">&copy; 2024 Pati Gönüllüleri. Tüm hakları saklıdır.</p>
             </div>
         </div>
     </footer>
