@@ -20,7 +20,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated", "sterilized", "microchipped"],
         urgent: false,
-        dateAdded: "2024-02-12",
+        dateAdded: "2025-02-12",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-shield-alt", text: "Mükemmel bekçi köpeği" },
@@ -63,7 +63,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated", "sterilized"],
         urgent: false,
-        dateAdded: "2024-01-20",
+        dateAdded: "2025-01-20",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-building", text: "Apartman yaşamına uygun" },
@@ -106,7 +106,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated"],
         urgent: true,
-        dateAdded: "2024-02-01",
+        dateAdded: "2025-02-01",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-rocket", text: "Çok enerjik ve oyuncu" },
@@ -149,7 +149,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated", "sterilized", "microchipped"],
         urgent: false,
-        dateAdded: "2024-01-10",
+        dateAdded: "2025-01-10",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-shield-alt", text: "Koruyucu ama nazik" },
@@ -192,7 +192,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated", "sterilized"],
         urgent: false,
-        dateAdded: "2024-01-25",
+        dateAdded: "2025-01-25",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-volume-down", text: "Sessiz ortam seviyor" },
@@ -235,7 +235,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated", "sterilized", "microchipped"],
         urgent: false,
-        dateAdded: "2024-02-05",
+        dateAdded: "2025-02-05",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-graduation-cap", text: "Deneyimli sahipler için" },
@@ -278,7 +278,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated"],
         urgent: true,
-        dateAdded: "2024-01-30",
+        dateAdded: "2025-01-30",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-heart", text: "Yaşlı ama çok sevecen" },
@@ -321,7 +321,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated", "sterilized"],
         urgent: false,
-        dateAdded: "2024-02-10",
+        dateAdded: "2025-02-10",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-running", text: "Çok enerjik ve aktif" },
@@ -365,7 +365,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated", "sterilized", "microchipped"],
         urgent: false,
-        dateAdded: "2024-01-15",
+        dateAdded: "2025-01-15",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-home", text: "Bahçeli ev tercihi" },
@@ -408,7 +408,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated", "sterilized"],
         urgent: false,
-        dateAdded: "2024-02-08",
+        dateAdded: "2025-02-08",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-crown", text: "Özel bakım gerektirir" },
@@ -451,7 +451,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated"],
         urgent: false,
-        dateAdded: "2024-01-28",
+        dateAdded: "2025-01-28",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-handshake", text: "Diğer hayvanlarla uyumlu" },
@@ -494,7 +494,7 @@ const PETS_DATA = [
         ],
         health: ["vaccinated", "microchipped"],
         urgent: true,
-        dateAdded: "2024-02-14",
+        dateAdded: "2025-02-14",
         location: "Denizli",
         specialNotes: [
             { icon: "fa-rocket", text: "Çok enerjik ve aktif" },
