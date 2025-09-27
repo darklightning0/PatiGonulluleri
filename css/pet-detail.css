@@ -372,6 +372,7 @@
     border-radius: 2px;
 }
 
+
 .health-tags {
     display: flex;
     flex-wrap: wrap;
@@ -928,7 +929,7 @@
 
 .similar-pets-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 32%));
     gap: 24px;
     align-items: stretch; /* FIX: Ensure all cards have equal height */
 }
