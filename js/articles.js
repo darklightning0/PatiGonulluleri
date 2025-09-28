@@ -1,0 +1,923 @@
+/**
+ * Fixed Articles Page JavaScript
+ * Handles search, filtering, view switching, and pagination
+ */
+
+// ===================
+// GLOBAL VARIABLES
+// ===================
+
+let currentView = 'grid';
+let currentSearch = '';
+let currentCategory = '';
+let currentSort = 'newest';
+let currentPage = 1;
+let articlesPerPage = 6;
+let totalPages = 1;
+let filteredArticles = [];
+let allArticles = [];
+let isLoading = false;
+
+// ===================
+// INITIALIZATION
+// ===================
+
+document.addEventListener('DOMContentLoaded', () => {
+    initArticlesPage();
+});
+
+function initArticlesPage() {
+    console.log('📚 Initializing Articles Page');
+    
+    // Check if ARTICLES_DATA is available
+    if (typeof ARTICLES_DATA === 'undefined') {
+        console.error('ARTICLES_DATA not found. Make sure articles-data.js is loaded.');
+        showNotification('Makaleler yüklenemedi. Lütfen sayfayı yenileyin.', 'error');
+        return;
+    }
+    
+    // Initialize with centralized data
+    allArticles = [...ARTICLES_DATA];
+    filteredArticles = [...allArticles];
+    
+    // Initialize components
+    initSearchAndFilters();
+    initViewToggle();
+    initNewsletterForm();
+    
+    // Load initial content
+    loadFeaturedArticles();
+    applyFiltersAndSearch();
+    
+    // Initialize language-dependent elements
+    setTimeout(() => {
+        updateCategoryFilterOptions();
+        updateSearchPlaceholder();
+    }, 100);
+    
+    console.log('✅ Articles Page Initialized');
+}
+
+// ===================
+// SEARCH AND FILTER FUNCTIONALITY
+// ===================
+
+function initSearchAndFilters() {
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const categoryFilter = document.getElementById('category-filter');
+    const sortFilter = document.getElementById('sort-filter');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    
+    // Search functionality
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(handleSearchInput, 300));
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSearch();
+            }
+        });
+    }
+    
+    if (searchBtn) {
+        searchBtn.addEventListener('click', handleSearch);
+    }
+    
+    // Filter functionality
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', handleCategoryFilter);
+    }
+    
+    if (sortFilter) {
+        sortFilter.addEventListener('change', handleSortFilter);
+    }
+    
+    // Clear filters
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', clearAllFilters);
+    }
+}
+
+function handleSearchInput(e) {
+    currentSearch = e.target.value.trim();
+    resetToFirstPage();
+    applyFiltersAndSearch();
+    updateClearFiltersButton();
+}
+
+function handleSearch() {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        currentSearch = searchInput.value.trim();
+        resetToFirstPage();
+        applyFiltersAndSearch();
+        updateClearFiltersButton();
+    }
+}
+
+function handleCategoryFilter(e) {
+    currentCategory = e.target.value;
+    resetToFirstPage();
+    applyFiltersAndSearch();
+    updateClearFiltersButton();
+}
+
+function handleSortFilter(e) {
+    currentSort = e.target.value;
+    resetToFirstPage();
+    applyFiltersAndSearch();
+}
+
+function clearAllFilters() {
+    currentSearch = '';
+    currentCategory = '';
+    currentSort = 'newest';
+    
+    // Reset form elements
+    const searchInput = document.getElementById('search-input');
+    const categoryFilter = document.getElementById('category-filter');
+    const sortFilter = document.getElementById('sort-filter');
+    
+    if (searchInput) searchInput.value = '';
+    if (categoryFilter) categoryFilter.value = '';
+    if (sortFilter) sortFilter.value = 'newest';
+    
+    resetToFirstPage();
+    applyFiltersAndSearch();
+    updateClearFiltersButton();
+    
+    showNotification('Filtreler temizlendi', 'success');
+}
+
+function updateClearFiltersButton() {
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    const hasActiveFilters = currentSearch || currentCategory || currentSort !== 'newest';
+    
+    if (clearFiltersBtn) {
+        clearFiltersBtn.style.display = hasActiveFilters ? 'flex' : 'none';
+    }
+}
+
+function resetToFirstPage() {
+    currentPage = 1;
+}
+
+// ===================
+// FILTERING AND SORTING LOGIC
+// ===================
+
+function applyFiltersAndSearch() {
+    try {
+        const currentLang = getCurrentLanguage();
+        
+        // Start with all articles
+        filteredArticles = [...allArticles];
+        
+        // Apply search filter
+        if (currentSearch) {
+            filteredArticles = filteredArticles.filter(article => {
+                try {
+                    const title = (article.title && article.title[currentLang]) ? 
+                        article.title[currentLang].toLowerCase() : '';
+                    const summary = (article.summary && article.summary[currentLang]) ? 
+                        article.summary[currentLang].toLowerCase() : '';
+                    const category = (article.category && article.category[currentLang]) ? 
+                        article.category[currentLang].toLowerCase() : '';
+                    const tags = (article.tags && Array.isArray(article.tags)) ? 
+                        article.tags.map(tag => 
+                            (tag && tag[currentLang]) ? tag[currentLang].toLowerCase() : ''
+                        ).join(' ') : '';
+                    const searchTerm = currentSearch.toLowerCase();
+                    
+                    return title.includes(searchTerm) || 
+                           summary.includes(searchTerm) || 
+                           category.includes(searchTerm) ||
+                           tags.includes(searchTerm);
+                } catch (error) {
+                    console.warn('Error filtering article:', article.id, error);
+                    return false;
+                }
+            });
+        }
+        
+        // Apply category filter
+        if (currentCategory) {
+            filteredArticles = filteredArticles.filter(article => {
+                try {
+                    return article.category && article.category[currentLang] === currentCategory;
+                } catch (error) {
+                    console.warn('Error filtering by category:', article.id, error);
+                    return false;
+                }
+            });
+        }
+        
+        // Apply sorting
+        applySorting();
+        
+        // Calculate pagination
+        calculatePagination();
+        
+        // Update display
+        loadArticles();
+        updateResultCount();
+        renderPagination();
+        updateEmptyState();
+        
+    } catch (error) {
+        console.error('Error in applyFiltersAndSearch:', error);
+        showNotification('Filtreleme sırasında bir hata oluştu.', 'error');
+    }
+}
+
+function applySorting() {
+    try {
+        switch (currentSort) {
+            case 'newest':
+                filteredArticles.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+                break;
+            case 'oldest':
+                filteredArticles.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
+                break;
+            case 'most-read':
+                filteredArticles.sort((a, b) => (b.views || 0) - (a.views || 0));
+                break;
+            case 'reading-time-asc':
+                filteredArticles.sort((a, b) => (a.readingTime || 0) - (b.readingTime || 0));
+                break;
+            case 'reading-time-desc':
+                filteredArticles.sort((a, b) => (b.readingTime || 0) - (a.readingTime || 0));
+                break;
+            default:
+                filteredArticles.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+        }
+    } catch (error) {
+        console.error('Error in applySorting:', error);
+    }
+}
+
+function calculatePagination() {
+    totalPages = Math.ceil(filteredArticles.length / articlesPerPage);
+    if (currentPage > totalPages && totalPages > 0) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) {
+        currentPage = 1;
+    }
+}
+
+// ===================
+// VIEW TOGGLE FUNCTIONALITY
+// ===================
+
+function initViewToggle() {
+    const viewButtons = document.querySelectorAll('.view-btn');
+    
+    viewButtons.forEach(btn => {
+        btn.addEventListener('click', handleViewChange);
+    });
+}
+
+function handleViewChange(e) {
+    const button = e.currentTarget;
+    const view = button.dataset.view;
+    
+    if (view !== currentView) {
+        currentView = view;
+        
+        // Update button states
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        button.classList.add('active');
+        
+        // Update container class
+        const container = document.getElementById('articles-container');
+        if (container) {
+            container.className = `articles-container ${view}-view`;
+        }
+        
+        // Re-render articles with new view
+        loadArticles();
+    }
+}
+
+// ===================
+// ARTICLE RENDERING
+// ===================
+
+function loadFeaturedArticles() {
+    const container = document.getElementById('featured-articles-container');
+    if (!container) return;
+    
+    try {
+        const featuredArticles = allArticles.filter(article => article.featured).slice(0, 3);
+        
+        if (featuredArticles.length === 0) {
+            const featuredSection = document.getElementById('featured-section');
+            if (featuredSection) {
+                featuredSection.style.display = 'none';
+            }
+            return;
+        }
+        
+        const articlesHTML = featuredArticles.map(article => {
+            try {
+                return createFeaturedArticleCard(article);
+            } catch (error) {
+                console.warn('Error creating featured article card:', article.id, error);
+                return '';
+            }
+        }).filter(html => html !== '').join('');
+        
+        container.innerHTML = articlesHTML;
+        
+        // Add click handlers
+        const cards = container.querySelectorAll('.featured-article-card');
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                const articleId = card.dataset.articleId;
+                if (articleId) {
+                    openArticle(articleId);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error loading featured articles:', error);
+    }
+}
+
+function loadArticles() {
+    const container = document.getElementById('articles-container');
+    if (!container) {
+        console.error('Articles container not found');
+        return;
+    }
+    
+    if (isLoading) return;
+    isLoading = true;
+    
+    // Show loading state
+    container.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div><span>Makaleler yükleniyor...</span></div>';
+    
+    // Simulate loading delay for better UX
+    setTimeout(() => {
+        try {
+            const startIndex = (currentPage - 1) * articlesPerPage;
+            const endIndex = startIndex + articlesPerPage;
+            const articlesToShow = filteredArticles.slice(startIndex, endIndex);
+            
+            if (articlesToShow.length === 0) {
+                container.innerHTML = '';
+            } else {
+                const articlesHTML = articlesToShow.map(article => {
+                    try {
+                        return createArticleCard(article);
+                    } catch (error) {
+                        console.warn('Error creating article card for article:', article.id, error);
+                        return '';
+                    }
+                }).filter(html => html !== '').join('');
+                
+                container.innerHTML = articlesHTML;
+                
+                // Add click handlers
+                const cards = container.querySelectorAll('.article-card');
+                cards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        const articleId = card.dataset.articleId;
+                        if (articleId) {
+                            openArticle(articleId);
+                        }
+                    });
+                });
+            }
+            
+            isLoading = false;
+        } catch (error) {
+            console.error('Error loading articles:', error);
+            container.innerHTML = '<div class="loading-container"><span>Makaleler yüklenirken hata oluştu.</span></div>';
+            showNotification('Makaleler yüklenirken hata oluştu.', 'error');
+            isLoading = false;
+        }
+    }, 200);
+}
+
+function createFeaturedArticleCard(article) {
+    try {
+        const currentLang = getCurrentLanguage();
+        
+        return `
+            <div class="featured-article-card" data-article-id="${article.id}">
+                <div class="article-image">
+                    <img src="${article.image || ''}" alt="${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}" loading="lazy">
+                    <div class="category-badge" data-tr="${(article.category && article.category.tr) ? article.category.tr : ''}" data-en="${(article.category && article.category.en) ? article.category.en : ''}">
+                        ${(article.category && article.category[currentLang]) ? article.category[currentLang] : ''}
+                    </div>
+                </div>
+                <div class="article-content">
+                    <h3 class="article-title">${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}</h3>
+                    <p class="article-summary">${(article.summary && article.summary[currentLang]) ? article.summary[currentLang] : ''}</p>
+                    <div class="article-meta">
+                        <div class="article-date">
+                            <i class="fas fa-calendar"></i>
+                            <span>${formatDate(article.publishDate, currentLang)}</span>
+                        </div>
+                        <div class="reading-time">
+                            <i class="fas fa-clock"></i>
+                            <span>${article.readingTime || 0} <span data-tr="dk" data-en="min">dk</span></span>
+                        </div>
+                        <div class="view-count">
+                            <i class="fas fa-eye"></i>
+                            <span>${formatNumber(article.views || 0)}</span>
+                        </div>
+                    </div>
+                    <div class="article-author">
+                        <img src="${(article.author && article.author.avatar) ? article.author.avatar : ''}" alt="${(article.author && article.author.name) ? article.author.name : ''}" class="author-avatar">
+                        <div class="author-info">
+                            <h4>${(article.author && article.author.name) ? article.author.name : ''}</h4>
+                            <p class="author-bio">${(article.author && article.author.bio && article.author.bio[currentLang]) ? article.author.bio[currentLang] : ''}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error creating featured article card:', error);
+        return '';
+    }
+}
+
+function createArticleCard(article) {
+    try {
+        const currentLang = getCurrentLanguage();
+        
+        const tags = (article.tags && Array.isArray(article.tags) && article.tags.length > 0) ? 
+            article.tags.slice(0, 3).map(tag => 
+                `<span class="article-tag">${(tag && tag[currentLang]) ? tag[currentLang] : ''}</span>`
+            ).join('') : '';
+        
+        return `
+            <div class="article-card" data-article-id="${article.id}">
+                <div class="article-image">
+                    <img src="${article.image || ''}" alt="${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}" loading="lazy">
+                    <div class="category-badge" data-tr="${(article.category && article.category.tr) ? article.category.tr : ''}" data-en="${(article.category && article.category.en) ? article.category.en : ''}">
+                        ${(article.category && article.category[currentLang]) ? article.category[currentLang] : ''}
+                    </div>
+                </div>
+                <div class="article-content">
+                    <h3 class="article-title">${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}</h3>
+                    <p class="article-summary">${(article.summary && article.summary[currentLang]) ? article.summary[currentLang] : ''}</p>
+                    <div class="article-meta">
+                        <div class="article-date">
+                            <i class="fas fa-calendar"></i>
+                            <span>${formatDate(article.publishDate, currentLang)}</span>
+                        </div>
+                        <div class="reading-time">
+                            <i class="fas fa-clock"></i>
+                            <span>${article.readingTime || 0} <span data-tr="dk" data-en="min">dk</span></span>
+                        </div>
+                        <div class="view-count">
+                            <i class="fas fa-eye"></i>
+                            <span>${formatNumber(article.views || 0)}</span>
+                        </div>
+                    </div>
+                    <div class="article-tags">
+                        ${tags}
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error creating article card:', error);
+        return '';
+    }
+}
+
+// ===================
+// PAGINATION FUNCTIONALITY
+// ===================
+
+function renderPagination() {
+    const paginationContainer = document.getElementById('pagination-controls');
+    const paginationSection = document.getElementById('pagination-section');
+    
+    if (!paginationContainer || !paginationSection) return;
+    
+    if (totalPages <= 1) {
+        paginationSection.style.display = 'none';
+        return;
+    }
+    
+    paginationSection.style.display = 'block';
+    
+    let paginationHTML = '';
+    
+    // Previous button
+    if (currentPage > 1) {
+        paginationHTML += `
+            <button class="pagination-btn prev-btn" data-page="${currentPage - 1}">
+                <i class="fas fa-chevron-left"></i>
+                <span data-tr="Önceki" data-en="Previous">Önceki</span>
+            </button>
+        `;
+    }
+    
+    // Page numbers
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+    
+    if (startPage > 1) {
+        paginationHTML += `<button class="pagination-btn page-btn" data-page="1">1</button>`;
+        if (startPage > 2) {
+            paginationHTML += `<span class="pagination-dots">...</span>`;
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+            <button class="pagination-btn page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">
+                ${i}
+            </button>
+        `;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            paginationHTML += `<span class="pagination-dots">...</span>`;
+        }
+        paginationHTML += `<button class="pagination-btn page-btn" data-page="${totalPages}">${totalPages}</button>`;
+    }
+    
+    // Next button
+    if (currentPage < totalPages) {
+        paginationHTML += `
+            <button class="pagination-btn next-btn" data-page="${currentPage + 1}">
+                <span data-tr="Sonraki" data-en="Next">Sonraki</span>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        `;
+    }
+    
+    paginationContainer.innerHTML = paginationHTML;
+    
+    // Add click handlers
+    const paginationBtns = paginationContainer.querySelectorAll('.pagination-btn');
+    paginationBtns.forEach(btn => {
+        btn.addEventListener('click', handlePaginationClick);
+    });
+}
+
+function handlePaginationClick(e) {
+    const button = e.currentTarget;
+    const page = parseInt(button.dataset.page);
+    
+    if (page && page !== currentPage && page >= 1 && page <= totalPages) {
+        currentPage = page;
+        loadArticles();
+        renderPagination();
+        
+        // Scroll to top of articles section
+        const articlesSection = document.querySelector('.articles-section');
+        if (articlesSection) {
+            articlesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+}
+
+// ===================
+// EMPTY STATE MANAGEMENT
+// ===================
+
+function updateEmptyState() {
+    const emptyState = document.getElementById('empty-state');
+    const articlesContainer = document.getElementById('articles-container');
+    const paginationSection = document.getElementById('pagination-section');
+    const newsletterSection = document.getElementById('newsletter-section');
+    
+    if (!emptyState || !articlesContainer) return;
+    
+    if (filteredArticles.length === 0) {
+        emptyState.classList.remove('hidden');
+        articlesContainer.style.display = 'none';
+        if (paginationSection) paginationSection.style.display = 'none';
+        // Keep newsletter visible even when no articles found
+        if (newsletterSection) newsletterSection.style.display = 'block';
+    } else {
+        emptyState.classList.add('hidden');
+        articlesContainer.style.display = currentView === 'grid' ? 'grid' : 'flex';
+        if (paginationSection && totalPages > 1) {
+            paginationSection.style.display = 'block';
+        }
+        // Always keep newsletter visible
+        if (newsletterSection) newsletterSection.style.display = 'block';
+    }
+}
+
+// ===================
+// NEWSLETTER FORM
+// ===================
+
+function initNewsletterForm() {
+    const newsletterForm = document.getElementById('articles-newsletter-form');
+    
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', handleNewsletterSubmit);
+    }
+}
+
+function handleNewsletterSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const email = formData.get('email');
+    const consent = formData.get('consent');
+    
+    // Validate
+    if (!email || !isValidEmail(email)) {
+        showNotification('Lütfen geçerli bir e-posta adresi giriniz.', 'error');
+        return;
+    }
+    
+    if (!consent) {
+        showNotification('Lütfen e-posta bildirimleri için onay veriniz.', 'error');
+        return;
+    }
+    
+    // Show loading
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Kaydediliyor...</span>';
+    
+    // Simulate API call
+    setTimeout(() => {
+        console.log('Newsletter subscription:', { email, consent: true });
+        
+        showNotification('E-posta listemize başarıyla kaydoldunuz!', 'success');
+        e.target.reset();
+        
+        // Reset button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }, 2000);
+}
+
+// ===================
+// ARTICLE NAVIGATION
+// ===================
+
+function openArticle(articleId) {
+    try {
+        const article = allArticles.find(a => a.id === parseInt(articleId));
+        
+        if (article) {
+            // Update view count
+            article.views = (article.views || 0) + 1;
+            
+            const currentLang = getCurrentLanguage();
+            const title = (article.title && article.title[currentLang]) ? article.title[currentLang] : 'Makale';
+            
+            console.log('Opening article:', title);
+            
+            // In real app, navigate to article detail page
+            window.location.href = `article-detail.html?id=${articleId}`;
+            
+            // For demo, show notification
+            showNotification(`"${title}" makalesini açıyorsunuz...`, 'info');
+        }
+    } catch (error) {
+        console.error('Error opening article:', error);
+        showNotification('Makale açılırken hata oluştu.', 'error');
+    }
+}
+
+// ===================
+// UTILITY FUNCTIONS
+// ===================
+
+function getCurrentLanguage() {
+    return window.currentLanguage || 'tr';
+}
+
+function updateResultCount() {
+    const totalElement = document.getElementById('total-articles');
+    if (totalElement) {
+        totalElement.textContent = filteredArticles.length;
+    }
+}
+
+function formatDate(dateString, lang = 'tr') {
+    try {
+        if (!dateString) return '';
+        
+        const date = new Date(dateString);
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        };
+        
+        return date.toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US', options);
+    } catch (error) {
+        console.warn('Error formatting date:', dateString, error);
+        return dateString || '';
+    }
+}
+
+function formatNumber(num) {
+    try {
+        const number = parseInt(num) || 0;
+        if (number >= 1000000) {
+            return Math.floor(number / 1000000) + 'M';
+        } else if (number >= 1000) {
+            return Math.floor(number / 1000) + 'K';
+        }
+        return number.toString();
+    } catch (error) {
+        console.warn('Error formatting number:', num, error);
+        return '0';
+    }
+}
+
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    });
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        font-size: 14px;
+        z-index: 10000;
+        opacity: 0;
+        transform: translateX(100px);
+        transition: all 0.3s ease;
+        max-width: 350px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        line-height: 1.4;
+    `;
+    
+    // Set background color based on type
+    switch (type) {
+        case 'success':
+            notification.style.backgroundColor = '#27ae60';
+            break;
+        case 'error':
+            notification.style.backgroundColor = '#e74c3c';
+            break;
+        case 'warning':
+            notification.style.backgroundColor = '#f39c12';
+            break;
+        default:
+            notification.style.backgroundColor = '#3498db';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remove after delay
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100px)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 4000);
+}
+
+// ===================
+// LANGUAGE CHANGE HANDLER
+// ===================
+
+function handleLanguageChange() {
+    try {
+        // Re-render all content when language changes
+        loadFeaturedArticles();
+        applyFiltersAndSearch();
+        updateCategoryFilterOptions();
+        updateSearchPlaceholder();
+    } catch (error) {
+        console.error('Error handling language change:', error);
+    }
+}
+
+function updateSearchPlaceholder() {
+    const searchInput = document.getElementById('search-input');
+    const currentLang = getCurrentLanguage();
+    
+    if (searchInput) {
+        searchInput.placeholder = currentLang === 'tr' ? 'Makale ara...' : 'Search articles...';
+    }
+}
+
+function updateCategoryFilterOptions() {
+    const categoryFilter = document.getElementById('category-filter');
+    if (!categoryFilter) return;
+    
+    try {
+        const currentLang = getCurrentLanguage();
+        const currentValue = categoryFilter.value;
+        
+        // Clear existing options
+        categoryFilter.innerHTML = '';
+        
+        // Re-add "All Categories" option
+        const allOption = document.createElement('option');
+        allOption.value = '';
+        allOption.setAttribute('data-tr', 'Tüm Kategoriler');
+        allOption.setAttribute('data-en', 'All Categories');
+        allOption.textContent = currentLang === 'tr' ? 'Tüm Kategoriler' : 'All Categories';
+        categoryFilter.appendChild(allOption);
+        
+        // Add predefined category options
+        const predefinedCategories = [
+            { tr: 'Sahiplendirme Rehberleri', en: 'Adoption Guides' },
+            { tr: 'Toplumsal Farkındalık', en: 'Social Awareness' },
+            { tr: 'Sağlık ve Tıp', en: 'Health and Medicine' },
+            { tr: 'Eğitim ve Davranış', en: 'Training and Behavior' },
+            { tr: 'Praktik Bilgiler', en: 'Practical Information' },
+            { tr: 'Gönüllülük', en: 'Volunteering' },
+            { tr: 'Mevsimsel Bakım', en: 'Seasonal Care' },
+            { tr: 'Özel Durumlar', en: 'Special Cases' },
+            { tr: 'Yaşam Alanları', en: 'Living Spaces' }
+        ];
+        
+        predefinedCategories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category[currentLang];
+            option.setAttribute('data-tr', category.tr);
+            option.setAttribute('data-en', category.en);
+            option.textContent = category[currentLang];
+            categoryFilter.appendChild(option);
+        });
+        
+        // Restore previous selection if valid
+        const availableCategories = Array.from(categoryFilter.options).map(opt => opt.value);
+        if (currentValue && availableCategories.includes(currentValue)) {
+            categoryFilter.value = currentValue;
+        }
+    } catch (error) {
+        console.error('Error updating category filter options:', error);
+    }
+}
+
+// ===================
+// ERROR HANDLING & INITIALIZATION
+// ===================
+
+window.addEventListener('error', (e) => {
+    console.error('Articles page error:', e.error || e.message);
+    
+    // Only show notification for actual errors, not null values
+    if (e.error && e.error.message && e.error.message !== 'null') {
+        showNotification('Bir hata oluştu. Lütfen sayfayı yenileyin.', 'error');
+    }
+});
+
+// Handle unhandled promise rejections
+window.addEventListener('unhandledrejection', (e) => {
+    console.error('Unhandled promise rejection:', e.reason);
+    showNotification('Beklenmeyen bir hata oluştu.', 'error');
+});
+
+// Listen for language changes
+document.addEventListener('languageChanged', handleLanguageChange);

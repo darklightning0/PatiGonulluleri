@@ -929,7 +929,7 @@
 
 .similar-pets-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 32%));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 30%));
     gap: 24px;
     align-items: stretch; /* FIX: Ensure all cards have equal height */
 }
