@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makaleler - Pati Gönüllüleri</title>
+    <meta name="description" content="Hayvan sahiplendirme, bakım, eğitim ve hayvan hakları hakkında uzman yazarlarımızın kaleme aldığı güncel makaleler ve rehberler.">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/articles.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="nav-wrapper">
+                <!-- Logo -->
+                <div class="logo">
+                    <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                    <span class="logo-text">Pati Gönüllüleri</span>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="nav" role="navigation">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link" data-tr="Anasayfa" data-en="Home">Anasayfa</a></li>
+                        <li><a href="about.html" class="nav-link" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="adopt.html" class="nav-link" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="makaleler.html" class="nav-link active" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="contact.html" class="nav-link" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                    
+                    <!-- Language Toggle -->
+                    <div class="language-toggle">
+                        <button class="lang-btn active" data-lang="tr">TR</button>
+                        <button class="lang-btn" data-lang="en">EN</button>
+                    </div>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" aria-label="Toggle mobile menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="articles-main">
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" data-tr="Anasayfa" data-en="Home">Anasayfa</a>
+                    <span class="separator">/</span>
+                    <span data-tr="Makaleler" data-en="Articles">Makaleler</span>
+                </div>
+                
+                <h1 class="page-title" data-tr="Makaleler ve Rehberler" data-en="Articles and Guides">Makaleler ve Rehberler</h1>
+                <p class="page-description" data-tr="Hayvan sahiplendirme, bakım, eğitim ve refah konularında uzmanlarımızın hazırladığı güncel makaleler ile bilgilerinizi artırın ve daha bilinçli bir pet sahibi olun." data-en="Increase your knowledge with current articles prepared by our experts on animal adoption, care, training and welfare and become a more conscious pet owner.">
+                    Hayvan sahiplendirme, bakım, eğitim ve refah konularında uzmanlarımızın hazırladığı güncel makaleler ile bilgilerinizi artırın ve daha bilinçli bir pet sahibi olun.
+                </p>
+            </div>
+        </section>
+
+        <!-- Featured Articles -->
+        <section class="featured-articles" id="featured-section">
+            <div class="container">
+                <h2 class="section-title" data-tr="Öne Çıkan Makaleler" data-en="Featured Articles">Öne Çıkan Makaleler</h2>
+                <div class="featured-grid" id="featured-articles-container">
+                    <!-- Featured articles will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Search and Filter Controls (Moved after Featured Articles) -->
+        <section class="search-filter-section">
+            <div class="container">
+                <div class="search-controls">
+                    <div class="search-bar">
+                        <div class="search-input-wrapper">
+                            <input type="text" id="search-input" class="search-input" placeholder="Makale ara..." data-tr="Makale ara..." data-en="Search articles...">
+                            <button class="search-btn" id="search-btn" aria-label="Ara">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-controls">
+                        <select id="category-filter" class="filter-select">
+                            <option value="" data-tr="Tüm Kategoriler" data-en="All Categories">Tüm Kategoriler</option>
+                            <option value="Sahiplendirme Rehberleri" data-tr="Sahiplendirme Rehberleri" data-en="Adoption Guides">Sahiplendirme Rehberleri</option>
+                            <option value="Toplumsal Farkındalık" data-tr="Toplumsal Farkındalık" data-en="Social Awareness">Toplumsal Farkındalık</option>
+                            <option value="Sağlık ve Tıp" data-tr="Sağlık ve Tıp" data-en="Health and Medicine">Sağlık ve Tıp</option>
+                            <option value="Eğitim ve Davranış" data-tr="Eğitim ve Davranış" data-en="Training and Behavior">Eğitim ve Davranış</option>
+                            <option value="Praktik Bilgiler" data-tr="Praktik Bilgiler" data-en="Practical Information">Praktik Bilgiler</option>
+                            <option value="Gönüllülük" data-tr="Gönüllülük" data-en="Volunteering">Gönüllülük</option>
+                        </select>
+                        
+                        <select id="sort-filter" class="filter-select">
+                            <option value="newest" data-tr="En Yeniler" data-en="Newest First">En Yeniler</option>
+                            <option value="oldest" data-tr="En Eskiler" data-en="Oldest First">En Eskiler</option>
+                            <option value="most-read" data-tr="En Çok Okunanlar" data-en="Most Read">En Çok Okunanlar</option>
+                            <option value="reading-time-asc" data-tr="Okuma Süresi (Az-Çok)" data-en="Reading Time (Low-High)">Okuma Süresi (Az-Çok)</option>
+                            <option value="reading-time-desc" data-tr="Okuma Süresi (Çok-Az)" data-en="Reading Time (High-Low)">Okuma Süresi (Çok-Az)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Results Summary -->
+                <div class="results-summary">
+                    <span class="result-count">
+                        <span id="total-articles">10</span> 
+                        <span data-tr="makale listeleniyor" data-en="articles listed">makale listeleniyor</span>
+                    </span>
+                    <span class="clear-filters" id="clear-filters" style="display: none;">
+                        <i class="fas fa-times"></i>
+                        <span data-tr="Filtreleri Temizle" data-en="Clear Filters">Filtreleri Temizle</span>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Articles Grid -->
+        <section class="articles-section">
+            <div class="container">
+                <div class="articles-header">
+                    <h2 class="section-title" data-tr="Tüm Makaleler" data-en="All Articles">Tüm Makaleler</h2>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="grid" title="Izgara Görünümü">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list" title="Liste Görünümü">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="articles-container grid-view" id="articles-container">
+                    <!-- Articles will be loaded dynamically -->
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-section" id="pagination-section">
+                    <div class="pagination-controls" id="pagination-controls">
+                        <!-- Pagination will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state hidden" id="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 data-tr="Makale Bulunamadı" data-en="No Articles Found">Makale Bulunamadı</h3>
+                    <p data-tr="Aradığınız kriterlere uygun makale bulunamadı. Lütfen farklı anahtar kelimeler deneyin." data-en="No articles found matching your search criteria. Please try different keywords.">
+                        Aradığınız kriterlere uygun makale bulunamadı. Lütfen farklı anahtar kelimeler deneyin.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Signup -->
+        <section class="newsletter-section" id="newsletter-section">
+            <div class="container">
+                <div class="newsletter-card">
+                    <div class="newsletter-content">
+                        <h2 data-tr="Yeni Makaleleri Kaçırmayın" data-en="Don't Miss New Articles">Yeni Makaleleri Kaçırmayın</h2>
+                        <p data-tr="Hayvan bakımı, sahiplendirme ve hayvan hakları konularındaki güncel makalelerimizden haberdar olmak için e-posta listemize katılın." data-en="Join our email list to stay informed about our current articles on animal care, adoption and animal rights.">
+                            Hayvan bakımı, sahiplendirme ve hayvan hakları konularındaki güncel makalelerimizden haberdar olmak için e-posta listemize katılın.
+                        </p>
+                        
+                        <form class="newsletter-form" id="articles-newsletter-form">
+                            <div class="newsletter-input-group">
+                                <input type="email" name="email" placeholder="E-posta adresiniz" data-tr="E-posta adresiniz" data-en="Your email address" required>
+                                <button type="submit">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span data-tr="Abone Ol" data-en="Subscribe">Abone Ol</span>
+                                </button>
+                            </div>
+                            <div class="newsletter-consent">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="consent" required>
+                                    <span class="checkmark"></span>
+                                    <span data-tr="E-posta bildirimleri almayı kabul ediyorum" data-en="I accept to receive email notifications">E-posta bildirimleri almayı kabul ediyorum</span>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section footer-brand">
+                    <div class="logo">
+                        <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                    </div>
+                    <p class="footer-description" data-tr="Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş." data-en="A volunteer organization working to ensure every animal finds a loving home.">
+                        Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş.
+                    </p>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Hızlı Bağlantılar" data-en="Quick Links">Hızlı Bağlantılar</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="adopt.html" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="makaleler.html" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="contact.html" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="İletişim" data-en="Contact">İletişim</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> iletisim@patigonulluleri.com</p>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Yasal" data-en="Legal">Yasal</h4>
+                    <ul class="footer-links">
+                        <li><a href="gizlilik.html" data-tr="Gizlilik Sözleşmesi" data-en="Privacy Policy">Gizlilik Sözleşmesi</a></li>
+                        <li><a href="kullanim.html" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a></li>
+                        <li><a href="kvkk.html" data-tr="KVKK Aydınlatma Metni" data-en="KVKK Disclosure Text">KVKK Aydınlatma Metni</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p data-tr="© 2025 Pati Gönüllüleri. Tüm hakları saklıdır." data-en="© 2025 Pati Gönüllüleri. All rights reserved.">&copy; 2025 Pati Gönüllüleri. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="data/articles-data.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/articles.js"></script>
+</body>
+</html>
