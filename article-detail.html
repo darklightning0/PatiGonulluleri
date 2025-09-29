@@ -3,12 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Makale Detayı - Pati Gönüllüleri</title>
-    <meta name="description" content="">
+    <title id="page-title">Makale - Pati Gönüllüleri</title>
+    <meta id="page-description" name="description" content="Hayvan sahiplendirme, bakım ve refah konularında uzman makale.">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" id="og-title" content="">
+    <meta property="og:description" id="og-description" content="">
+    <meta property="og:image" id="og-image" content="">
+    <meta property="og:url" id="og-url" content="">
+    <meta property="og:type" content="article">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitter-title" content="">
+    <meta name="twitter:description" id="twitter-description" content="">
+    <meta name="twitter:image" id="twitter-image" content="">
     
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/articles.css"> <!-- Re-using styles for cards -->
     <link rel="stylesheet" href="css/article-detail.css">
     
     <!-- Google Fonts -->
@@ -16,31 +28,61 @@
     
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json" id="structured-data">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "",
+        "description": "",
+        "image": "",
+        "author": {
+            "@type": "Person",
+            "name": ""
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Pati Gönüllüleri"
+        },
+        "datePublished": "",
+        "dateModified": ""
+    }
+    </script>
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="nav-wrapper">
-                <a href="index.html" class="logo">
+                <!-- Logo -->
+                <div class="logo">
                     <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
                     <span class="logo-text">Pati Gönüllüleri</span>
-                </a>
+                </div>
+
+                <!-- Navigation -->
                 <nav class="nav" role="navigation">
                     <ul class="nav-list">
                         <li><a href="index.html" class="nav-link" data-tr="Anasayfa" data-en="Home">Anasayfa</a></li>
-                        <li><a href="hakkimizda.html" class="nav-link" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="about.html" class="nav-link" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
                         <li><a href="adopt.html" class="nav-link" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
-                        <li><a href="makaleler.html" class="nav-link active" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
-                        <li><a href="iletisim.html" class="nav-link" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                        <li><a href="articles.html" class="nav-link" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="contact.html" class="nav-link" data-tr="İletişim" data-en="Contact">İletişim</a></li>
                     </ul>
+                    
+                    <!-- Language Toggle -->
                     <div class="language-toggle">
                         <button class="lang-btn active" data-lang="tr">TR</button>
                         <button class="lang-btn" data-lang="en">EN</button>
                     </div>
                 </nav>
+
+                <!-- Mobile Menu Button -->
                 <button class="mobile-menu-btn" aria-label="Toggle mobile menu">
-                    <span></span><span></span><span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
             </div>
         </div>
@@ -48,93 +90,237 @@
 
     <!-- Main Content -->
     <main class="article-detail-main">
-        <div class="hero-image-container">
-            <img id="article-hero-image" src="" alt="" class="hero-image">
-            <div class="hero-overlay"></div>
-        </div>
-
-        <div class="container article-container">
-            <div class="article-layout">
-                <!-- Main Article Content -->
-                <article class="article-content">
-                    <header class="article-header">
-                        <div class="breadcrumb">
-                            <a href="index.html" data-tr="Anasayfa" data-en="Home">Anasayfa</a>
-                            <span class="separator">/</span>
-                            <a href="articles.html" data-tr="Makaleler" data-en="Articles">Makaleler</a>
-                        </div>
-                        <div id="article-category" class="category-tag"></div>
-                        <h1 id="article-title" class="article-title-main"></h1>
-                        <div class="article-meta-main">
-                            <span id="article-author-meta"></span>
-                            <span class="meta-separator">•</span>
-                            <span id="article-date"></span>
-                            <span class="meta-separator">•</span>
-                            <span id="article-read-time"></span>
-                        </div>
-                    </header>
-
-                    <div id="article-body" class="article-body">
-                        <!-- Full article content will be injected here -->
-                    </div>
-                    
-                    <div id="article-sources" class="article-sources hidden">
-                        <h3 data-tr="Kaynaklar" data-en="Sources">Kaynaklar</h3>
-                        <ol id="sources-list"></ol>
-                    </div>
-
-
-                    <footer class="article-footer">
-                        <div class="author-box">
-                            <img id="author-avatar" src="" alt="" class="author-avatar">
-                            <div class="author-info">
-                                <span class="author-written-by" data-tr="YAZAR" data-en="AUTHOR">YAZAR</span>
-                                <h4 id="author-name"></h4>
-                                <p id="author-bio"></p>
-                            </div>
-                        </div>
-                    </footer>
-                </article>
-
-                <!-- Sidebar -->
-                <aside class="article-sidebar">
-                    <div class="sidebar-widget sticky-widget">
-                        <h3 class="widget-title" data-tr="Bu Makaleyi Paylaş" data-en="Share This Article">Bu Makaleyi Paylaş</h3>
-                        <div class="share-buttons">
-                            <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" class="share-btn facebook" id="share-facebook" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i> Facebook</a>
-                            <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" class="share-btn twitter" id="share-twitter" target="_blank" rel="noopener"><i class="fab fa-twitter"></i> Twitter</a>
-                            <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" class="share-btn whatsapp" id="share-whatsapp" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                            <button class="share-btn copy-link" id="copy-link-btn"><i class="fas fa-link"></i> <span data-tr="Linki Kopyala" data-en="Copy Link">Linki Kopyala</span></button>
-                        </div>
-                    </div>
-                </aside>
-            </div>
-        </div>
-
-        <!-- Related Articles -->
-        <section class="related-articles-section">
+        <!-- Breadcrumb -->
+        <section class="breadcrumb-section">
             <div class="container">
-                <h2 class="section-title-related" data-tr="Benzer Makaleler" data-en="Related Articles">Benzer Makaleler</h2>
-                <div class="articles-container grid-view" id="related-articles-grid">
-                    <!-- Related article cards will be loaded here -->
+                <div class="breadcrumb">
+                    <a href="index.html" data-tr="Anasayfa" data-en="Home">Anasayfa</a>
+                    <span class="separator">/</span>
+                    <a href="articles.html" data-tr="Makaleler" data-en="Articles">Makaleler</a>
+                    <span class="separator">/</span>
+                    <span id="article-breadcrumb-title">Makale</span>
                 </div>
             </div>
         </section>
 
-
-                <!-- Call to Action -->
-        <section class="cta-section-article">
+        <!-- Article Content -->
+        <article class="article-container">
             <div class="container">
-                <h2 data-tr="Bir Hayatı Değiştirin" data-en="Change a Life">Bir Hayatı Değiştirin</h2>
-                <p data-tr="Makalelerimiz size ilham verdiyse, bir sonraki adımınızı atın ve yuva arayan dostlarımıza göz atın." data-en="If our articles inspired you, take the next step and browse our friends looking for a home.">Makalelerimiz size ilham verdiyse, bir sonraki adımınızı atın ve yuva arayan dostlarımıza göz atın.</p>
-                <a href="adopt.html" class="btn btn-primary" data-tr="Sahiplen" data-en="Adopt Now">Sahiplen</a>
+                <div class="article-layout">
+                    <!-- Main Article Content -->
+                    <div class="article-content">
+                        <!-- Article Header -->
+                        <header class="article-header">
+                            <div class="article-meta-top">
+                                <span id="article-category" class="category-badge">Kategori</span>
+                                <div class="article-badges">
+                                    <span id="urgent-badge" class="urgent-badge hidden" data-tr="ACİL" data-en="URGENT">ACİL</span>
+                                </div>
+                            </div>
+                            
+                            <h1 id="article-title" class="article-title">Makale Başlığı Yükleniyor...</h1>
+                            
+                            <div class="article-meta">
+                                <div class="author-info">
+                                    <img id="author-avatar" src="" alt="" class="author-avatar">
+                                    <div class="author-details">
+                                        <div class="author-name" id="author-name">Yazar</div>
+                                        <div class="author-bio" id="author-bio">Yazar Açıklaması</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="article-stats">
+                                    <div class="stat-item">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span id="publish-date">Tarih</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span id="reading-time">0 dk</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="fas fa-eye"></i>
+                                        <span id="view-count">0</span>
+                                    </div>
+                                    <div class="stat-item" id="last-updated" style="display: none;">
+                                        <i class="fas fa-edit"></i>
+                                        <span id="updated-date">Güncelleme</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Share Buttons -->
+                            <div class="share-section">
+                                <span class="share-label" data-tr="Paylaş:" data-en="Share:">Paylaş:</span>
+                                <div class="share-buttons">
+                                    <button class="share-btn facebook" id="share-facebook" aria-label="Facebook'ta Paylaş">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </button>
+                                    <button class="share-btn twitter" id="share-twitter" aria-label="Twitter'da Paylaş">
+                                        <i class="fab fa-twitter"></i>
+                                    </button>
+                                    <button class="share-btn linkedin" id="share-linkedin" aria-label="LinkedIn'de Paylaş">
+                                        <i class="fab fa-linkedin-in"></i>
+                                    </button>
+                                    <button class="share-btn whatsapp" id="share-whatsapp" aria-label="WhatsApp'ta Paylaş">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </button>
+                                    <button class="share-btn copy" id="copy-link" aria-label="Bağlantıyı Kopyala">
+                                        <i class="fas fa-link"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </header>
+
+                        <!-- Article Image -->
+                        <div class="article-image-container">
+                            <img id="article-image" src="" alt="" class="article-image">
+                        </div>
+
+                        <!-- Article Body -->
+                        <div class="article-body">
+                            <div id="article-content" class="article-text">
+                                <!-- Article content will be loaded here -->
+                            </div>
+
+                            <!-- Article Tags -->
+                            <div class="article-tags-section">
+                                <h3 data-tr="Etiketler" data-en="Tags">Etiketler</h3>
+                                <div id="article-tags" class="article-tags">
+                                    <!-- Tags will be loaded here -->
+                                </div>
+                            </div>
+
+                            <!-- Sources Section -->
+                            <div class="sources-section" id="sources-section">
+                                <h3 data-tr="Kaynaklar" data-en="Sources">Kaynaklar</h3>
+                                <div id="sources-list" class="sources-list">
+                                    <!-- Sources will be loaded here -->
+                                </div>
+                            </div>
+
+                            <!-- Author Bio Section -->
+                            <div class="author-section">
+                                <h3 data-tr="Yazar Hakkında" data-en="About the Author">Yazar Hakkında</h3>
+                                <div class="author-card">
+                                    <img id="author-card-avatar" src="" alt="" class="author-card-avatar">
+                                    <div class="author-card-content">
+                                        <h4 id="author-card-name">Yazar Adı</h4>
+                                        <p id="author-card-bio">Yazar açıklaması</p>
+                                        <p id="author-credentials" class="author-credentials">Yetkinlikler</p>
+                                        <div id="author-social" class="author-social">
+                                            <!-- Author social links will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Similar Articles Section -->
+                            <div class="similar-articles-section" id="similar-articles-section">
+                                <h3 data-tr="Benzer Makaleler" data-en="Similar Articles">Benzer Makaleler</h3>
+                                <div class="similar-articles-grid" id="similar-articles-grid">
+                                    <!-- Similar articles will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <aside class="article-sidebar">
+                        <!-- Table of Contents -->
+                        <div class="sidebar-widget toc-widget">
+                            <h3 data-tr="İçindekiler" data-en="Table of Contents">İçindekiler</h3>
+                            <nav id="table-of-contents" class="toc-nav">
+                                <!-- TOC will be generated automatically -->
+                            </nav>
+                        </div>
+
+                        <!-- Newsletter Signup -->
+                        <div class="sidebar-widget newsletter-widget">
+                            <h3 data-tr="Yeni Makaleler" data-en="New Articles">Yeni Makaleler</h3>
+                            <p data-tr="Güncel makalelerimizden haberdar olun" data-en="Stay informed about our latest articles">Güncel makalelerimizden haberdar olun</p>
+                            <form class="newsletter-form" id="sidebar-newsletter">
+                                <input type="email" name="email" placeholder="E-posta adresiniz" required>
+                                <button type="submit">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span data-tr="Abone Ol" data-en="Subscribe">Abone Ol</span>
+                                </button>
+                            </form>
+                        </div>
+                    </aside>
+                </div>
             </div>
-        </section>
-        
+        </article>
     </main>
 
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <span data-tr="Makale yükleniyor..." data-en="Loading article...">Makale yükleniyor...</span>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="error-state hidden">
+        <div class="container">
+            <div class="error-content">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h2 data-tr="Makale Bulunamadı" data-en="Article Not Found">Makale Bulunamadı</h2>
+                <p data-tr="Aradığınız makale bulunamadı veya kaldırılmış olabilir." data-en="The article you're looking for was not found or may have been removed.">Aradığınız makale bulunamadı veya kaldırılmış olabilir.</p>
+                <a href="articles.html" class="btn btn-primary" data-tr="Makalelere Dön" data-en="Back to Articles">Makalelere Dön</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer class="footer">
-         <!-- Your existing footer code here -->
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section footer-brand">
+                    <div class="logo">
+                        <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                    </div>
+                    <p class="footer-description" data-tr="Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş." data-en="A volunteer organization working to ensure every animal finds a loving home.">
+                        Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Hızlı Bağlantılar" data-en="Quick Links">Hızlı Bağlantılar</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="adopt.html" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="articles.html" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="contact.html" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="İletişim" data-en="Contact">İletişim</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> iletisim@patigonulluleri.com</p>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Yasal" data-en="Legal">Yasal</h4>
+                    <ul class="footer-links">
+                        <li><a href="gizlilik.html" data-tr="Gizlilik Sözleşmesi" data-en="Privacy Policy">Gizlilik Sözleşmesi</a></li>
+                        <li><a href="kullanim.html" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a></li>
+                        <li><a href="kvkk.html" data-tr="KVKK Aydınlatma Metni" data-en="KVKK Disclosure Text">KVKK Aydınlatma Metni</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p data-tr="© 2025 Pati Gönüllüleri. Tüm hakları saklıdır." data-en="© 2025 Pati Gönüllüleri. All rights reserved.">&copy; 2025 Pati Gönüllüleri. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
     </footer>
 
     <!-- JavaScript -->

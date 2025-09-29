@@ -220,9 +220,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0 0 0;
+    padding: 5px 0 0 0;
     border-top: 1px solid rgba(179, 187, 175, 0.2);
-    margin-top: 20px;
+    margin-top: 5px;
 }
 
 .result-count {
