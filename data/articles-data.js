@@ -128,7 +128,7 @@ const ARTICLES_DATA = [
     <li>Create feeding area in quiet corner</li>
 </ul>`
         },
-        image: "assets/articles/article_1.jpg",
+        image: "assets/articles/article_1.webp",
         author: {
             name: "Dr. Ayşe Kaya",
             avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b789?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
@@ -250,7 +250,7 @@ const ARTICLES_DATA = [
     <li>Ask for support on social media</li>
 </ol>`
         },
-        image: "assets/articles/article_2.jpg",
+        image: "assets/articles/article_2.webp",
         author: {
             name: "Mehmet Özkan",
             avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
@@ -326,7 +326,7 @@ const ARTICLES_DATA = [
 <h2>Schedule</h2>
 <p>Puppies should begin vaccinations from 6–8 weeks of age and complete them according to veterinary advice.</p>`
         },
-        image: "assets/articles/article_3.jpg",
+        image: "assets/articles/article_3.webp",
         author: {
             name: "Dr. Selin Demir",
             avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
@@ -397,7 +397,7 @@ const ARTICLES_DATA = [
 <li>Climbing and exploration areas</li>
 </ul>`
         },
-        image: "assets/articles/article_4.jpg",
+        image: "assets/articles/article_4.webp",
         author: {
             name: "Zeynep Karaca",
             avatar: "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
@@ -468,7 +468,7 @@ const ARTICLES_DATA = [
 <li>Offer protein-rich food during freezing weather</li>
 </ul>`
         },
-        image: "assets/articles/article_5.jpg",
+        image: "assets/articles/article_5.webp",
         author: {
             name: "Ahmet Yıldız",
             avatar: "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
@@ -534,7 +534,7 @@ const ARTICLES_DATA = [
 <li>Don’t skip regular veterinary check-ups</li>
 </ul>`
         },
-        image: "assets/articles/article_6.jpg",
+        image: "assets/articles/article_6.webp",
         author: {
             name: "Elif Arslan",
             avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
@@ -600,7 +600,7 @@ const ARTICLES_DATA = [
 <li>Assisting in adoption processes</li>
 </ul>`
         },
-        image: "assets/articles/article_7.jpg",
+        image: "assets/articles/article_7.webp",
         author: {
             name: "Cemal Ergin",
             avatar: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
@@ -666,7 +666,7 @@ const ARTICLES_DATA = [
 <li>Create quiet resting corners</li>
 </ul>`
         },
-        image: "assets/articles/article_8.jpg",
+        image: "assets/articles/article_8.webp",
         author: {
             name: "Merve Kalkan",
             avatar: "https://images.unsplash.com/photo-1531256379411-56c5d6f35f19?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
@@ -734,7 +734,7 @@ const ARTICLES_DATA = [
 <li>No</li>
 </ul>`
         },
-        image: "assets/articles/article_9.jpg",
+        image: "assets/articles/article_9.webp",
         author: {
             name: "Okan Tunç",
             avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
@@ -802,7 +802,7 @@ const ARTICLES_DATA = [
 <li>Cleaning wounds</li>
 </ul>`
         },
-        image: "assets/articles/article_10.jpg",
+        image: "assets/articles/article_10.webp",
         author: {
             name: "Dr. Hakan Yılmaz",
             avatar: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
