@@ -318,7 +318,7 @@
     min-height: 120px;
 }
 
-/* Checkbox Groups */
+* Checkbox Groups */
 .checkbox-group {
     display: flex;
     flex-direction: column;
@@ -329,6 +329,13 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 12px;
+}
+
+.checkbox-group.error {
+    border: 2px solid #e74c3c;
+    padding: 12px;
+    border-radius: var(--border-radius);
+    background-color: rgba(231, 76, 60, 0.05);
 }
 
 .checkbox-label {

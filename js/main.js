@@ -624,6 +624,8 @@ function optimizeAnimations() {
     window.addEventListener('scroll', requestTick);
 }
 
+
+
 // ===================
 // INITIALIZATION
 // ===================

@@ -134,7 +134,7 @@
             <div class="container">
                 <div class="forms-grid">
                     <!-- General Contact Form -->
-                    <div class="form-section">
+                    <div class="form-section" id="general-contact">
                         <div class="form-header">
                             <h2 data-tr="Genel İletişim" data-en="General Contact">Genel İletişim</h2>
                             <p data-tr="Sorularınız, önerileriniz veya geri bildirimleriniz için formu doldurun" data-en="Fill out the form for your questions, suggestions or feedback">Sorularınız, önerileriniz veya geri bildirimleriniz için formu doldurun</p>
@@ -170,14 +170,13 @@
                                 <textarea id="message" name="message" rows="5" required placeholder="Lütfen mesajınızı detaylıca yazın..."></textarea>
                             </div>
 
+                            <!-- KVKK -->
                             <div class="form-group checkbox-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="privacy-agreement" name="privacyAgreement" required>
-                                    <span class="checkmark"></span>
-                                    <span data-tr="Kişisel verilerimin işlenmesini kabul ediyorum" data-en="I accept the processing of my personal data">
-                                        <a href="kvkk.html" data-tr="Kişisel verilerimin işlenmesini kabul ediyorum" data-en="I accept the processing of my personal data">Kişisel verilerimin işlenmesini kabul ediyorum</a>
-                                    </span>
-                                </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="adoption-privacy-agreement" name="privacyAgreement" required>
+                                <span class="checkmark"></span>
+                                <a href="kvkk.html">Kişisel verilerimin işlenmesini kabul ediyorum</a>
+                            </label>
                             </div>
 
                             <button type="submit" class="submit-btn">
@@ -190,111 +189,146 @@
                     <!-- Volunteer Application Form -->
                     <div class="form-section">
                         <div class="form-header">
-                            <h2 data-tr="Gönüllü Başvurusu" data-en="Volunteer Application">Gönüllü Başvurusu</h2>
-                            <p data-tr="Gönüllü olmak istiyorsanız bu formu doldurun, sizinle iletişime geçelim" data-en="If you want to become a volunteer, fill out this form and we'll contact you">Gönüllü olmak istiyorsanız bu formu doldurun, sizinle iletişime geçelim</p>
+                            <h2 data-tr="Sahiplendirme İlanı" data-en="Adoption Notice">Sahiplendirme İlanı</h2>
+                            <p data-tr="Bir hayvan için sahiplendirme ilanı vermek istiyorsanız bu formu doldurun"
+                            data-en="If you want to post an adoption notice for an animal, please fill out this form.">
+                            Bir hayvan için sahiplendirme ilanı vermek istiyorsanız bu formu doldurun
+                            </p>
                         </div>
 
-                        <form class="contact-form" id="volunteer-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="vol-name" data-tr="Adınız Soyadınız" data-en="Your Full Name">Adınız Soyadınız</label>
-                                    <input type="text" id="vol-name" name="name" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="vol-age" data-tr="Yaşınız" data-en="Your Age">Yaşınız</label>
-                                    <select id="vol-age" name="age" required>
-                                        <option value="" data-tr="Yaş aralığı seçin" data-en="Select age range">Yaş aralığı seçin</option>
-                                        <option value="16-25">16-25</option>
-                                        <option value="26-35">26-35</option>
-                                        <option value="36-45">36-45</option>
-                                        <option value="46-55">46-55</option>
-                                        <option value="55+" data-tr="55+" data-en="55+">55+</option>
-                                    </select>
-                                </div>
-                            </div>
+        <form class="contact-form" enctype="multipart/form-data" id="adoptation-form" novalidate>
+            <!-- 1. Name surname -->
+            <div class="form-group">
+            <label for="owner-name">Ad Soyad <span style="color:red">*</span></label>
+            <input type="text" id="owner-name" name="name" required>
+            </div>
 
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="vol-email" data-tr="E-posta" data-en="Email">E-posta</label>
-                                    <input type="email" id="vol-email" name="email" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="vol-phone" data-tr="Telefon (İsteğe bağlı)" data-en="Phone (Optional)">Telefon (İsteğe bağlı)</label>
-                                    <input type="tel" id="vol-phone" name="phone">
-                                </div>
-                            </div>
+            <!-- 2. Mail -->
+            <div class="form-group">
+            <label for="owner-email">E-posta <span style="color:red">*</span></label>
+            <input type="email" id="owner-email" name="email" required>
+            </div>
 
-                            <div class="form-group">
-                                <label for="vol-areas" data-tr="İlgi Alanlarınız" data-en="Areas of Interest">İlgi Alanlarınız</label>
-                                <div class="checkbox-group multiple">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="interests" value="animal-care">
-                                        <span class="checkmark"></span>
-                                        <span data-tr="Hayvan Bakımı" data-en="Animal Care">Hayvan Bakımı</span>
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="interests" value="adoption-support">
-                                        <span class="checkmark"></span>
-                                        <span data-tr="Sahiplendirme Desteği" data-en="Adoption Support">Sahiplendirme Desteği</span>
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="interests" value="social-media">
-                                        <span class="checkmark"></span>
-                                        <span data-tr="Sosyal Medya" data-en="Social Media">Sosyal Medya</span>
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="interests" value="events">
-                                        <span class="checkmark"></span>
-                                        <span data-tr="Etkinlik Organizasyonu" data-en="Event Organization">Etkinlik Organizasyonu</span>
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="interests" value="transport">
-                                        <span class="checkmark"></span>
-                                        <span data-tr="Ulaşım Desteği" data-en="Transportation Support">Ulaşım Desteği</span>
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" name="interests" value="fundraising">
-                                        <span class="checkmark"></span>
-                                        <span data-tr="Bağış Toplama" data-en="Fundraising">Bağış Toplama</span>
-                                    </label>
-                                </div>
-                            </div>
+            <!-- 3. Phone -->
+            <div class="form-group">
+            <label for="owner-phone">Telefon Numarası <span style="color:red">*</span></label>
+            <input type="tel" id="owner-phone" name="phone" required>
+            </div>
 
-                            <div class="form-group">
-                                <label for="vol-availability" data-tr="Uygunluk Durumunuz" data-en="Your Availability">Uygunluk Durumunuz</label>
-                                <select id="vol-availability" name="availability" required>
-                                    <option value="" data-tr="Seçiniz" data-en="Select">Seçiniz</option>
-                                    <option value="weekdays" data-tr="Hafta içi" data-en="Weekdays">Hafta içi</option>
-                                    <option value="weekends" data-tr="Hafta sonu" data-en="Weekends">Hafta sonu</option>
-                                    <option value="flexible" data-tr="Esnek" data-en="Flexible">Esnek</option>
-                                    <option value="limited" data-tr="Sınırlı" data-en="Limited">Sınırlı</option>
-                                </select>
-                            </div>
+            <!-- 4. City -->
+            <div class="form-group">
+            <label for="city">Şehir <span style="color:red">*</span></label>
+            <select id="city" name="city" required></select>
+            </div>
 
-                            <div class="form-group">
-                                <label for="vol-experience" data-tr="Hayvan Deneyiminiz" data-en="Animal Experience">Hayvan Deneyiminiz</label>
-                                <textarea id="vol-experience" name="experience" rows="3" placeholder="Daha önce hayvanlarla çalışma deneyiminiz var mı? Varsa kısaca belirtin..."></textarea>
-                            </div>
+            <!-- 5. İlçe -->
+            <div class="form-group">
+            <label for="district">İlçe <span style="color:red">*</span></label>
+            <select id="district" name="district" required></select>
+            </div>
 
-                            <div class="form-group">
-                                <label for="vol-motivation" data-tr="Motivasyonunuz" data-en="Your Motivation">Motivasyonunuz</label>
-                                <textarea id="vol-motivation" name="motivation" rows="3" placeholder="Neden gönüllü olmak istiyorsunuz?" required></textarea>
-                            </div>
+            <!-- 6. Tür -->
+            <div class="form-group">
+            <label for="animal-type">Tür <span style="color:red">*</span></label>
+            <select id="animal-type" name="animalType" required>
+                <option value="">Seçiniz</option>
+                <option value="kedi">Kedi</option>
+                <option value="köpek">Köpek</option>
+                <option value="other">Diğer</option>
+            </select>
+            </div>
 
-                            <div class="form-group checkbox-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="vol-agreement" name="agreement" required>
-                                    <span class="checkmark"></span>
-                                    <span data-tr="Gönüllülük koşullarını kabul ediyorum" data-en="I accept the volunteer terms and conditions">Gönüllülük koşullarını kabul ediyorum</span>
-                                </label>
-                            </div>
+            <!-- 6.1 Irk -->
+            <div class="form-group" id="breed-group">
+            <label for="breed">Irk</label>
+            <input type="text" id="breed" name="breed" placeholder="Biliyorsanız yazınız">
+            </div>
 
-                            <button type="submit" class="submit-btn">
-                                <i class="fas fa-heart"></i>
-                                <span data-tr="Başvuru Gönder" data-en="Send Application">Başvuru Gönder</span>
-                            </button>
-                        </form>
-                    </div>
+            <!-- 7. Yaş -->
+            <div class="form-group">
+            <label for="age">Yaş (biliniyorsa)</label>
+            <input type="text" id="age" name="age" placeholder="Tahmini yaş">
+            </div>
+
+            <!-- 8. Boyut -->
+            <div class="form-group">
+            <label for="size">Boyut <span style="color:red">*</span></label>
+            <select id="size" name="size" required>
+                <option value="">Seçiniz</option>
+                <option value="küçük">Küçük</option>
+                <option value="orta">Orta</option>
+                <option value="büyük">Büyük</option>
+            </select>
+            </div>
+
+            <!-- 9. Cinsiyet -->
+            <div class="form-group">
+            <label for="gender">Cinsiyet (biliniyorsa)</label>
+            <input type="text" id="gender" name="gender" placeholder="Erkek / Dişi">
+            </div>
+
+            <!-- 10. Sağlık bilgileri -->
+            <div class="form-group">
+            <label>Aşılı? Kısırlaştırılmış? Çipli? <span style="color:red">*</span></label>
+            <div class="checkbox-group multiple">
+                <label class="checkbox-label">
+                <input type="checkbox" name="health[]" value="aşılı">
+                <span class="checkmark"></span> Aşılı
+                </label>
+                <label class="checkbox-label">
+                <input type="checkbox" name="health[]" value="kısır">
+                <span class="checkmark"></span> Kısırlaştırılmış
+                </label>
+                <label class="checkbox-label">
+                <input type="checkbox" name="health[]" value="çipli">
+                <span class="checkmark"></span> Çipli
+                </label>
+                <label class="checkbox-label">
+                <input type="checkbox" name="health[]" value="bilinmiyor">
+                <span class="checkmark"></span> Bilmiyorum
+                </label>
+            </div>
+            </div>
+
+            <!-- 11. Ekstra sağlık bilgisi -->
+            <div class="form-group">
+            <label for="extra-health">Ekstra sağlık bilgisi</label>
+            <textarea id="extra-health" name="extraHealth" rows="3"></textarea>
+            </div>
+
+            <!-- 12. Açıklama -->
+            <div class="form-group">
+            <label for="description">Hayvan Açıklaması <span style="color:red">*</span></label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+            </div>
+
+            <!-- 13. Özel notlar -->
+            <div class="form-group">
+            <label for="notes">Özel Notlar</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="Madde madde yazabilirsiniz"></textarea>
+            </div>
+
+            <!-- 14. Fotoğraflar -->
+            <div class="form-group" enctype="multipart/form-data">
+            <label for="photos">Hayvan Fotoğrafları (Maks. 3 adet) <span style="color:red">*</span></label>
+            <input type="file" id="photos" name="photos[]" accept="image/*" multiple required>
+            </div>
+
+            <!-- KVKK -->
+            <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="privacy-agreement" name="privacyAgreement" required>
+                <span class="checkmark"></span>
+                <a href="kvkk.html">Kişisel verilerimin işlenmesini kabul ediyorum</a>
+            </label>
+            </div>
+
+            <button type="submit" class="submit-btn">
+            <i class="fas fa-paw"></i> İlan Gönder
+            </button>
+        </form>
+        </div>
+
                 </div>
             </div>
         </section>

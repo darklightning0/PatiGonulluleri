@@ -230,24 +230,30 @@
                     <!-- Main Content -->
                     <div class="main-content">
                         <!-- Sort Controls -->
+                                                <!-- Sort Controls -->
                         <div class="sort-controls">
-                            <div class="sort-options">
-                                <label for="sort-select" data-tr="Sırala:" data-en="Sort by:">Sırala:</label>
-                                <select id="sort-select" name="sortBy">
-                                    <option value="newest" data-tr="En Yeniler" data-en="Newest First">En Yeniler</option>
-                                    <option value="oldest" data-tr="En Eskiler" data-en="Oldest First">En Eskiler</option>
-                                    <option value="age-asc" data-tr="Yaş (Küçükten Büyüğe)" data-en="Age (Young to Old)">Yaş (Küçükten Büyüğe)</option>
-                                    <option value="age-desc" data-tr="Yaş (Büyükten Küçüğe)" data-en="Age (Old to Young)">Yaş (Büyükten Küçüğe)</option>
-                                    <option value="name-asc" data-tr="İsim (A-Z)" data-en="Name (A-Z)">İsim (A-Z)</option>
-                                    <option value="name-desc" data-tr="İsim (Z-A)" data-en="Name (Z-A)">İsim (Z-A)</option>
-                                </select>
+                            <div class="sort-controls-left">
+                                <div class="sort-options">
+                                    <label for="sort-select">Sırala:</label>
+                                    <select id="sort-select">
+                                        <option value="newest">En Yeni</option>
+                                        <option value="oldest">En Eski</option>
+                                        <option value="name-asc">İsim (A-Z)</option>
+                                        <option value="name-desc">İsim (Z-A)</option>
+                                    </select>
+                                </div>
+                                
+                                <a href="contact.html#general-contact" class="post-ad-btn">
+                                    <i class="fas fa-plus"></i>
+                                    <span>İlan Ver</span>
+                                </a>
                             </div>
 
                             <div class="view-options">
-                                <button class="view-btn active" data-view="grid" title="Izgara Görünümü" aria-label="Grid view">
-                                    <i class="fas fa-th"></i>
+                                <button class="view-btn active" data-view="grid" aria-label="Grid view">
+                                    <i class="fas fa-th-large"></i>
                                 </button>
-                                <button class="view-btn" data-view="list" title="Liste Görünümü" aria-label="List view">
+                                <button class="view-btn" data-view="list" aria-label="List view">
                                     <i class="fas fa-list"></i>
                                 </button>
                             </div>
