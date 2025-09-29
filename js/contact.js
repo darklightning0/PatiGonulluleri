@@ -42,12 +42,17 @@ function initAdoptionForm() {
   const citySelect = document.getElementById("city");
   const districtSelect = document.getElementById("district");
   const fileInput = document.getElementById("photos");
+  let currentStep = 1;
+  const totalSteps = 4;
+
+  // Initialize stepper
+  initStepper();
 
   // File upload validation
   fileInput.addEventListener('change', validateFileUpload);
 
-  // Form submission handler
-  form.addEventListener("submit", handleAdoptionFormSubmit);
+  // Form submission handler - pass currentStep as closure
+  form.addEventListener("submit", (e) => handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, validateStep));
 
   // City/District handlers
   citySelect.addEventListener("change", () => {
@@ -55,6 +60,130 @@ function initAdoptionForm() {
     const plateId = selected.dataset.plate;
     plateId ? loadDistricts(plateId) : (districtSelect.innerHTML = `<option value="">Önce şehir seçiniz</option>`);
   });
+
+  // Initialize navigation buttons
+  const navigationHTML = `
+    <div class="form-navigation">
+      <button type="button" class="prev-btn" style="display: none">
+        <i class="fas fa-arrow-left"></i> Geri
+      </button>
+      <button type="button" class="next-btn">
+        İleri <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  `;
+  form.insertAdjacentHTML('beforeend', navigationHTML);
+
+  const prevBtn = form.querySelector('.prev-btn');
+  const nextBtn = form.querySelector('.next-btn');
+
+  // Add button event listeners
+// Add button event listeners
+nextBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  
+  // If we're on the last step, let form submission handle validation
+  if (currentStep === totalSteps) {
+    // Trigger form submission
+    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    return;
+  }
+  
+  // Otherwise, navigate to next step
+  navigateStep(1);
+});
+prevBtn.addEventListener('click', () => navigateStep(-1));
+
+  function initStepper() {
+    updateStepProgress();
+    document.querySelectorAll('.step-indicator').forEach((step, index) => {
+      step.addEventListener('click', () => {
+        const stepNumber = index + 1;
+        if (validatePreviousSteps(stepNumber)) {
+          goToStep(stepNumber);
+        }
+      });
+    });
+  }
+
+    function navigateStep(direction) {
+    const newStep = currentStep + direction;
+    
+    if (newStep < 1 || newStep > totalSteps) return;
+    
+    // Only validate the current step when moving forward (not when arriving at final step)
+    if (direction > 0 && !validateStep(currentStep)) {
+        showNotification('Lütfen tüm zorunlu alanları doldurun.', 'error');
+        return;
+    }
+    
+    goToStep(newStep);
+    }
+
+  function goToStep(step) {
+    // Hide current step
+    const currentStepEl = form.querySelector(`.form-step[data-step="${currentStep}"]`);
+    currentStepEl.classList.remove('active');
+    
+    // Show new step
+    const newStepEl = form.querySelector(`.form-step[data-step="${step}"]`);
+    newStepEl.classList.add('active');
+    
+    // Update step indicators
+    updateStepProgress(step);
+    
+    // Update buttons
+    prevBtn.style.display = step === 1 ? 'none' : 'flex';
+    nextBtn.innerHTML = step === totalSteps ? 
+      '<i class="fas fa-paw"></i> İlan Gönder' : 
+      'İleri <i class="fas fa-arrow-right"></i>';
+    nextBtn.type = step === totalSteps ? 'submit' : 'button';
+    
+    currentStep = step;
+  }
+  
+
+  function validateStep(step) {
+    const stepEl = form.querySelector(`.form-step[data-step="${step}"]`);
+    const requiredFields = stepEl.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+      if (!field.value) {
+        isValid = false;
+        field.classList.add('error');
+      } else {
+        field.classList.remove('error');
+      }
+    });
+    
+    return isValid;
+  }
+
+  function validatePreviousSteps(targetStep) {
+    for (let i = 1; i < targetStep; i++) {
+      if (!validateStep(i)) {
+        showNotification(`Lütfen ${i}. adımdaki tüm zorunlu alanları doldurun.`, 'error');
+        goToStep(i);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function updateStepProgress(step = currentStep) {
+    const indicators = document.querySelectorAll('.step-indicator');
+    indicators.forEach((indicator, index) => {
+      const stepNum = index + 1;
+      indicator.classList.remove('active', 'completed');
+      
+      if (stepNum === step) {
+        indicator.classList.add('active');
+      } else if (stepNum < step) {
+        indicator.classList.add('completed');
+      }
+    });
+  }
 
   loadCities();
 
@@ -123,16 +252,20 @@ function validateFileUpload(e) {
   }
 }
 
-async function handleAdoptionFormSubmit(e) {
+async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, validateStep) {
   e.preventDefault();
   
   const form = e.target;
   const formData = new FormData(form);
-  const submitBtn = form.querySelector(".submit-btn");
+  const submitBtn = form.querySelector('button[type="submit"]');
 
-  if (!validateForm(form)) {
-    showNotification('Lütfen tüm zorunlu alanları doldurun.', 'error');
-    return;
+  // Validate all steps before submission
+  for (let i = 1; i <= totalSteps; i++) {
+    if (!validateStep(i)) {
+      showNotification(`Lütfen ${i}. adımdaki tüm zorunlu alanları doldurun.`, 'error');
+      goToStep(i);
+      return;
+    }
   }
 
   if (!formData.get('privacyAgreement')) {
@@ -142,6 +275,8 @@ async function handleAdoptionFormSubmit(e) {
 
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gönderiliyor...';
+
+  // Rest of your submission code stays the same...
 
   try {
     const files = form.querySelector('#photos').files;
@@ -187,7 +322,17 @@ async function handleAdoptionFormSubmit(e) {
 
     if (result.result === 'success') {
       showNotification('İlanınız başarıyla gönderildi! En kısa sürede yayınlanacaktır.', 'success');
+      
+      // Reset form
       form.reset();
+      const fileInput = form.querySelector('#photos');
+      if (fileInput) fileInput.value = '';
+      const districtSelect = form.querySelector('#district');
+      if (districtSelect) {
+        districtSelect.innerHTML = '<option value="">Önce şehir seçiniz</option>';
+      }
+      goToStep(1);
+      form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
     } else {
       throw new Error(result.message || 'Bir hata oluştu');
     }

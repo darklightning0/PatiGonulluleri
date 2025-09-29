@@ -196,121 +196,134 @@
                             </p>
                         </div>
 
-        <form class="contact-form" enctype="multipart/form-data" id="adoptation-form" novalidate>
-            <!-- 1. Name surname -->
-            <div class="form-group">
-            <label for="owner-name">Ad Soyad <span style="color:red">*</span></label>
-            <input type="text" id="owner-name" name="name" required>
+        <form class="contact-form stepper-form" enctype="multipart/form-data" id="adoptation-form" novalidate>
+            <!-- Stepper Progress -->
+            <div class="stepper-progress">
+                <div class="step-indicator active" data-step="1">
+                    <span class="step-number">1</span>
+                    <span class="step-title">Sahiplendiren Bilgileri</span>
+                </div>
+                <div class="step-indicator" data-step="2">
+                    <span class="step-number">2</span>
+                    <span class="step-title">Hayvan Bilgileri</span>
+                </div>
+                <div class="step-indicator" data-step="3">
+                    <span class="step-number">3</span>
+                    <span class="step-title">Sağlık Bilgileri</span>
+                </div>
+                <div class="step-indicator" data-step="4">
+                    <span class="step-number">4</span>
+                    <span class="step-title">Fotoğraflar ve Onay</span>
+                </div>
             </div>
 
-            <!-- 2. Mail -->
-            <div class="form-group">
-            <label for="owner-email">E-posta <span style="color:red">*</span></label>
-            <input type="email" id="owner-email" name="email" required>
+            <!-- Step 1: Pet Owner Information -->
+            <div class="form-step active" data-step="1">
+                <div class="form-group">
+                    <label for="owner-name">Ad Soyad <span style="color:red">*</span></label>
+                    <input type="text" id="owner-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="owner-email">E-posta <span style="color:red">*</span></label>
+                    <input type="email" id="owner-email" name="email" required placeholder="mail@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="owner-phone">Telefon Numarası <span style="color:red">*</span></label>
+                    <input type="tel" id="owner-phone" name="phone" required placeholder="(5XX) XXX XX XX">
+                </div>
+                <div class="form-group">
+                    <label for="city">Şehir <span style="color:red">*</span></label>
+                    <select id="city" name="city" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="district">İlçe <span style="color:red">*</span></label>
+                    <select id="district" name="district" required></select>
+                </div>
             </div>
 
-            <!-- 3. Phone -->
-            <div class="form-group">
-            <label for="owner-phone">Telefon Numarası <span style="color:red">*</span></label>
-            <input type="tel" id="owner-phone" name="phone" required>
+            <!-- Step 2: Basic Pet Information -->
+            <div class="form-step" data-step="2">
+                <div class="form-group">
+                    <label for="animal-type">Tür <span style="color:red">*</span></label>
+                    <select id="animal-type" name="animalType" required>
+                        <option value="">Seçiniz</option>
+                        <option value="kedi">Kedi</option>
+                        <option value="köpek">Köpek</option>
+                        <option value="other">Diğer</option>
+                    </select>
+                </div>
+                <div class="form-group" id="breed-group">
+                    <label for="breed">Irk</label>
+                    <input type="text" id="breed" name="breed" placeholder="Biliyorsanız yazınız">
+                </div>
+                <div class="form-group">
+                    <label for="age">Yaş - Biliniyorsa</label>
+                    <input type="text" id="age" name="age" placeholder="Yıla yuvarlayak yazınız">
+                </div>
+                <div class="form-group">
+                    <label for="size">Boyut <span style="color:red">*</span></label>
+                    <select id="size" name="size" required>
+                        <option value="">Seçiniz</option>
+                        <option value="küçük">Küçük</option>
+                        <option value="orta">Orta</option>
+                        <option value="büyük">Büyük</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Cinsiyet - Biliniyorsa</label>
+                    <input type="text" id="gender" name="gender" placeholder="Erkek / Dişi">
+                </div>
             </div>
 
-            <!-- 4. City -->
-            <div class="form-group">
-            <label for="city">Şehir <span style="color:red">*</span></label>
-            <select id="city" name="city" required></select>
+            <!-- Step 3: Health Information -->
+            <div class="form-step" data-step="3">
+                <div class="form-group">
+                    <label>Sağlık bilgileri <span style="color:red">*</span></label>
+                    <div class="checkbox-group multiple">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="health[]" value="aşılı">
+                            <span class="checkmark"></span> Aşılı
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="health[]" value="kısır">
+                            <span class="checkmark"></span> Kısırlaştırılmış
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="health[]" value="çipli">
+                            <span class="checkmark"></span> Çipli
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="health[]" value="bilinmiyor">
+                            <span class="checkmark"></span> Bilmiyorum
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="extra-health">Ekstra sağlık bilgisi</label>
+                    <textarea id="extra-health" name="extraHealth" rows="3"></textarea>
+                </div>
             </div>
 
-            <!-- 5. İlçe -->
+            <!-- Step 4: Photos and Agreement -->
+            <div class="form-step" data-step="4">
+                
             <div class="form-group">
-            <label for="district">İlçe <span style="color:red">*</span></label>
-            <select id="district" name="district" required></select>
-            </div>
-
-            <!-- 6. Tür -->
-            <div class="form-group">
-            <label for="animal-type">Tür <span style="color:red">*</span></label>
-            <select id="animal-type" name="animalType" required>
-                <option value="">Seçiniz</option>
-                <option value="kedi">Kedi</option>
-                <option value="köpek">Köpek</option>
-                <option value="other">Diğer</option>
-            </select>
-            </div>
-
-            <!-- 6.1 Irk -->
-            <div class="form-group" id="breed-group">
-            <label for="breed">Irk</label>
-            <input type="text" id="breed" name="breed" placeholder="Biliyorsanız yazınız">
-            </div>
-
-            <!-- 7. Yaş -->
-            <div class="form-group">
-            <label for="age">Yaş (biliniyorsa)</label>
-            <input type="text" id="age" name="age" placeholder="Tahmini yaş">
-            </div>
-
-            <!-- 8. Boyut -->
-            <div class="form-group">
-            <label for="size">Boyut <span style="color:red">*</span></label>
-            <select id="size" name="size" required>
-                <option value="">Seçiniz</option>
-                <option value="küçük">Küçük</option>
-                <option value="orta">Orta</option>
-                <option value="büyük">Büyük</option>
-            </select>
-            </div>
-
-            <!-- 9. Cinsiyet -->
-            <div class="form-group">
-            <label for="gender">Cinsiyet (biliniyorsa)</label>
-            <input type="text" id="gender" name="gender" placeholder="Erkek / Dişi">
-            </div>
-
-            <!-- 10. Sağlık bilgileri -->
-            <div class="form-group">
-            <label>Aşılı? Kısırlaştırılmış? Çipli? <span style="color:red">*</span></label>
-            <div class="checkbox-group multiple">
-                <label class="checkbox-label">
-                <input type="checkbox" name="health[]" value="aşılı">
-                <span class="checkmark"></span> Aşılı
-                </label>
-                <label class="checkbox-label">
-                <input type="checkbox" name="health[]" value="kısır">
-                <span class="checkmark"></span> Kısırlaştırılmış
-                </label>
-                <label class="checkbox-label">
-                <input type="checkbox" name="health[]" value="çipli">
-                <span class="checkmark"></span> Çipli
-                </label>
-                <label class="checkbox-label">
-                <input type="checkbox" name="health[]" value="bilinmiyor">
-                <span class="checkmark"></span> Bilmiyorum
-                </label>
-            </div>
-            </div>
-
-            <!-- 11. Ekstra sağlık bilgisi -->
-            <div class="form-group">
-            <label for="extra-health">Ekstra sağlık bilgisi</label>
-            <textarea id="extra-health" name="extraHealth" rows="3"></textarea>
-            </div>
-
-            <!-- 12. Açıklama -->
-            <div class="form-group">
-            <label for="description">Hayvan Açıklaması <span style="color:red">*</span></label>
+            <label for="description">Hayvanınızın Açıklaması <span style="color:red">*</span></label>
             <textarea id="description" name="description" rows="4" required></textarea>
             </div>
 
             <!-- 13. Özel notlar -->
             <div class="form-group">
             <label for="notes">Özel Notlar</label>
-            <textarea id="notes" name="notes" rows="3" placeholder="Madde madde yazabilirsiniz"></textarea>
+            <textarea id="notes" name="notes" rows="3" placeholder="Örnek:
+            * Tasmasız gezmeyi sever.
+            * Hafif korkaktır.
+            * Bahçeli evler daha uygundur."></textarea>
             </div>
 
             <!-- 14. Fotoğraflar -->
             <div class="form-group" enctype="multipart/form-data">
-            <label for="photos">Hayvan Fotoğrafları (Maks. 3 adet) <span style="color:red">*</span></label>
+            <label for="photos">Hayvanınızın Fotoğrafları (Maks. 3 adet) <span style="color:red">*</span></label>
             <input type="file" id="photos" name="photos[]" accept="image/*" multiple required>
             </div>
 

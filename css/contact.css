@@ -8,6 +8,209 @@
 }
 
 /* ===================
+   STEPPER FORM STYLES
+   =================== */
+
+.stepper-form {
+    position: relative;
+}
+
+.stepper-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    position: relative;
+    padding: 0 20px;
+}
+
+.stepper-progress::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 40px;
+    right: 40px;
+    height: 2px;
+    background: var(--sage-green);
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.step-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2px solid var(--sage-green);
+    color: var(--sage-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.step-title {
+    font-size: 14px;
+    color: var(--medium-gray);
+    text-align: center;
+    transition: all 0.3s ease;
+    max-width: 150px;
+    padding: 0 10px;
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+}
+
+.step-indicator.active .step-number {
+    background: var(--accent-orange);
+    border-color: var(--accent-orange);
+    color: var(--white);
+}
+
+.step-indicator.active .step-title {
+    color: var(--primary-brown);
+    font-weight: 500;
+}
+
+.step-indicator.completed .step-number {
+    background: var(--sage-green);
+    border-color: var(--sage-green);
+    color: var(--white);
+}
+
+.form-step {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.form-step .step-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--primary-brown);
+    margin-bottom: 24px;
+    font-weight: 600;
+}
+
+.stepper-form .form-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(114, 80, 55, 0.1);
+}
+
+.stepper-form .prev-btn,
+.stepper-form .next-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stepper-form .prev-btn {
+    background: var(--white);
+    color: var(--primary-brown);
+    border: 2px solid var(--sage-green);
+}
+
+.stepper-form .next-btn {
+    background: var(--accent-orange);
+    color: var(--white);
+    border: none;
+}
+
+.stepper-form .prev-btn:hover {
+    background: var(--sage-green);
+    color: var(--white);
+}
+
+.stepper-form .next-btn:hover {
+    background: var(--light-orange);
+    transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile Responsive Styles for Stepper */
+@media (max-width: 768px) {
+    .stepper-progress {
+        flex-direction: column;
+        gap: 40px;
+        padding: 0;
+        margin-bottom: 30px;
+    }
+
+    .stepper-progress::before {
+        top: 0;
+        bottom: 0;
+        left: 16px;
+        right: auto;
+        width: 2px;
+        height: auto;
+    }
+
+    .step-indicator {
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 16px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .step-title {
+        position: static;
+        transform: none;
+        text-align: left;
+        padding: 0;
+        margin: 0;
+    }
+
+    .form-step .step-title {
+        font-size: 1.3rem;
+    }
+
+    .stepper-form .form-navigation {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .stepper-form .prev-btn,
+    .stepper-form .next-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ===================
    PAGE HEADER
    =================== */
 
