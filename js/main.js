@@ -189,35 +189,54 @@ function animateNumber(element, start, end, duration = 2000) {
  * Initialize language switching functionality
  */
 function initLanguageToggle() {
-    if (!window.languageManager) {
-        console.error('LanguageManager not initialized');
-        return;
-    }
-
     const langButtons = document.querySelectorAll('.lang-btn');
-    
-    // Set initial button states
-    updateLanguageButtons(window.languageManager.getLanguage());
     
     langButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const targetLang = btn.dataset.lang;
-            window.languageManager.setLanguage(targetLang);
-            updateLanguageButtons(targetLang);
+            if (targetLang !== currentLanguage) {
+                switchLanguage(targetLang);
+                updateLanguageButtons(targetLang);
+            }
         });
     });
 }
 
-// Legacy function kept for backward compatibility
+/**
+ * Switch between languages
+ */
 function switchLanguage(lang) {
-    if (window.languageManager) {
-        window.languageManager.setLanguage(lang);
-    }
+    currentLanguage = lang;
+    
+    // Update all translatable elements
+    const translatableElements = document.querySelectorAll('[data-tr][data-en]');
+    
+    translatableElements.forEach(element => {
+        const trText = element.dataset.tr;
+        const enText = element.dataset.en;
+        
+        if (lang === 'tr') {
+            element.textContent = trText;
+        } else if (lang === 'en') {
+            element.textContent = enText;
+        }
+    });
+    
+    // Update form placeholders and other attributes if needed
+    updateFormTexts(lang);
+    
+    // Store language preference
+    localStorage.setItem('preferredLanguage', lang);
+    
+    // Add smooth transition effect
+    document.body.style.opacity = '0.8';
+    setTimeout(() => {
+        document.body.style.opacity = '1';
+    }, 200);
 }
 
 /**
  * Update language button states
- * @param {string} activeLang - The currently active language code
  */
 function updateLanguageButtons(activeLang) {
     const langButtons = document.querySelectorAll('.lang-btn');
@@ -597,43 +616,53 @@ function initSmoothScrolling() {
  * Load and display featured pets
  */
 function loadFeaturedPets() {
+    // 1. Doğru konteyneri ID'si ile seç
     const petsContainer = document.getElementById('featured-pets');
-    if (!petsContainer) return;
+    if (!petsContainer) {
+        console.error("Pet container #featured-pets not found!");
+        return;
+    }
 
-    // Sort pets: urgent first, then by id
+    // Hayvanları sırala: Acil olanlar öne, sonra yeni eklenenler
     const sortedPets = PETS_DATA.sort((a, b) => {
-        if (a.isUrgent && !b.isUrgent) return -1;
-        if (!a.isUrgent && b.isUrgent) return 1;
-        return b.id - a.id; // Newer pets first
+        if (a.urgent && !b.urgent) return -1; // 'urgent' olan 'a' öne gelsin
+        if (!a.urgent && b.urgent) return 1; // 'urgent' olan 'b' öne gelsin
+        return new Date(b.dateAdded) - new Date(a.dateAdded); // Tarihe göre sırala (yeni olanlar önde)
     });
 
-    // Get first 3 pets
+    // İlk 4 hayvanı al (veya istediğin kadar)
     const featuredPets = sortedPets.slice(0, 3);
     
-    // Clear existing content
+    // Mevcut içeriği temizle
     petsContainer.innerHTML = '';
     
-    // Add pets
-    function renderFeaturedPets() {
-    const petsContainer = document.querySelector('.pets-container'); // Konteyneri fonksiyon içinde tanımla
-    petsContainer.innerHTML = ''; // ÖNEMLİ: Her seferinde konteyneri temizle!
-
+    // 2. Gereksiz iç fonksiyon olmadan doğrudan döngüyü çalıştır
     featuredPets.forEach(pet => {
-        const lang = currentLanguage || 'tr';
+        // Bu kısım senin dil çeviri kodun, doğru çalışıyor
+        const lang = document.documentElement.lang || 'tr';
         const ageText = pet.age + (lang === 'tr' ? ' yaşında' : ' year' + (pet.age > 1 ? 's' : ''));
         const petType = pet.type === 'dog' ? (lang === 'tr' ? 'Köpek' : 'Dog') : (lang === 'tr' ? 'Kedi' : 'Cat');
-        const petSize = pet.size === 'Large' ? (lang === 'tr' ? 'Büyük' : 'Large') : pet.size === 'Medium' ? (lang === 'tr' ? 'Orta' : 'Medium') : (lang === 'tr' ? 'Küçük' : 'Small');
+        
+        // Boyut için senin kodunu daha okunabilir hale getirdim
+        let petSize;
+        if (pet.size === 'large') {
+            petSize = lang === 'tr' ? 'Büyük' : 'Large';
+        } else if (pet.size === 'medium') {
+            petSize = lang === 'tr' ? 'Orta' : 'Medium';
+        } else {
+            petSize = lang === 'tr' ? 'Küçük' : 'Small';
+        }
         
         const petHTML = `
             <div class="pet-card">
                 <div class="pet-image">
-                    <img src="${pet.images[0]}" alt="${pet.name}">
-                    ${pet.isUrgent ? `<span class="pet-badge urgent">${lang === 'tr' ? 'Acil' : 'Urgent'}</span>` : ''}
+                    <img src="${pet.image}" alt="${pet.name}">
+                    ${pet.urgent ? `<span class="pet-badge urgent">${lang === 'tr' ? 'Acil' : 'Urgent'}</span>` : ''}
                     <span class="pet-badge ${pet.type.toLowerCase()}">${petType}</span>
                 </div>
                 <div class="pet-info">
                     <h3 class="pet-name">${pet.name}</h3>
-                    <p class="pet-description">${pet.description}</p>
+                    <p class="pet-description">${pet.description.substring(0, 100)}...</p>
                     <div class="pet-details">
                         <span class="pet-age">${ageText}</span>
                         <span class="pet-size">${petSize}</span>
@@ -645,10 +674,11 @@ function loadFeaturedPets() {
                 </div>
             </div>
         `;
+        // 3. HTML'i doğru konteynere ekle
         petsContainer.insertAdjacentHTML('beforeend', petHTML);
     });
 }
-}
+
 
 // ===================
 // ARTICLES LOADING
@@ -766,6 +796,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initSmoothScrolling();
     initImageLoading();
     optimizeAnimations();
+
     
     // Add scroll reveal class to animated elements
     const animatedElements = document.querySelectorAll('.pet-card, .feature-card, .stat-number');

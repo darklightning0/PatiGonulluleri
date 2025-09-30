@@ -12,19 +12,6 @@ let isPhoneVisible = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     initPetDetailPage();
-    
-    // Subscribe to language changes if LanguageManager is available
-    if (window.languageManager) {
-        window.languageManager.subscribe(() => {
-            // Re-render everything with new language
-            if (currentPet) {
-                updatePetDetails(currentPet);
-                updateTranslatedFields();
-                updateContactCard();
-                updateSimilarPets();
-            }
-        });
-    }
 });
 
 function initPetDetailPage() {
@@ -248,7 +235,7 @@ function updatePageTitle() {
 }
 
 function getCurrentLanguage() {
-    return window.languageManager ? window.languageManager.getLanguage() : (window.currentLanguage || 'tr');
+    return window.currentLanguage || 'tr';
 }
 
 // ===================

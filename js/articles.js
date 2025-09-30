@@ -24,20 +24,6 @@ let isLoading = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     initArticlesPage();
-    
-    // Subscribe to language changes if LanguageManager is available
-    if (window.languageManager) {
-        window.languageManager.subscribe(() => {
-            // Re-render everything with new language
-            clearCache();
-            loadFeaturedArticles();
-            applyFiltersAndSearch();
-            updateSortLabel();
-            updateCategoryFilterOptions();
-            updateViewToggleButtons();
-            updateSearchPlaceholder();
-        });
-    }
 });
 
 function initArticlesPage() {
@@ -185,23 +171,6 @@ function applyFiltersAndSearch() {
     try {
         const currentLang = getCurrentLanguage();
         
-        // Check cache first
-        const cacheKey = {
-            search: currentSearch,
-            category: currentCategory,
-            sort: currentSort,
-            page: currentPage,
-            lang: currentLang
-        };
-        
-        const cachedResults = window.resultsCache?.get(cacheKey);
-        if (cachedResults) {
-            filteredArticles = cachedResults;
-            renderArticles();
-            updatePagination();
-            return;
-        }
-        
         // Start with all articles
         filteredArticles = [...allArticles];
         
@@ -249,17 +218,6 @@ function applyFiltersAndSearch() {
         
         // Calculate pagination
         calculatePagination();
-        
-        // Cache the filtered results
-        if (window.resultsCache) {
-            window.resultsCache.set({
-                search: currentSearch,
-                category: currentCategory,
-                sort: currentSort,
-                page: currentPage,
-                lang: currentLang
-            }, filteredArticles);
-        }
         
         // Update display
         loadArticles();
@@ -740,7 +698,7 @@ function openArticle(articleId) {
 // ===================
 
 function getCurrentLanguage() {
-    return window.languageManager ? window.languageManager.getLanguage() : (window.currentLanguage || 'tr');
+    return window.currentLanguage || 'tr';
 }
 
 function updateResultCount() {
