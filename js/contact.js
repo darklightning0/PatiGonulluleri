@@ -8,7 +8,7 @@
 // ===================
 
 let isSubmitting = false;
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk-mCVqMgOB4tJrqkNDJRmyA-0qLIw9w8vMP7dEmjm9vSEB6chvDn9dLblkF0EILDIng/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrRDoR_hikB5_Tmhi9xIuGkFK6yqfIEXVfTENuUsAm-1qEPKflaKXKjtPxY3HMGES9vw/exec";
 
 // ===================
 // INITIALIZATION
@@ -17,6 +17,20 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk-mCVqMgOB4tJrqkND
 document.addEventListener("DOMContentLoaded", () => {
   initContactPage();
   initAdoptionForm();
+  
+  // Subscribe to language changes if LanguageManager is available
+  if (window.languageManager) {
+    window.languageManager.subscribe(() => {
+      // Update form-specific elements
+      updateStepTitles();
+      updateNavigationButtons();
+      updateFormPlaceholders();
+      updateValidationMessages();
+      
+      // Clear any active error messages as they might be in wrong language
+      clearFormErrors();
+    });
+  }
 });
 
 function initContactPage() {
@@ -36,7 +50,7 @@ function initContactPage() {
 // ===================
 
 function initAdoptionForm() {
-  const form = document.getElementById("adoptation-form");
+  const form = document.getElementById("Adoption-form");
   if (!form) return;
 
   const citySelect = document.getElementById("city");
@@ -52,7 +66,14 @@ function initAdoptionForm() {
   fileInput.addEventListener('change', validateFileUpload);
 
   // Form submission handler - pass currentStep as closure
-  form.addEventListener("submit", (e) => handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, validateStep));
+  form.addEventListener("submit", (e) => {
+    if (!window.utils || !window.utils.checkRateLimit()) {
+      showNotification('Lütfen 1 dakika bekleyip tekrar deneyin.', 'error');
+      e.preventDefault();
+      return;
+    }
+    handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, validateStep);
+  });
 
   // City/District handlers
   citySelect.addEventListener("change", () => {
@@ -275,8 +296,6 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
 
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gönderiliyor...';
-
-  // Rest of your submission code stays the same...
 
   try {
     const files = form.querySelector('#photos').files;
@@ -715,8 +734,87 @@ function showNotification(message, type = 'info') {
   }, 5000);
 }
 
+/**
+ * Get current language
+ */
 function getCurrentLanguage() {
-  return window.currentLanguage || 'tr';
+  return window.languageManager ? window.languageManager.getLanguage() : (window.currentLanguage || 'tr');
+}
+
+/**
+ * Update step titles based on current language
+ */
+function updateStepTitles() {
+  const stepTitles = {
+    1: { tr: 'Sahiplendiren Bilgileri', en: 'Owner Information' },
+    2: { tr: 'Hayvan Bilgileri', en: 'Pet Information' },
+    3: { tr: 'Sağlık Bilgileri', en: 'Health Information' },
+    4: { tr: 'Fotoğraflar ve Onay', en: 'Photos and Confirmation' }
+  };
+  
+  const currentLang = getCurrentLanguage();
+  document.querySelectorAll('.step-title').forEach((title, index) => {
+    if (stepTitles[index + 1]) {
+      title.textContent = stepTitles[index + 1][currentLang];
+    }
+  });
+}
+
+/**
+ * Update navigation button text based on current language
+ */
+function updateNavigationButtons() {
+  const currentLang = getCurrentLanguage();
+  const prevBtn = document.querySelector('.prev-btn');
+  const nextBtn = document.querySelector('.next-btn');
+  
+  if (prevBtn) {
+    prevBtn.innerHTML = `<i class="fas fa-arrow-left"></i> ${currentLang === 'tr' ? 'Geri' : 'Back'}`;
+  }
+  
+  if (nextBtn) {
+    const isLastStep = currentStep === totalSteps;
+    nextBtn.innerHTML = isLastStep ? 
+      (currentLang === 'tr' ? 'Gönder' : 'Submit') :
+      `${currentLang === 'tr' ? 'İleri' : 'Next'} <i class="fas fa-arrow-right"></i>`;
+  }
+}
+
+/**
+ * Update form placeholders and labels based on current language
+ */
+function updateFormPlaceholders() {
+  const translations = {
+    'name': { tr: 'Adınız', en: 'Your Name' },
+    'email': { tr: 'E-posta Adresiniz', en: 'Your Email' },
+    'phone': { tr: 'Telefon Numaranız', en: 'Your Phone' },
+    'city': { tr: 'Şehir Seçiniz', en: 'Select City' },
+    'district': { tr: 'İlçe Seçiniz', en: 'Select District' },
+    'address': { tr: 'Adres', en: 'Address' },
+    'message': { tr: 'Mesajınız', en: 'Your Message' }
+  };
+  
+  const currentLang = getCurrentLanguage();
+  
+  // Update placeholders
+  Object.keys(translations).forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.placeholder = translations[id][currentLang];
+    }
+  });
+}
+
+/**
+ * Clear any displayed form errors
+ */
+function clearFormErrors() {
+  document.querySelectorAll('.error-message').forEach(error => {
+    error.remove();
+  });
+  document.querySelectorAll('.input-error').forEach(input => {
+    input.classList.remove('input-error');
+  });
 }
 
 function trackFormSubmission(type, data) {

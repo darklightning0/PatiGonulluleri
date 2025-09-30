@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     <!-- Header -->
@@ -22,10 +22,10 @@
         <div class="header-container">
             <div class="nav-wrapper">
                 <!-- Logo -->
-                <div class="logo">
+                <a href="index.html" class="logo">
                     <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
                     <span class="logo-text">Pati Gönüllüleri</span>
-                </div>
+                </a>
 
                 <!-- Navigation -->
                 <nav class="nav" role="navigation">
@@ -104,24 +104,10 @@
                                 <i class="fab fa-instagram"></i>
                             </a>
                             <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" class="social-link twitter" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                                <i class="fab fa-twitter"></i>
+                                <i class="fab fa-x-twitter"></i>
                             </a>
                             <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" class="social-link youtube" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
                                 <i class="fab fa-youtube"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- WhatsApp -->
-                    <div class="contact-card">
-                        <div class="contact-icon whatsapp">
-                            <i class="fab fa-whatsapp"></i>
-                        </div>
-                        <h3 data-tr="WhatsApp" data-en="WhatsApp">WhatsApp</h3>
-                        <p data-tr="WhatsApp üzerinden sorularınızı sorabilirsiniz" data-en="You can reach us via WhatsApp">WhatsApp üzerinden sorularınızı sorabilirsiniz</p>
-                        <div class="contact-info">
-                            <a href="https://wa.me/905001234567" class="whatsapp-btn">
-                                <span data-tr="Mesaj Gönder" data-en="Send Message">Mesaj Gönder</span>
                             </a>
                         </div>
                     </div>
@@ -196,7 +182,7 @@
                             </p>
                         </div>
 
-        <form class="contact-form stepper-form" enctype="multipart/form-data" id="adoptation-form" novalidate>
+        <form class="contact-form stepper-form" enctype="multipart/form-data" id="Adoption-form" novalidate>
             <!-- Stepper Progress -->
             <div class="stepper-progress">
                 <div class="step-indicator active" data-step="1">
@@ -230,6 +216,10 @@
                 <div class="form-group">
                     <label for="owner-phone">Telefon Numarası <span style="color:red">*</span></label>
                     <input type="tel" id="owner-phone" name="phone" required placeholder="(5XX) XXX XX XX">
+                </div>
+                <div class="form-group">
+                    <label for="available-hours">Müsait Saatler</label>
+                    <input type="text" id="available-hours" name="availableHours" placeholder="XX:XX-XX:XX">
                 </div>
                 <div class="form-group">
                     <label for="city">Şehir <span style="color:red">*</span></label>
@@ -455,7 +445,7 @@
                     <div class="social-links">
                         <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
                         <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
@@ -474,6 +464,7 @@
                     <h4 data-tr="İletişim" data-en="Contact">İletişim</h4>
                     <div class="contact-info">
                         <p><i class="fas fa-envelope"></i> iletisim@patigonulluleri.com</p>
+                        <p><i class="fas fa-map-marker-alt"></i> İzmir, Türkiye</p>
                     </div>
                 </div>
 
@@ -494,6 +485,7 @@
     </footer>
 
     <!-- JavaScript -->
+    <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
     <script src="js/contact.js"></script>
 </body>

@@ -27,6 +27,20 @@ let filteredPets = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     initAdoptPage();
+    
+    // Subscribe to language changes if LanguageManager is available
+    if (window.languageManager) {
+        window.languageManager.subscribe(() => {
+            // Re-render everything with new language
+            updateFilterLabels();
+            applyFiltersAndSort();
+            renderPets();
+            updatePagination();
+            updateResultCount();
+            updateSortLabel();
+            updateToggleFiltersButton();
+        });
+    }
 });
 
 document.getElementById('pets-container').addEventListener('click', (e) => {
@@ -447,6 +461,12 @@ function createPetCard(pet) {
     // Translate data based on current language
     const translatedData = translatePetData(pet, currentLang);
     
+    // Sanitize all text input
+    const sanitize = window.utils ? window.utils.sanitizeHTML : (text => text);
+    const petName = sanitize(pet.name);
+    const translatedDesc = sanitize(translatedData.description);
+    const translatedBreed = sanitize(translatedData.breed);
+    
     const urgentBadge = pet.urgent ? `<div class="pet-urgent-badge" data-tr="ACİL" data-en="URGENT">ACİL</div>` : '';
     
     const healthTags = pet.health.map(health => {
@@ -477,10 +497,10 @@ function createPetCard(pet) {
                 </div>
                 <div class="pet-card-content">
                     <div class="pet-card-header">
-                        <h3 class="pet-card-name">${pet.name}</h3>
-                        <div class="pet-card-breed">${translatedData.breed}</div>
+                        <h3 class="pet-card-name">${petName}</h3>
+                        <div class="pet-card-breed">${translatedBreed}</div>
                     </div>
-                    <p class="pet-card-description">${translatedData.description}</p>
+                    <p class="pet-card-description">${translatedDesc}</p>
                     <div class="pet-card-details">
                         <div class="pet-detail-item">
                             <i class="fas fa-birthday-cake"></i>
@@ -587,8 +607,7 @@ function translatePetData(pet, lang) {
 }
 
 function getCurrentLanguage() {
-    // Get current language from the main.js currentLanguage variable or default to 'tr'
-    return window.currentLanguage || 'tr';
+    return window.languageManager ? window.languageManager.getLanguage() : (window.currentLanguage || 'tr');
 }
 
 function updateLanguageTexts() {

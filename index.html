@@ -20,10 +20,10 @@
         <div class="header-container">
             <div class="nav-wrapper">
                 <!-- Logo -->
-                <div class="logo">
+                <a href="index.html" class="logo">
                     <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
                     <span class="logo-text">Pati Gönüllüleri</span>
-                </div>
+                </a>
 
                 <!-- Navigation -->
                 <nav class="nav" role="navigation">
@@ -70,7 +70,7 @@
                     </p>
                     <div class="hero-buttons">
                         <a href="adopt.html" class="btn btn-primary" data-tr="Sahiplen" data-en="Adopt Now">Sahiplen</a>
-                        <a href="contact.html#general-contact" class="btn btn-secondary" data-tr="İlan ver" data-en="Post an Adoptation Notice">İlan ver</a>
+                        <a href="contact.html#general-contact" class="btn btn-secondary" data-tr="İlan ver" data-en="Post an Adoption Notice">İlan ver</a>
                     </div>
                 </div>
             </div>
@@ -86,69 +86,8 @@
                     </p>
                 </div>
 
-                <div class="pets-grid">
-                    <!-- Pet Card 1 -->
-                    <div class="pet-card">
-                        <div class="pet-image">
-                            <img src="https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Pamuk - Sevimli Golden Retriever">
-                            <div class="pet-badge">
-                                <span data-tr="Köpek" data-en="Dog">Köpek</span>
-                            </div>
-                        </div>
-                        <div class="pet-info">
-                            <h3 class="pet-name">Pamuk</h3>
-                            <p class="pet-description" data-tr="3 yaşında, oyuncu ve çok sevecen. Çocuklarla çok iyi anlaşıyor." data-en="3 years old, playful and very affectionate. Gets along great with children.">
-                                3 yaşında, oyuncu ve çok sevecen. Çocuklarla çok iyi anlaşıyor.
-                            </p>
-                            <div class="pet-details">
-                                <span class="pet-age" data-tr="3 Yaş" data-en="3 Years">3 Yaş</span>
-                                <span class="pet-size" data-tr="Büyük" data-en="Large">Büyük</span>
-                            </div>
-                            <a href="adopt.html?pet=pamuk" class="btn btn-outline" data-tr="Daha Fazla" data-en="Learn More">Daha Fazla</a>
-                        </div>
-                    </div>
-
-                    <!-- Pet Card 2 -->
-                    <div class="pet-card">
-                        <div class="pet-image">
-                            <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Luna - Şirin Kedi">
-                            <div class="pet-badge">
-                                <span data-tr="Kedi" data-en="Cat">Kedi</span>
-                            </div>
-                        </div>
-                        <div class="pet-info">
-                            <h3 class="pet-name">Luna</h3>
-                            <p class="pet-description" data-tr="2 yaşında, sakin ve uysal. Kucakta sevgi almayı çok seviyor." data-en="2 years old, calm and gentle. Loves being cuddled and receiving affection.">
-                                2 yaşında, sakin ve uysal. Kucakta sevgi almayı çok seviyor.
-                            </p>
-                            <div class="pet-details">
-                                <span class="pet-age" data-tr="2 Yaş" data-en="2 Years">2 Yaş</span>
-                                <span class="pet-size" data-tr="Orta" data-en="Medium">Orta</span>
-                            </div>
-                            <a href="adopt.html?pet=luna" class="btn btn-outline" data-tr="Daha Fazla" data-en="Learn More">Daha Fazla</a>
-                        </div>
-                    </div>
-
-                    <!-- Pet Card 3 -->
-                    <div class="pet-card">
-                        <div class="pet-image">
-                            <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Karamel - Tatlı Kedi">
-                            <div class="pet-badge">
-                                <span data-tr="Kedi" data-en="Cat">Kedi</span>
-                            </div>
-                        </div>
-                        <div class="pet-info">
-                            <h3 class="pet-name">Karamel</h3>
-                            <p class="pet-description" data-tr="1 yaşında, enerjik ve meraklı. Yeni maceralara hazır küçük kaşif." data-en="1 year old, energetic and curious. A little explorer ready for new adventures.">
-                                1 yaşında, enerjik ve meraklı. Yeni maceralara hazır küçük kaşif.
-                            </p>
-                            <div class="pet-details">
-                                <span class="pet-age" data-tr="1 Yaş" data-en="1 Year">1 Yaş</span>
-                                <span class="pet-size" data-tr="Küçük" data-en="Small">Küçük</span>
-                            </div>
-                            <a href="adopt.html?pet=karamel" class="btn btn-outline" data-tr="Daha Fazla" data-en="Learn More">Daha Fazla</a>
-                        </div>
-                    </div>
+                                <div class="pets-grid" id="featured-pets">
+                    <!-- Pets will be loaded dynamically -->
                 </div>
 
                 <div class="section-footer">
@@ -224,34 +163,30 @@
                         </p>
                         <div class="mission-stats">
                             <div class="stat">
-                                <span class="stat-number">250+</span>
+                                <span class="stat-number">0+</span>
                                 <span class="stat-label" data-tr="Sahiplendirme" data-en="Adoptions">Sahiplendirme</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-number">500+</span>
-                                <span class="stat-label" data-tr="Kurtarılan Hayvan" data-en="Rescued Animals">Kurtarılan Hayvan</span>
+                                <span class="stat-number">0+</span>
+                                <span class="stat-label" data-tr="Animals Reached" data-en="Animals Reached">Ulaşılan Hayvan</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Articles Section -->
                     <div class="feature-card articles-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-book-open"></i>
-                        </div>
-                        <h3 data-tr="Güncel Makaleler" data-en="Latest Articles">Güncel Makaleler</h3>
-                        <div class="article-preview">
-                            <article class="mini-article">
-                                <h4 data-tr="Yeni Sahiplenilen Kediler İçin İlk Hafta Rehberi" data-en="First Week Guide for Newly Adopted Cats">Yeni Sahiplenilen Kediler İçin İlk Hafta Rehberi</h4>
-                                <p data-tr="Yeni evine gelen kediler için adaptasyon süreci..." data-en="The adaptation process for cats coming to their new home...">Yeni evine gelen kediler için adaptasyon süreci...</p>
-                            </article>
-                            <article class="mini-article">
-                                <h4 data-tr="Sokak Hayvanlarına Nasıl Yardım Edebiliriz?" data-en="How Can We Help Street Animals?">Sokak Hayvanlarına Nasıl Yardım Edebiliriz?</h4>
-                                <p data-tr="Basit adımlarla hayvan dostlarımızın hayatlarını kolaylaştırabiliriz..." data-en="We can make life easier for our animal friends with simple steps...">Basit adımlarla hayvan dostlarımızın hayatlarını kolaylaştırabiliriz...</p>
-                            </article>
-                        </div>
-                        <a href="articles.html" class="btn btn-outline" data-tr="Tüm Makaleleri Oku" data-en="Read All Articles">Tüm Makaleleri Oku</a>
-                    </div>
+    <div class="feature-icon">
+        <i class="fas fa-newspaper"></i>
+    </div>
+    <h3 data-tr="Güncel Makaleler" data-en="Latest Articles">Güncel Makaleler</h3>
+    <div class="article-preview">
+        <!-- Articles will be loaded dynamically -->
+    </div>
+    <a href="articles.html" class="btn btn-outline" data-tr="Tüm Makaleleri Oku" data-en="Read All Articles">
+        <i class="fas fa-book-reader"></i>
+        Tüm Makaleleri Oku
+    </a>
+</div>
                 </div>
             </div>
         </section>
@@ -289,8 +224,7 @@
                     <h4 data-tr="İletişim" data-en="Contact">İletişim</h4>
                     <div class="contact-info">
                         <p><i class="fas fa-envelope"></i> iletisim@patigonulluleri.com</p>
-                        <p><i class="fas fa-phone"></i> +90 (258) 123 45 67</p>
-                        <p><i class="fas fa-map-marker-alt"></i> Denizli, Türkiye</p>
+                        <p><i class="fas fa-map-marker-alt"></i> İzmir, Türkiye</p>
                     </div>
                 </div>
 
@@ -311,6 +245,11 @@
     </footer>
 
     <!-- JavaScript -->
+    <script src="data/articles-data.js"></script>
+    <script src="data/pets-data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/imageLoader.js"></script>
+    <script src="js/languageManager.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

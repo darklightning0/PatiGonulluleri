@@ -21,7 +21,7 @@ const PETS_DATA = [
         health: ["vaccinated", "sterilized", "microchipped"],
         urgent: false,
         dateAdded: "2025-02-12",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-shield-alt", text: "Mükemmel bekçi köpeği" },
             { icon: "fa-graduation-cap", text: "Çok zeki ve eğitimli" },
@@ -36,7 +36,7 @@ const PETS_DATA = [
             online: true,
             phone: "+90 (258) 901 23 45",
             responseTime: "Genellikle 2 saat içinde",
-            location: "Merkez, Denizli",
+            location: "Merkez, İzmir",
             languages: "Türkçe, English, Deutsch"
         }
     },
@@ -64,7 +64,7 @@ const PETS_DATA = [
         health: ["vaccinated", "sterilized"],
         urgent: false,
         dateAdded: "2025-01-20",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-building", text: "Apartman yaşamına uygun" },
             { icon: "fa-heart", text: "Çok sevecen ve uysal" },
@@ -79,7 +79,7 @@ const PETS_DATA = [
             online: false,
             phone: "+90 (258) 234 56 78",
             responseTime: "Genellikle 4 saat içinde",
-            location: "Merkez, Denizli",
+            location: "Merkez, İzmir",
             languages: "Türkçe"
         }
     },
@@ -107,7 +107,7 @@ const PETS_DATA = [
         health: ["vaccinated"],
         urgent: true,
         dateAdded: "2025-02-01",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-rocket", text: "Çok enerjik ve oyuncu" },
             { icon: "fa-user", text: "Genç sahipler için ideal" },
@@ -122,7 +122,7 @@ const PETS_DATA = [
             online: true,
             phone: "+90 (258) 345 67 89",
             responseTime: "Genellikle 1 saat içinde",
-            location: "Pamukkale, Denizli",
+            location: "Pamukkale, İzmir",
             languages: "Türkçe"
         }
     },
@@ -150,7 +150,7 @@ const PETS_DATA = [
         health: ["vaccinated", "sterilized", "microchipped"],
         urgent: false,
         dateAdded: "2025-01-10",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-shield-alt", text: "Koruyucu ama nazik" },
             { icon: "fa-graduation-cap", text: "Deneyimli sahipler için" },
@@ -165,7 +165,7 @@ const PETS_DATA = [
             online: false,
             phone: "+90 (258) 456 78 90",
             responseTime: "Genellikle 3 saat içinde",
-            location: "Merkez, Denizli",
+            location: "Merkez, İzmir",
             languages: "Türkçe, English"
         }
     },
@@ -193,7 +193,7 @@ const PETS_DATA = [
         health: ["vaccinated", "sterilized"],
         urgent: false,
         dateAdded: "2025-01-25",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-volume-down", text: "Sessiz ortam seviyor" },
             { icon: "fa-heart", text: "Çok sadık ve bağlı" },
@@ -208,7 +208,7 @@ const PETS_DATA = [
             online: true,
             phone: "+90 (258) 567 89 01",
             responseTime: "Genellikle 2 saat içinde",
-            location: "Pamukkale, Denizli",
+            location: "Pamukkale, İzmir",
             languages: "Türkçe"
         }
     },
@@ -236,7 +236,7 @@ const PETS_DATA = [
         health: ["vaccinated", "sterilized", "microchipped"],
         urgent: false,
         dateAdded: "2025-02-05",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-graduation-cap", text: "Deneyimli sahipler için" },
             { icon: "fa-dumbbell", text: "Güçlü ve atletik" },
@@ -251,7 +251,7 @@ const PETS_DATA = [
             online: false,
             phone: "+90 (258) 678 90 12",
             responseTime: "Genellikle 4 saat içinde",
-            location: "Merkez, Denizli",
+            location: "Merkez, İzmir",
             languages: "Türkçe"
         }
     },
@@ -279,7 +279,7 @@ const PETS_DATA = [
         health: ["vaccinated"],
         urgent: true,
         dateAdded: "2025-01-30",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-heart", text: "Yaşlı ama çok sevecen" },
             { icon: "fa-user-friends", text: "Sakin aileler için" },
@@ -294,7 +294,7 @@ const PETS_DATA = [
             online: true,
             phone: "+90 (258) 789 01 23",
             responseTime: "Genellikle 1 saat içinde",
-            location: "Pamukkale, Denizli",
+            location: "Pamukkale, İzmir",
             languages: "Türkçe"
         }
     },
@@ -322,7 +322,7 @@ const PETS_DATA = [
         health: ["vaccinated", "sterilized"],
         urgent: false,
         dateAdded: "2025-02-10",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-running", text: "Çok enerjik ve aktif" },
             { icon: "fa-child", text: "Çocuk dostu" },
@@ -337,7 +337,7 @@ const PETS_DATA = [
             online: false,
             phone: "+90 (258) 890 12 34",
             responseTime: "Genellikle 3 saat içinde",
-            location: "Merkez, Denizli",
+            location: "Merkez, İzmir",
             languages: "Türkçe, English"
         }
     },
@@ -366,7 +366,7 @@ const PETS_DATA = [
         health: ["vaccinated", "sterilized", "microchipped"],
         urgent: false,
         dateAdded: "2025-01-15",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-home", text: "Bahçeli ev tercihi" },
             { icon: "fa-users", text: "Çocuklu aileler için uygun" },
@@ -381,7 +381,7 @@ const PETS_DATA = [
             online: true,
             phone: "+90 (258) 123 45 67",
             responseTime: "Genellikle 2 saat içinde",
-            location: "Pamukkale, Denizli",
+            location: "Pamukkale, İzmir",
             languages: "Türkçe, English"
         }
     },
@@ -409,7 +409,7 @@ const PETS_DATA = [
         health: ["vaccinated", "sterilized"],
         urgent: false,
         dateAdded: "2025-02-08",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-crown", text: "Özel bakım gerektirir" },
             { icon: "fa-gem", text: "Çok zarif ve güzel" },
@@ -424,7 +424,7 @@ const PETS_DATA = [
             online: false,
             phone: "+90 (258) 012 34 56",
             responseTime: "Genellikle 1 saat içinde",
-            location: "Pamukkale, Denizli",
+            location: "Pamukkale, İzmir",
             languages: "Türkçe, English"
         }
     },
@@ -452,7 +452,7 @@ const PETS_DATA = [
         health: ["vaccinated"],
         urgent: false,
         dateAdded: "2025-01-28",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-handshake", text: "Diğer hayvanlarla uyumlu" },
             { icon: "fa-home", text: "Mükemmel ev kedisi" },
@@ -467,7 +467,7 @@ const PETS_DATA = [
             online: true,
             phone: "+90 (258) 123 45 67",
             responseTime: "Genellikle 2 saat içinde",
-            location: "Merkez, Denizli",
+            location: "Merkez, İzmir",
             languages: "Türkçe"
         }
     },
@@ -495,7 +495,7 @@ const PETS_DATA = [
         health: ["vaccinated", "microchipped"],
         urgent: true,
         dateAdded: "2025-02-14",
-        location: "Denizli",
+        location: "İzmir",
         specialNotes: [
             { icon: "fa-rocket", text: "Çok enerjik ve aktif" },
             { icon: "fa-graduation-cap", text: "Eğitime açık" },
@@ -510,7 +510,7 @@ const PETS_DATA = [
             online: true,
             phone: "+90 (258) 234 56 78",
             responseTime: "Genellikle 1 saat içinde",
-            location: "Pamukkale, Denizli",
+            location: "Pamukkale, İzmir",
             languages: "Türkçe, English"
         }
     },

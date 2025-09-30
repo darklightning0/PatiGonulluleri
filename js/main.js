@@ -85,7 +85,45 @@ const translations = {
         "© 2025 Pati Gönüllüleri. Tüm hakları saklıdır.": "© 2025 Pati Gönüllüleri. All rights reserved."
     }
 };
+// INITIALIZATION
+// ===================
 
+/**
+ * Initialize all functionality when DOM is loaded
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize language switching
+    initLanguageToggle();
+    loadLanguagePreference();
+    
+    // Initialize navigation
+    initMobileNavigation();
+    updateActiveNavLink();
+    
+    // Initialize forms and validation
+    initFormValidation();
+    
+    // Initialize scroll effects
+    initScrollEffects();
+    initSmoothScrolling();
+    
+    // Initialize image loading
+    initImageLoading();
+    
+    // Load latest articles and featured pets
+    loadLatestArticles();
+    loadFeaturedPets();
+    
+    // Add resize listener for articles
+    window.addEventListener('resize', debounce(() => {
+        loadLatestArticles();
+    }, 250));
+    
+    // Initialize performance optimizations
+    optimizeAnimations();
+    
+    console.log('✨ All functionality initialized successfully');        
+});
 // ===================
 // UTILITY FUNCTIONS
 // ===================
@@ -151,54 +189,35 @@ function animateNumber(element, start, end, duration = 2000) {
  * Initialize language switching functionality
  */
 function initLanguageToggle() {
+    if (!window.languageManager) {
+        console.error('LanguageManager not initialized');
+        return;
+    }
+
     const langButtons = document.querySelectorAll('.lang-btn');
+    
+    // Set initial button states
+    updateLanguageButtons(window.languageManager.getLanguage());
     
     langButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const targetLang = btn.dataset.lang;
-            if (targetLang !== currentLanguage) {
-                switchLanguage(targetLang);
-                updateLanguageButtons(targetLang);
-            }
+            window.languageManager.setLanguage(targetLang);
+            updateLanguageButtons(targetLang);
         });
     });
 }
 
-/**
- * Switch between languages
- */
+// Legacy function kept for backward compatibility
 function switchLanguage(lang) {
-    currentLanguage = lang;
-    
-    // Update all translatable elements
-    const translatableElements = document.querySelectorAll('[data-tr][data-en]');
-    
-    translatableElements.forEach(element => {
-        const trText = element.dataset.tr;
-        const enText = element.dataset.en;
-        
-        if (lang === 'tr') {
-            element.textContent = trText;
-        } else if (lang === 'en') {
-            element.textContent = enText;
-        }
-    });
-    
-    // Update form placeholders and other attributes if needed
-    updateFormTexts(lang);
-    
-    // Store language preference
-    localStorage.setItem('preferredLanguage', lang);
-    
-    // Add smooth transition effect
-    document.body.style.opacity = '0.8';
-    setTimeout(() => {
-        document.body.style.opacity = '1';
-    }, 200);
+    if (window.languageManager) {
+        window.languageManager.setLanguage(lang);
+    }
 }
 
 /**
  * Update language button states
+ * @param {string} activeLang - The currently active language code
  */
 function updateLanguageButtons(activeLang) {
     const langButtons = document.querySelectorAll('.lang-btn');
@@ -567,6 +586,108 @@ function initSmoothScrolling() {
                 closeMobileMenu();
             }
         });
+    });
+}
+
+// ===================
+// FEATURED PETS LOADING
+// ===================
+
+/**
+ * Load and display featured pets
+ */
+function loadFeaturedPets() {
+    const petsContainer = document.getElementById('featured-pets');
+    if (!petsContainer) return;
+
+    // Sort pets: urgent first, then by id
+    const sortedPets = PETS_DATA.sort((a, b) => {
+        if (a.isUrgent && !b.isUrgent) return -1;
+        if (!a.isUrgent && b.isUrgent) return 1;
+        return b.id - a.id; // Newer pets first
+    });
+
+    // Get first 3 pets
+    const featuredPets = sortedPets.slice(0, 3);
+    
+    // Clear existing content
+    petsContainer.innerHTML = '';
+    
+    // Add pets
+    function renderFeaturedPets() {
+    const petsContainer = document.querySelector('.pets-container'); // Konteyneri fonksiyon içinde tanımla
+    petsContainer.innerHTML = ''; // ÖNEMLİ: Her seferinde konteyneri temizle!
+
+    featuredPets.forEach(pet => {
+        const lang = currentLanguage || 'tr';
+        const ageText = pet.age + (lang === 'tr' ? ' yaşında' : ' year' + (pet.age > 1 ? 's' : ''));
+        const petType = pet.type === 'dog' ? (lang === 'tr' ? 'Köpek' : 'Dog') : (lang === 'tr' ? 'Kedi' : 'Cat');
+        const petSize = pet.size === 'Large' ? (lang === 'tr' ? 'Büyük' : 'Large') : pet.size === 'Medium' ? (lang === 'tr' ? 'Orta' : 'Medium') : (lang === 'tr' ? 'Küçük' : 'Small');
+        
+        const petHTML = `
+            <div class="pet-card">
+                <div class="pet-image">
+                    <img src="${pet.images[0]}" alt="${pet.name}">
+                    ${pet.isUrgent ? `<span class="pet-badge urgent">${lang === 'tr' ? 'Acil' : 'Urgent'}</span>` : ''}
+                    <span class="pet-badge ${pet.type.toLowerCase()}">${petType}</span>
+                </div>
+                <div class="pet-info">
+                    <h3 class="pet-name">${pet.name}</h3>
+                    <p class="pet-description">${pet.description}</p>
+                    <div class="pet-details">
+                        <span class="pet-age">${ageText}</span>
+                        <span class="pet-size">${petSize}</span>
+                    </div>
+                    <a href="pet-detail.html?id=${pet.id}" class="btn btn-outline btn-sm">
+                        <i class="fas fa-paw"></i>
+                        <span data-tr="Daha Fazla" data-en="Learn More">${lang === 'tr' ? 'Daha Fazla' : 'Learn More'}</span>
+                    </a>
+                </div>
+            </div>
+        `;
+        petsContainer.insertAdjacentHTML('beforeend', petHTML);
+    });
+}
+}
+
+// ===================
+// ARTICLES LOADING
+// ===================
+
+/**
+ * Load and display latest articles
+ */
+function loadLatestArticles() {
+    const articlesContainer = document.querySelector('.articles-card .article-preview');
+    if (!articlesContainer) return;
+
+    // Sort articles by id (assuming newer articles have higher IDs)
+    const sortedArticles = ARTICLES_DATA.sort((a, b) => b.id - a.id);
+    
+    // Get screen width to determine number of articles to show
+    const screenWidth = window.innerWidth;
+    const articlesToShow = screenWidth < 768 ? 3 : 5;
+    
+    // Get latest articles
+    const latestArticles = sortedArticles.slice(0, articlesToShow);
+    
+    // Clear existing content
+    articlesContainer.innerHTML = '';
+    
+    // Add articles
+    latestArticles.forEach(article => {
+        const lang = currentLanguage || 'tr';
+        const articleHTML = `
+            <div class="mini-article">
+                <h4>
+                    <a href="article-detail.html?id=${article.id}&slug=${article.slug}">
+                        ${article.title[lang]}
+                    </a>
+                </h4>
+                <p>${article.summary[lang]}</p>
+            </div>
+        `;
+        articlesContainer.insertAdjacentHTML('beforeend', articleHTML);
     });
 }
 
