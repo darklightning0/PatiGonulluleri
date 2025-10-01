@@ -63,8 +63,8 @@ export async function onRequestGet(context) {
 
     // 6. Set the signed token in a secure, HttpOnly cookie
     response.headers.set(
-      "Set-Cookie",
-      `__csrf_token=${signedToken}; HttpOnly; Secure; SameSite=Strict; Path=/`
+    "Set-Cookie",
+    `__csrf_token=${signedToken}; HttpOnly; Secure; SameSite=Lax; Path=/`
     );
 
     return response;

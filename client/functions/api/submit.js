@@ -96,6 +96,8 @@ export async function onRequestPost(context) {
       headers: headers,
       body: request.body,
     });
+    console.log("Incoming cookies:", request.headers.get("Cookie"));
+    console.log("Form token:", bodyToken);
 
     return new Response(googleResponse.body, {
       status: googleResponse.status,
