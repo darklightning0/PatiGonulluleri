@@ -306,6 +306,7 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
   e.preventDefault();
 
   const form = e.target;
+  
   // Always update the hidden input with the latest token from the cookie
   const csrfInput = form.querySelector('input[name="csrfToken"]');
   if (csrfInput) {
@@ -313,10 +314,18 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     if (cookie) {
       const [token] = cookie[1].split('.');
       csrfInput.value = token || '';
+      console.log('🔑 Updated CSRF token in form:', token.substring(0, 8) + '...');
+    } else {
+      console.error('❌ No CSRF token found in cookies');
     }
   }
+  
+  // Create FormData AFTER updating the hidden input
   const formData = new FormData(form);
   const submitBtn = form.querySelector('button[type="submit"]');
+  
+  // Debug: Verify the token is in FormData
+  console.log('📋 CSRF token in FormData:', formData.get('csrfToken')?.substring(0, 8) + '...');
 
   // Validate all steps before submission
   for (let i = 1; i <= totalSteps; i++) {
