@@ -14,8 +14,11 @@
  */
 async function verify(key, signature, data) {
   try {
+    // Decode the base64 signature
     const sig = atob(signature);
+    // Convert the string to a byte array
     const sigBytes = Uint8Array.from(sig, (c) => c.charCodeAt(0));
+    // Verify the signature
     return await crypto.subtle.verify(
       "HMAC",
       key,
@@ -23,6 +26,7 @@ async function verify(key, signature, data) {
       new TextEncoder().encode(data)
     );
   } catch (e) {
+    console.error("Signature verification error:", e);
     return false;
   }
 }
@@ -30,8 +34,11 @@ async function verify(key, signature, data) {
 export async function onRequestPost(context) {
   const { request, env } = context;
   const GOOGLE_SCRIPT_URL = env.GOOGLE_SCRIPT_URL;
+
+  // ★★★ CHANGE: Read the secret key from Cloudflare environment variables ★★★
   const SECRET_KEY = env.TOKEN_KEY;
 
+  // Failsafe in case the environment variable is not set
   if (!SECRET_KEY) {
     console.error("CSRF validation failed: TOKEN_KEY secret is not set.");
     return new Response(JSON.stringify({ result: 'error', message: 'Server configuration error.' }), { status: 500 });
@@ -46,10 +53,14 @@ export async function onRequestPost(context) {
     const cookieToken = cookie?.match(/__csrf_token=([^;]+)/)?.[1];
 
     if (!bodyToken || !cookieToken) {
-      throw new Error("CSRF tokens not found");
+      throw new Error("CSRF tokens not found in request.");
     }
 
     const [token, signature] = cookieToken.split(".");
+
+    if (!token || !signature) {
+      throw new Error("CSRF cookie is malformed.");
+    }
 
     const key = await crypto.subtle.importKey(
       "raw",
@@ -61,7 +72,7 @@ export async function onRequestPost(context) {
 
     const isValid = (bodyToken === token) && (await verify(key, signature, bodyToken));
     if (!isValid) {
-      throw new Error("Invalid CSRF token");
+      throw new Error("Invalid CSRF token.");
     }
   } catch (error) {
     console.error("CSRF Validation Failed:", error.message);

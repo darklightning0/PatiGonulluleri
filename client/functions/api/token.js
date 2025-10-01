@@ -5,9 +5,6 @@
  * This uses the "Double Submit Cookie" pattern.
  */
 
-// A secure, random string. In a real app, generate this and store it as a secret.
-// For now, this is sufficient for demonstration.
-
 /**
  * Creates a signature for a token to verify it later.
  * @param {CryptoKey} key - The secret key for signing.
@@ -27,7 +24,10 @@ async function sign(key, data) {
  * Handles GET requests to generate and send a CSRF token.
  */
 export async function onRequestGet(context) {
+  // ★★★ CHANGE: Read the secret key from Cloudflare environment variables ★★★
   const SECRET_KEY = context.env.TOKEN_KEY;
+
+  // Failsafe in case the environment variable is not set
   if (!SECRET_KEY) {
     console.error("CSRF token generation failed: TOKEN_KEY secret is not set.");
     return new Response(JSON.stringify({ error: "Server configuration error" }), {
