@@ -8,7 +8,9 @@
 // ===================
 
 let isSubmitting = false;
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrRDoR_hikB5_Tmhi9xIuGkFK6yqfIEXVfTENuUsAm-1qEPKflaKXKjtPxY3HMGES9vw/exec";
+// The secret URL is REMOVED from the frontend.
+// We now point to our own secure API endpoint (Cloudflare Function).
+const ADOPTION_FORM_ENDPOINT = "/api/submit";
 
 // ===================
 // INITIALIZATION
@@ -21,13 +23,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function initContactPage() {
   console.log('📞 Initializing Contact Page');
-  
+
   initForms();
   initFAQ();
   initScrollAnimations();
   initNewsletterSignup();
   initAccessibilityEnhancements();
-  
+
   console.log('✅ Contact Page Initialized');
 }
 
@@ -78,21 +80,23 @@ function initAdoptionForm() {
   const nextBtn = form.querySelector('.next-btn');
 
   // Add button event listeners
-// Add button event listeners
-nextBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  
-  // If we're on the last step, let form submission handle validation
-  if (currentStep === totalSteps) {
-    // Trigger form submission
-    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-    return;
-  }
-  
-  // Otherwise, navigate to next step
-  navigateStep(1);
-});
-prevBtn.addEventListener('click', () => navigateStep(-1));
+  nextBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    // If we're on the last step, let form submission handle validation
+    if (currentStep === totalSteps) {
+      // Trigger form submission
+      form.dispatchEvent(new Event('submit', {
+        cancelable: true,
+        bubbles: true
+      }));
+      return;
+    }
+
+    // Otherwise, navigate to next step
+    navigateStep(1);
+  });
+  prevBtn.addEventListener('click', () => navigateStep(-1));
 
   function initStepper() {
     updateStepProgress();
@@ -106,48 +110,48 @@ prevBtn.addEventListener('click', () => navigateStep(-1));
     });
   }
 
-    function navigateStep(direction) {
+  function navigateStep(direction) {
     const newStep = currentStep + direction;
-    
+
     if (newStep < 1 || newStep > totalSteps) return;
-    
+
     // Only validate the current step when moving forward (not when arriving at final step)
     if (direction > 0 && !validateStep(currentStep)) {
-        showNotification('Lütfen tüm zorunlu alanları doldurun.', 'error');
-        return;
+      showNotification('Lütfen tüm zorunlu alanları doldurun.', 'error');
+      return;
     }
-    
+
     goToStep(newStep);
-    }
+  }
 
   function goToStep(step) {
     // Hide current step
     const currentStepEl = form.querySelector(`.form-step[data-step="${currentStep}"]`);
     currentStepEl.classList.remove('active');
-    
+
     // Show new step
     const newStepEl = form.querySelector(`.form-step[data-step="${step}"]`);
     newStepEl.classList.add('active');
-    
+
     // Update step indicators
     updateStepProgress(step);
-    
+
     // Update buttons
     prevBtn.style.display = step === 1 ? 'none' : 'flex';
-    nextBtn.innerHTML = step === totalSteps ? 
-      '<i class="fas fa-paw"></i> İlan Gönder' : 
+    nextBtn.innerHTML = step === totalSteps ?
+      '<i class="fas fa-paw"></i> İlan Gönder' :
       'İleri <i class="fas fa-arrow-right"></i>';
     nextBtn.type = step === totalSteps ? 'submit' : 'button';
-    
+
     currentStep = step;
   }
-  
+
 
   function validateStep(step) {
     const stepEl = form.querySelector(`.form-step[data-step="${step}"]`);
     const requiredFields = stepEl.querySelectorAll('[required]');
     let isValid = true;
-    
+
     requiredFields.forEach(field => {
       if (!field.value) {
         isValid = false;
@@ -156,7 +160,7 @@ prevBtn.addEventListener('click', () => navigateStep(-1));
         field.classList.remove('error');
       }
     });
-    
+
     return isValid;
   }
 
@@ -176,7 +180,7 @@ prevBtn.addEventListener('click', () => navigateStep(-1));
     indicators.forEach((indicator, index) => {
       const stepNum = index + 1;
       indicator.classList.remove('active', 'completed');
-      
+
       if (stepNum === step) {
         indicator.classList.add('active');
       } else if (stepNum < step) {
@@ -254,7 +258,7 @@ function validateFileUpload(e) {
 
 async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, validateStep) {
   e.preventDefault();
-  
+
   const form = e.target;
   const formData = new FormData(form);
   const submitBtn = form.querySelector('button[type="submit"]');
@@ -278,10 +282,10 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
 
   try {
     const files = form.querySelector('#photos').files;
-    
+
     // Convert files to Base64
     const filesData = await Promise.all(
-      Array.from(files).map((file, i) => 
+      Array.from(files).map((file, i) =>
         new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (e) => resolve({
@@ -311,16 +315,23 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
       formDataToSend.append(`photo${file.index}_type`, file.type);
     });
 
-    const response = await fetch(SCRIPT_URL, {
+    // ==========================================================
+    //  ★★★ THIS IS THE ONLY LINE THAT CHANGED IN THIS FUNCTION ★★★
+    // ==========================================================
+    const response = await fetch(ADOPTION_FORM_ENDPOINT, {
       method: 'POST',
       body: formDataToSend
+      // No 'Content-Type' header needed; the browser sets it for FormData
     });
+    // ==========================================================
+    //  END OF CHANGE
+    // ==========================================================
 
     const result = await response.json();
 
     if (result.result === 'success') {
       showNotification('İlanınız başarıyla gönderildi! En kısa sürede yayınlanacaktır.', 'success');
-      
+
       // Reset form
       form.reset();
       const fileInput = form.querySelector('#photos');
@@ -349,7 +360,7 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
 
 function initForms() {
   const generalForm = document.getElementById('general-contact-form');
-  
+
   if (generalForm) {
     generalForm.addEventListener('submit', handleGeneralFormSubmit);
     initFormValidation(generalForm);
@@ -358,14 +369,14 @@ function initForms() {
 
 function initFormValidation(form) {
   if (!form) return;
-  
+
   const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-  
+
   inputs.forEach(input => {
     input.addEventListener('blur', () => validateField(input));
     input.addEventListener('input', () => clearFieldError(input));
   });
-  
+
   const emailInputs = form.querySelectorAll('input[type="email"]');
   emailInputs.forEach(input => {
     input.addEventListener('blur', () => validateEmail(input));
@@ -374,26 +385,26 @@ function initFormValidation(form) {
 
 function handleGeneralFormSubmit(e) {
   e.preventDefault();
-  
+
   if (isSubmitting) return;
-  
+
   const form = e.target;
   const formData = new FormData(form);
-  
+
   if (!validateForm(form)) {
-    showNotification(getCurrentLanguage() === 'tr' ? 
-      'Lütfen tüm gerekli alanları doğru şekilde doldurun.' : 
+    showNotification(getCurrentLanguage() === 'tr' ?
+      'Lütfen tüm gerekli alanları doğru şekilde doldurun.' :
       'Please fill all required fields correctly.', 'error');
     return;
   }
-  
+
   if (!formData.get('privacyAgreement')) {
-    showNotification(getCurrentLanguage() === 'tr' ? 
-      'Kişisel verilerin işlenmesi onayını vermelisiniz.' : 
+    showNotification(getCurrentLanguage() === 'tr' ?
+      'Kişisel verilerin işlenmesi onayını vermelisiniz.' :
       'You must consent to personal data processing.', 'error');
     return;
   }
-  
+
   const contactData = {
     name: formData.get('name'),
     email: formData.get('email'),
@@ -402,32 +413,35 @@ function handleGeneralFormSubmit(e) {
     timestamp: new Date().toISOString(),
     type: 'general_contact'
   };
-  
+
   submitForm(form, contactData, 'Mesajınız gönderildi! En kısa sürede size dönüş yapacağız.');
 }
 
 function submitForm(form, data, successMessage) {
   isSubmitting = true;
-  
+
   const submitBtn = form.querySelector('.submit-btn');
   const originalHTML = submitBtn.innerHTML;
-  
+
   submitBtn.classList.add('loading');
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Gönderiliyor...</span>';
-  
+
   setTimeout(() => {
     try {
       console.log('Form submitted:', data);
       showNotification(successMessage, 'success');
       form.reset();
       clearAllFieldErrors(form);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
       trackFormSubmission(data.type, data);
     } catch (error) {
       console.error('Form submission error:', error);
-      showNotification(getCurrentLanguage() === 'tr' ? 
-        'Bir hata oluştu. Lütfen tekrar deneyin.' : 
+      showNotification(getCurrentLanguage() === 'tr' ?
+        'Bir hata oluştu. Lütfen tekrar deneyin.' :
         'An error occurred. Please try again.', 'error');
     } finally {
       submitBtn.classList.remove('loading');
@@ -445,13 +459,13 @@ function submitForm(form, data, successMessage) {
 function validateForm(form) {
   const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
   let isValid = true;
-  
+
   requiredFields.forEach(field => {
     if (!validateField(field)) {
       isValid = false;
     }
   });
-  
+
   return isValid;
 }
 
@@ -459,25 +473,25 @@ function validateField(field) {
   const value = field.value.trim();
   let isValid = true;
   let errorMessage = '';
-  
+
   if (field.hasAttribute('required') && !value) {
     isValid = false;
-    errorMessage = getCurrentLanguage() === 'tr' ? 
+    errorMessage = getCurrentLanguage() === 'tr' ?
       'Bu alan zorunludur.' : 'This field is required.';
   }
-  
+
   if (field.type === 'email' && value && !isValidEmail(value)) {
     isValid = false;
-    errorMessage = getCurrentLanguage() === 'tr' ? 
+    errorMessage = getCurrentLanguage() === 'tr' ?
       'Geçerli bir e-posta adresi giriniz.' : 'Please enter a valid email address.';
   }
-  
+
   if (field.type === 'tel' && value && !isValidPhone(value)) {
     isValid = false;
-    errorMessage = getCurrentLanguage() === 'tr' ? 
+    errorMessage = getCurrentLanguage() === 'tr' ?
       'Geçerli bir telefon numarası giriniz.' : 'Please enter a valid phone number.';
   }
-  
+
   isValid ? clearFieldError(field) : showFieldError(field, errorMessage);
   return isValid;
 }
@@ -485,7 +499,7 @@ function validateField(field) {
 function validateEmail(field) {
   const value = field.value.trim();
   if (value && !isValidEmail(value)) {
-    showFieldError(field, getCurrentLanguage() === 'tr' ? 
+    showFieldError(field, getCurrentLanguage() === 'tr' ?
       'Geçerli bir e-posta adresi giriniz.' : 'Please enter a valid email address.');
     return false;
   }
@@ -503,10 +517,10 @@ function isValidPhone(phone) {
 
 function showFieldError(field, message) {
   field.style.borderColor = '#e74c3c';
-  
+
   const existingError = field.parentNode.querySelector('.error-message');
   if (existingError) existingError.remove();
-  
+
   const errorDiv = document.createElement('div');
   errorDiv.className = 'error-message';
   errorDiv.textContent = message;
@@ -516,10 +530,10 @@ function showFieldError(field, message) {
 
 function clearFieldError(field) {
   field.style.borderColor = '';
-  
+
   const errorMessage = field.parentNode.querySelector('.error-message');
   if (errorMessage) errorMessage.remove();
-  
+
   const formGroup = field.closest('.form-group');
   if (formGroup) formGroup.classList.remove('error');
 }
@@ -536,10 +550,10 @@ function clearAllFieldErrors(form) {
 
 function initFAQ() {
   const faqItems = document.querySelectorAll('.faq-item');
-  
+
   faqItems.forEach(item => {
     const question = item.querySelector('.faq-question');
-    
+
     if (question) {
       question.addEventListener('click', () => toggleFAQ(item));
       question.addEventListener('keydown', (e) => {
@@ -559,7 +573,7 @@ function toggleFAQ(faqItem) {
   const isActive = faqItem.classList.contains('active');
   const answer = faqItem.querySelector('.faq-answer');
   const question = faqItem.querySelector('.faq-question');
-  
+
   if (isActive) {
     faqItem.classList.remove('active');
     answer.style.maxHeight = '0';
@@ -595,40 +609,40 @@ function initNewsletterSignup() {
 
 function handleNewsletterSubmit(e) {
   e.preventDefault();
-  
+
   const formData = new FormData(e.target);
   const email = formData.get('email');
   const consent = formData.get('consent');
-  
+
   if (!email || !isValidEmail(email)) {
-    showNotification(getCurrentLanguage() === 'tr' ? 
-      'Geçerli bir e-posta adresi giriniz.' : 
+    showNotification(getCurrentLanguage() === 'tr' ?
+      'Geçerli bir e-posta adresi giriniz.' :
       'Please enter a valid email address.', 'error');
     return;
   }
-  
+
   if (!consent) {
-    showNotification(getCurrentLanguage() === 'tr' ? 
-      'E-posta bildirimleri için onay vermelisiniz.' : 
+    showNotification(getCurrentLanguage() === 'tr' ?
+      'E-posta bildirimleri için onay vermelisiniz.' :
       'You must consent to email notifications.', 'error');
     return;
   }
-  
+
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const originalHTML = submitBtn.innerHTML;
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-  
+
   setTimeout(() => {
     const newsletterData = {
       email: email,
       timestamp: new Date().toISOString(),
       type: 'newsletter_signup'
     };
-    
+
     console.log('Newsletter signup:', newsletterData);
-    showNotification(getCurrentLanguage() === 'tr' ? 
-      'E-posta listemize başarıyla kaydoldunuz!' : 
+    showNotification(getCurrentLanguage() === 'tr' ?
+      'E-posta listemize başarıyla kaydoldunuz!' :
       'Successfully subscribed to our email list!', 'success');
     e.target.reset();
     submitBtn.disabled = false;
@@ -645,9 +659,9 @@ function initScrollAnimations() {
   const animatedElements = document.querySelectorAll(
     '.contact-card, .form-section, .faq-item, .newsletter-card'
   );
-  
+
   animatedElements.forEach(element => element.classList.add('scroll-reveal'));
-  
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -660,7 +674,7 @@ function initScrollAnimations() {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px'
   });
-  
+
   animatedElements.forEach(element => observer.observe(element));
 }
 
@@ -670,7 +684,7 @@ function initScrollAnimations() {
 
 function showNotification(message, type = 'info') {
   document.querySelectorAll('.notification').forEach(n => n.remove());
-  
+
   const notification = document.createElement('div');
   notification.className = `notification ${type}`;
   notification.style.cssText = `
@@ -690,7 +704,7 @@ function showNotification(message, type = 'info') {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     line-height: 1.4;
   `;
-  
+
   const colors = {
     success: '#27ae60',
     error: '#e74c3c',
@@ -700,12 +714,12 @@ function showNotification(message, type = 'info') {
   notification.style.backgroundColor = colors[type] || colors.info;
   notification.textContent = message;
   document.body.appendChild(notification);
-  
+
   setTimeout(() => {
     notification.style.opacity = '1';
     notification.style.transform = 'translateX(0)';
   }, 100);
-  
+
   setTimeout(() => {
     notification.style.opacity = '0';
     notification.style.transform = 'translateX(100px)';
@@ -731,9 +745,9 @@ function trackFormSubmission(type, data) {
 
 window.addEventListener('error', (e) => {
   console.error('Contact Page Error:', e.error);
-  if (e.error.message.includes('fetch') || e.error.message.includes('network')) {
-    showNotification(getCurrentLanguage() === 'tr' ? 
-      'İnternet bağlantınızı kontrol edin.' : 
+  if (e.error && e.error.message && (e.error.message.includes('fetch') || e.error.message.includes('network'))) {
+    showNotification(getCurrentLanguage() === 'tr' ?
+      'İnternet bağlantınızı kontrol edin.' :
       'Please check your internet connection.', 'error');
   }
 });
@@ -761,13 +775,13 @@ function initAccessibilityEnhancements() {
       }
     });
   });
-  
+
   const liveRegion = document.createElement('div');
   liveRegion.setAttribute('aria-live', 'polite');
   liveRegion.setAttribute('aria-atomic', 'true');
   liveRegion.style.cssText = 'position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden';
   document.body.appendChild(liveRegion);
-  
+
   const originalShow = showNotification;
   window.showNotification = (message, type) => {
     liveRegion.textContent = message;
