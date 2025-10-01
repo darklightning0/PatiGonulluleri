@@ -57,25 +57,41 @@ function initAdoptionForm() {
     // 2. Fetch the token from our new API endpoint
     try {
       const response = await fetch('/api/token', {
-        credentials: 'include'
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'application/json'
+        }
       });
+      
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`Token fetch failed: ${response.status}`);
       }
+      
       const data = await response.json();
       
       // 3. Set the token value in the hidden input
+      if (!data.csrfToken) {
+        throw new Error('No CSRF token in response');
+      }
+      
       hiddenInput.value = data.csrfToken;
-      console.log('CSRF token set successfully.');
+      console.log('✅ CSRF token set successfully:', data.csrfToken.substring(0, 8) + '...');
+      
+      // Log cookie to verify it was set
+      console.log('🍪 Cookies after token fetch:', document.cookie);
+      
     } catch (error) {
-      console.error('Failed to fetch CSRF token:', error);
+      console.error('❌ Failed to fetch CSRF token:', error);
       showNotification('Güvenlik anahtarı alınamadı. Form gönderilemez.', 'error');
       // Disable the form if the token can't be fetched
       const submitBtn = form.querySelector('button[type="submit"]');
       if(submitBtn) submitBtn.disabled = true;
     }
   }
-  setupCsrfToken();
+  
+  // Wait for token setup before allowing form interactions
+  setupCsrfToken(); 
 
   // Initialize stepper
   initStepper();
