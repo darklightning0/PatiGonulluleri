@@ -47,6 +47,34 @@ function initAdoptionForm() {
   let currentStep = 1;
   const totalSteps = 4;
 
+  async function setupCsrfToken() {
+    // 1. Add a hidden input field to the form
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'csrfToken';
+    form.appendChild(hiddenInput);
+
+    // 2. Fetch the token from our new API endpoint
+    try {
+      const response = await fetch('/api/token');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      
+      // 3. Set the token value in the hidden input
+      hiddenInput.value = data.csrfToken;
+      console.log('CSRF token set successfully.');
+    } catch (error) {
+      console.error('Failed to fetch CSRF token:', error);
+      showNotification('Güvenlik anahtarı alınamadı. Form gönderilemez.', 'error');
+      // Disable the form if the token can't be fetched
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if(submitBtn) submitBtn.disabled = true;
+    }
+  }
+  setupCsrfToken();
+
   // Initialize stepper
   initStepper();
 
