@@ -56,7 +56,9 @@ function initAdoptionForm() {
 
     // 2. Fetch the token from our new API endpoint
     try {
-      const response = await fetch('/api/token');
+      const response = await fetch('/api/token', {
+        credentials: 'include'
+      });
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -348,8 +350,8 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     // ==========================================================
     const response = await fetch(ADOPTION_FORM_ENDPOINT, {
       method: 'POST',
-      body: formDataToSend
-      // No 'Content-Type' header needed; the browser sets it for FormData
+      body: formDataToSend,
+      credentials: 'include'
     });
     // ==========================================================
     //  END OF CHANGE
