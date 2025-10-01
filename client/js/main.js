@@ -619,7 +619,6 @@ function loadFeaturedPets() {
     // 1. Doğru konteyneri ID'si ile seç
     const petsContainer = document.getElementById('featured-pets');
     if (!petsContainer) {
-        console.error("Pet container #featured-pets not found!");
         return;
     }
 
