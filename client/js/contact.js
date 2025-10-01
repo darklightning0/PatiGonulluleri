@@ -1,5 +1,6 @@
+
 /**
- * Contact Page JavaScript
+ * Contact Page JavaScript - FIXED CSRF IMPLEMENTATION
  * Handles form submissions, FAQ interactions, and contact functionality
  */
 
@@ -8,8 +9,7 @@
 // ===================
 
 let isSubmitting = false;
-// The secret URL is REMOVED from the frontend.
-// We now point to our own secure API endpoint (Cloudflare Function).
+let csrfTokenReady = false; // Track if token is ready
 const ADOPTION_FORM_ENDPOINT = "/api/submit";
 
 // ===================
@@ -48,14 +48,9 @@ function initAdoptionForm() {
   const totalSteps = 4;
 
   async function setupCsrfToken() {
-    // 1. Add a hidden input field to the form
-    const hiddenInput = document.createElement('input');
-    hiddenInput.type = 'hidden';
-    hiddenInput.name = 'csrfToken';
-    form.appendChild(hiddenInput);
-
-    // 2. Fetch the token from our new API endpoint
     try {
+      console.log('🔐 Fetching CSRF token...');
+      
       const response = await fetch('/api/token', {
         method: 'GET',
         credentials: 'same-origin',
@@ -70,27 +65,39 @@ function initAdoptionForm() {
       
       const data = await response.json();
       
-      // 3. Set the token value in the hidden input
       if (!data.csrfToken) {
         throw new Error('No CSRF token in response');
       }
       
-      hiddenInput.value = data.csrfToken;
-      console.log('✅ CSRF token set successfully:', data.csrfToken.substring(0, 8) + '...');
+      // Store the token in a data attribute on the form
+      form.dataset.csrfToken = data.csrfToken;
+      csrfTokenReady = true;
       
-      // Log cookie to verify it was set
+      console.log('✅ CSRF token ready:', data.csrfToken.substring(0, 8) + '...');
       console.log('🍪 Cookies after token fetch:', document.cookie);
+      
+      // Enable submit button now that token is ready
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn && submitBtn.disabled) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paw"></i> İlan Gönder';
+      }
       
     } catch (error) {
       console.error('❌ Failed to fetch CSRF token:', error);
-      showNotification('Güvenlik anahtarı alınamadı. Form gönderilemez.', 'error');
-      // Disable the form if the token can't be fetched
+      showNotification('Güvenlik anahtarı alınamadı. Lütfen sayfayı yenileyin.', 'error');
+      csrfTokenReady = false;
+      
+      // Keep the submit button disabled
       const submitBtn = form.querySelector('button[type="submit"]');
-      if(submitBtn) submitBtn.disabled = true;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Güvenlik Hatası';
+      }
     }
   }
   
-  // Wait for token setup before allowing form interactions
+  // Fetch token immediately
   setupCsrfToken(); 
 
   // Initialize stepper
@@ -100,7 +107,6 @@ function initAdoptionForm() {
   fileInput.addEventListener('change', validateFileUpload);
 
   form.addEventListener("submit", (e) => handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, validateStep));
-
 
   // City/District handlers
   citySelect.addEventListener("change", () => {
@@ -129,9 +135,8 @@ function initAdoptionForm() {
   nextBtn.addEventListener('click', (e) => {
     e.preventDefault();
 
-    // If we're on the last step, let form submission handle validation
+    // If we're on the last step, trigger form submission
     if (currentStep === totalSteps) {
-      // Trigger form submission
       form.dispatchEvent(new Event('submit', {
         cancelable: true,
         bubbles: true
@@ -161,7 +166,7 @@ function initAdoptionForm() {
 
     if (newStep < 1 || newStep > totalSteps) return;
 
-    // Only validate the current step when moving forward (not when arriving at final step)
+    // Only validate when moving forward
     if (direction > 0 && !validateStep(currentStep)) {
       showNotification('Lütfen tüm zorunlu alanları doldurun.', 'error');
       return;
@@ -191,7 +196,6 @@ function initAdoptionForm() {
 
     currentStep = step;
   }
-
 
   function validateStep(step) {
     const stepEl = form.querySelector(`.form-step[data-step="${step}"]`);
@@ -306,26 +310,33 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
   e.preventDefault();
 
   const form = e.target;
-  
-  // Always update the hidden input with the latest token from the cookie
-  const csrfInput = form.querySelector('input[name="csrfToken"]');
-  if (csrfInput) {
-    const cookie = document.cookie.match(/__csrf_token=([^;]+)/);
-    if (cookie) {
-      const [token] = cookie[1].split('.');
-      csrfInput.value = token || '';
-      console.log('🔑 Updated CSRF token in form:', token.substring(0, 8) + '...');
-    } else {
-      console.error('❌ No CSRF token found in cookies');
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  // Check if CSRF token is ready
+  if (!csrfTokenReady) {
+    console.error('❌ CSRF token not ready');
+    showNotification('Güvenlik anahtarı hazır değil. Lütfen bekleyin veya sayfayı yenileyin.', 'error');
+    
+    // Try to fetch token again
+    const tokenPromise = fetch('/api/token', {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: { 'Accept': 'application/json' }
+    });
+    
+    try {
+      const response = await tokenPromise;
+      const data = await response.json();
+      if (data.csrfToken) {
+        form.dataset.csrfToken = data.csrfToken;
+        csrfTokenReady = true;
+        console.log('✅ CSRF token fetched on retry');
+      }
+    } catch (error) {
+      console.error('Failed to fetch token on retry:', error);
+      return;
     }
   }
-  
-  // Create FormData AFTER updating the hidden input
-  const formData = new FormData(form);
-  const submitBtn = form.querySelector('button[type="submit"]');
-  
-  // Debug: Verify the token is in FormData
-  console.log('📋 CSRF token in FormData:', formData.get('csrfToken')?.substring(0, 8) + '...');
 
   // Validate all steps before submission
   for (let i = 1; i <= totalSteps; i++) {
@@ -334,6 +345,20 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
       goToStep(i);
       return;
     }
+  }
+
+  // Create FormData from the form
+  const formData = new FormData(form);
+
+  // Add the CSRF token from the data attribute
+  const csrfToken = form.dataset.csrfToken;
+  if (csrfToken) {
+    formData.append('csrfToken', csrfToken);
+    console.log('🔑 CSRF token added to FormData:', csrfToken.substring(0, 8) + '...');
+  } else {
+    console.error('❌ No CSRF token available');
+    showNotification('Güvenlik hatası. Lütfen sayfayı yenileyin.', 'error');
+    return;
   }
 
   if (!formData.get('privacyAgreement')) {
@@ -364,8 +389,10 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
       )
     );
 
-    // Create FormData with all fields
+    // Create new FormData with all fields including CSRF token
     const formDataToSend = new FormData();
+    
+    // Add all form fields
     for (let [key, value] of formData.entries()) {
       if (key !== 'photos[]') {
         formDataToSend.append(key, value);
@@ -379,17 +406,15 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
       formDataToSend.append(`photo${file.index}_type`, file.type);
     });
 
-    // ==========================================================
-    //  ★★★ THIS IS THE ONLY LINE THAT CHANGED IN THIS FUNCTION ★★★
-    // ==========================================================
+    // Debug: Log all fields being sent
+    console.log('📋 Fields being sent:', Array.from(formDataToSend.keys()));
+    console.log('🔑 CSRF token in final FormData:', formDataToSend.get('csrfToken')?.substring(0, 8) + '...');
+
     const response = await fetch(ADOPTION_FORM_ENDPOINT, {
       method: 'POST',
       body: formDataToSend,
       credentials: 'include'
     });
-    // ==========================================================
-    //  END OF CHANGE
-    // ==========================================================
 
     const result = await response.json();
 
@@ -398,6 +423,9 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
 
       // Reset form
       form.reset();
+      delete form.dataset.csrfToken; // Clear the stored token
+      csrfTokenReady = false; // Reset token ready flag
+      
       const fileInput = form.querySelector('#photos');
       if (fileInput) fileInput.value = '';
       const districtSelect = form.querySelector('#district');
@@ -406,6 +434,20 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
       }
       goToStep(1);
       form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+      
+      // Fetch a new token for the next submission
+      fetch('/api/token', {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json' }
+      }).then(response => response.json()).then(data => {
+        if (data.csrfToken) {
+          form.dataset.csrfToken = data.csrfToken;
+          csrfTokenReady = true;
+          console.log('✅ New CSRF token ready for next submission');
+        }
+      }).catch(err => console.error('Failed to fetch new token:', err));
+      
     } else {
       throw new Error(result.message || 'Bir hata oluştu');
     }
@@ -802,7 +844,6 @@ function trackFormSubmission(type, data) {
     fields: Object.keys(data).length
   });
 }
-
 // ===================
 // EVENT HANDLERS
 // ===================
