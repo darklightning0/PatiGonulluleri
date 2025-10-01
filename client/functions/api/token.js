@@ -7,7 +7,6 @@
 
 // A secure, random string. In a real app, generate this and store it as a secret.
 // For now, this is sufficient for demonstration.
-const SECRET_KEY = env.TOKEN_KEY;
 
 /**
  * Creates a signature for a token to verify it later.
@@ -28,6 +27,15 @@ async function sign(key, data) {
  * Handles GET requests to generate and send a CSRF token.
  */
 export async function onRequestGet(context) {
+  const SECRET_KEY = context.env.TOKEN_KEY;
+  if (!SECRET_KEY) {
+    console.error("CSRF token generation failed: TOKEN_KEY secret is not set.");
+    return new Response(JSON.stringify({ error: "Server configuration error" }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  
   try {
     // 1. Generate a random token
     const token = crypto.randomUUID();

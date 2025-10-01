@@ -5,8 +5,6 @@
  * and includes CSRF protection.
  */
 
-const SECRET_KEY = "your-super-secret-key-that-is-at-least-32-characters-long";
-
 /**
  * Verifies the HMAC signature of the token.
  * @param {CryptoKey} key - The secret key for signing.
@@ -32,6 +30,12 @@ async function verify(key, signature, data) {
 export async function onRequestPost(context) {
   const { request, env } = context;
   const GOOGLE_SCRIPT_URL = env.GOOGLE_SCRIPT_URL;
+  const SECRET_KEY = env.TOKEN_KEY;
+
+  if (!SECRET_KEY) {
+    console.error("CSRF validation failed: TOKEN_KEY secret is not set.");
+    return new Response(JSON.stringify({ result: 'error', message: 'Server configuration error.' }), { status: 500 });
+  }
 
   // --- CSRF VALIDATION START ---
   try {
