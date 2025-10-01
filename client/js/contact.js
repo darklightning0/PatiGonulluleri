@@ -303,23 +303,18 @@ function validateFileUpload(e) {
 }
 
 async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, validateStep) {
-
   e.preventDefault();
 
   const form = e.target;
-  // --- CSRF PATCH: update hidden input with latest cookie token before creating FormData ---
+  // Always update the hidden input with the latest token from the cookie
   const csrfInput = form.querySelector('input[name="csrfToken"]');
   if (csrfInput) {
-    // Try to extract the token from the __csrf_token cookie (Double Submit Cookie pattern)
     const cookie = document.cookie.match(/__csrf_token=([^;]+)/);
     if (cookie) {
-      const [token, signature] = cookie[1].split('.');
-      if (token) {
-        csrfInput.value = token;
-      }
+      const [token] = cookie[1].split('.');
+      csrfInput.value = token || '';
     }
   }
-  // --- END PATCH ---
   const formData = new FormData(form);
   const submitBtn = form.querySelector('button[type="submit"]');
 
