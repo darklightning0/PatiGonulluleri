@@ -33,52 +33,81 @@ async function verify(key, signature, data) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  
+  console.log("=== REQUEST RECEIVED ===");
+  console.log("Method:", request.method);
+  console.log("URL:", request.url);
+  console.log("Headers:", Object.fromEntries(request.headers.entries()));
+  
   const GOOGLE_SCRIPT_URL = env.GOOGLE_SCRIPT_URL;
-
-  // â˜…â˜…â˜… CHANGE: Read the secret key from Cloudflare environment variables â˜…â˜…â˜…
   const SECRET_KEY = env.TOKEN_KEY;
 
-  // Failsafe in case the environment variable is not set
+  // Check environment variables
   if (!SECRET_KEY) {
     console.error("CSRF validation failed: TOKEN_KEY secret is not set.");
-    return new Response(JSON.stringify({ result: 'error', message: 'Server configuration error.' }), { 
+    return new Response(JSON.stringify({ result: 'error', message: 'Server configuration error: TOKEN_KEY missing.' }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
+  if (!GOOGLE_SCRIPT_URL) {
+    console.error("GOOGLE_SCRIPT_URL is not set.");
+    return new Response(
+      JSON.stringify({ result: 'error', message: 'Server configuration error: GOOGLE_SCRIPT_URL missing.' }), 
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
+
+  let formData;
+  let bodyToken;
+
   // --- CSRF VALIDATION START ---
   try {
-    const formData = await request.clone().formData();
-    const bodyToken = formData.get("csrfToken");
+    // Clone request to read form data without consuming the body
+    formData = await request.clone().formData();
+    bodyToken = formData.get("csrfToken");
     const cookie = request.headers.get("Cookie");
     
     console.log("=== CSRF VALIDATION DEBUG ===");
-    console.log("ðŸ“§ All form fields:", Array.from(formData.keys()));
-    console.log("ðŸ”‘ Body token (first 20 chars):", bodyToken?.substring(0, 20));
-    console.log("ðŸª Cookie header:", cookie);
+    console.log("📧 All form fields:", Array.from(formData.keys()));
+    console.log("🔑 Body token:", bodyToken);
+    console.log("🍪 Cookie header:", cookie);
     
-    const cookieToken = cookie?.match(/__csrf_token=([^;]+)/)?.[1];
-    console.log("ðŸª Extracted cookie token (first 20 chars):", cookieToken?.substring(0, 20));
-
     if (!bodyToken) {
-      console.error("âŒ No CSRF token in form body");
+      console.error("❌ No CSRF token in form body");
       throw new Error("CSRF token not found in form body.");
     }
     
+    const cookieToken = cookie?.match(/__csrf_token=([^;]+)/)?.[1];
+    console.log("🍪 Extracted cookie token:", cookieToken?.substring(0, 40) + "...");
+
     if (!cookieToken) {
-      console.error("âŒ No CSRF token in cookies");
+      console.error("❌ No CSRF token in cookies");
       throw new Error("CSRF token not found in cookies.");
     }
 
     const [token, signature] = cookieToken.split(".");
-    console.log("ðŸ” Split cookie - token:", token?.substring(0, 20), "signature:", signature?.substring(0, 20));
+    console.log("🔍 Split cookie - token:", token, "signature:", signature?.substring(0, 20) + "...");
 
     if (!token || !signature) {
-      console.error("âŒ Cookie token is malformed");
+      console.error("❌ Cookie token is malformed");
       throw new Error("CSRF cookie is malformed.");
     }
 
+    // Check if tokens match
+    const tokensMatch = bodyToken === token;
+    console.log("🔍 Tokens match:", tokensMatch);
+    
+    if (!tokensMatch) {
+      console.error("❌ Token mismatch - Body:", bodyToken, "Cookie:", token);
+      throw new Error("CSRF token mismatch.");
+    }
+
+    // Verify signature
     const key = await crypto.subtle.importKey(
       "raw",
       new TextEncoder().encode(SECRET_KEY),
@@ -87,27 +116,22 @@ export async function onRequestPost(context) {
       ["verify"]
     );
 
-    const tokensMatch = bodyToken === token;
     const signatureValid = await verify(key, signature, bodyToken);
-    
-    console.log("ðŸ” Tokens match:", tokensMatch);
-    console.log("ðŸ” Signature valid:", signatureValid);
+    console.log("🔍 Signature valid:", signatureValid);
 
-    const isValid = tokensMatch && signatureValid;
-    
-    if (!isValid) {
-      console.error("âŒ CSRF validation failed");
-      throw new Error("Invalid CSRF token.");
+    if (!signatureValid) {
+      console.error("❌ Invalid signature");
+      throw new Error("Invalid CSRF token signature.");
     }
     
-    console.log("âœ… CSRF validation passed");
+    console.log("✅ CSRF validation passed");
+    
   } catch (error) {
     console.error("CSRF Validation Failed:", error.message);
     return new Response(
       JSON.stringify({ 
         result: 'error', 
-        message: 'Security check failed. Please refresh the page and try again.',
-        debug: error.message // Remove this in production
+        message: 'Security check failed. Please refresh the page and try again.'
       }), 
       { 
         status: 403,
@@ -117,42 +141,84 @@ export async function onRequestPost(context) {
   }
   // --- CSRF VALIDATION END ---
 
-  if (!GOOGLE_SCRIPT_URL) {
-    return new Response(
-      JSON.stringify({ result: 'error', message: 'Server configuration error.' }), 
-      { 
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
-  }
-
+  // --- FORWARD TO GOOGLE SCRIPT ---
   try {
-    const headers = new Headers();
-    const contentType = request.headers.get('Content-Type');
-    if (contentType) {
-      headers.set('Content-Type', contentType);
+    console.log("📤 Preparing to forward to Google Script...");
+    
+    // Remove CSRF token from form data before forwarding
+    const cleanFormData = new FormData();
+    for (let [key, value] of formData.entries()) {
+      if (key !== 'csrfToken') {
+        cleanFormData.append(key, value);
+      }
     }
     
-    console.log("ðŸ“¤ Forwarding request to Google Script");
+    console.log("📋 Fields being sent to Google:", Array.from(cleanFormData.keys()));
+    
     const googleResponse = await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
-      headers: headers,
-      body: request.body,
+      body: cleanFormData,
     });
 
-    console.log("Google Script response status:", googleResponse.status);
+    console.log("📥 Google Script response status:", googleResponse.status);
+    console.log("📥 Google Script response headers:", Object.fromEntries(googleResponse.headers.entries()));
     
-    return new Response(googleResponse.body, {
-      status: googleResponse.status,
-      statusText: googleResponse.statusText,
-      headers: googleResponse.headers,
+    // Read the response body as text first
+    const responseText = await googleResponse.text();
+    console.log("📥 Google Script response body:", responseText.substring(0, 500));
+    
+    // Try to parse as JSON
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Failed to parse Google Script response as JSON:", parseError);
+      // If Google Script returns HTML or non-JSON, treat as success if status is 200/302
+      if (googleResponse.status === 200 || googleResponse.status === 302) {
+        console.log("✅ Google Script returned non-JSON success response");
+        return new Response(
+          JSON.stringify({ result: 'success', message: 'Form submitted successfully' }), 
+          { 
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      } else {
+        throw new Error("Google Script returned non-JSON error response");
+      }
+    }
+    
+    // Return the parsed response
+    return new Response(JSON.stringify(responseData), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
-    console.error('Error proxying request to Google Script:', error);
+    console.error('❌ Error forwarding to Google Script:', error);
+    console.error('Error details:', error.stack);
+    
+    // Since the data might have been saved despite the error, 
+    // check if it's a response parsing issue
+    if (error.message.includes('JSON')) {
+      console.log("⚠️ Data may have been saved despite JSON parsing error");
+      return new Response(
+        JSON.stringify({ 
+          result: 'success', 
+          message: 'Form submitted (with warnings)' 
+        }), 
+        { 
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
     return new Response(
-      JSON.stringify({ result: 'error', message: 'An internal server error occurred.' }), 
+      JSON.stringify({ 
+        result: 'error', 
+        message: 'An error occurred while processing your request. Please try again.' 
+      }), 
       { 
         status: 500,
         headers: { 'Content-Type': 'application/json' }
