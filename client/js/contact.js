@@ -72,9 +72,6 @@ function initAdoptionForm() {
       form.dataset.csrfToken = data.csrfToken;
       csrfTokenReady = true;
       
-      console.log('✅ CSRF token ready:', data.csrfToken.substring(0, 8) + '...');
-      console.log('🍪 Cookies after token fetch:', document.cookie);
-      
       // Enable submit button now that token is ready
       const submitBtn = form.querySelector('button[type="submit"]');
       if (submitBtn && submitBtn.disabled) {

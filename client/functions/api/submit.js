@@ -31,13 +31,59 @@ async function verify(key, signature, data) {
   }
 }
 
+/**
+ * Validates the form data against a set of rules.
+ * @param {FormData} formData - The form data to validate.
+ * @returns {{isValid: boolean, errors: string[]}} - An object containing the validation result.
+ */
+function validateFormData(formData) {
+    const errors = [];
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const phone = formData.get("phone");
+    const city = formData.get("city");
+    const district = formData.get("district");
+    const animalType = formData.get("animalType");
+    const size = formData.get("size");
+    const description = formData.get("description");
+    const privacyAgreement = formData.get("privacyAgreement");
+
+    if (!name || name.trim().length < 2) {
+        errors.push("Ad Soyad alanı zorunludur.");
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errors.push("Geçerli bir e-posta adresi giriniz.");
+    }
+    if (!phone || !/^[\+]?[(]?[\d\s\-\(\)]{10,}$/.test(phone)) {
+        errors.push("Geçerli bir telefon numarası giriniz.");
+    }
+    if (!city) {
+        errors.push("Şehir seçimi zorunludur.");
+    }
+    if (!district) {
+        errors.push("İlçe seçimi zorunludur.");
+    }
+    if (!animalType) {
+        errors.push("Hayvan türü seçimi zorunludur.");
+    }
+    if (!size) {
+        errors.push("Boyut seçimi zorunludur.");
+    }
+    if (!description || description.trim().length < 10) {
+        errors.push("Açıklama alanı en az 10 karakter olmalıdır.");
+    }
+    if (privacyAgreement !== "on") {
+        errors.push("KVKK metnini onaylamanız gerekmektedir.");
+    }
+
+    return {
+        isValid: errors.length === 0,
+        errors: errors,
+    };
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
-  
-  console.log("=== REQUEST RECEIVED ===");
-  console.log("Method:", request.method);
-  console.log("URL:", request.url);
-  console.log("Headers:", Object.fromEntries(request.headers.entries()));
   
   const GOOGLE_SCRIPT_URL = env.GOOGLE_SCRIPT_URL;
   const SECRET_KEY = env.TOKEN_KEY;
@@ -72,18 +118,12 @@ export async function onRequestPost(context) {
     bodyToken = formData.get("csrfToken");
     const cookie = request.headers.get("Cookie");
     
-    console.log("=== CSRF VALIDATION DEBUG ===");
-    console.log("📧 All form fields:", Array.from(formData.keys()));
-    console.log("🔑 Body token:", bodyToken);
-    console.log("🍪 Cookie header:", cookie);
-    
     if (!bodyToken) {
       console.error("❌ No CSRF token in form body");
       throw new Error("CSRF token not found in form body.");
     }
     
     const cookieToken = cookie?.match(/__csrf_token=([^;]+)/)?.[1];
-    console.log("🍪 Extracted cookie token:", cookieToken?.substring(0, 40) + "...");
 
     if (!cookieToken) {
       console.error("❌ No CSRF token in cookies");
@@ -91,7 +131,6 @@ export async function onRequestPost(context) {
     }
 
     const [token, signature] = cookieToken.split(".");
-    console.log("🔍 Split cookie - token:", token, "signature:", signature?.substring(0, 20) + "...");
 
     if (!token || !signature) {
       console.error("❌ Cookie token is malformed");
@@ -100,7 +139,6 @@ export async function onRequestPost(context) {
 
     // Check if tokens match
     const tokensMatch = bodyToken === token;
-    console.log("🔍 Tokens match:", tokensMatch);
     
     if (!tokensMatch) {
       console.error("❌ Token mismatch - Body:", bodyToken, "Cookie:", token);
@@ -117,14 +155,12 @@ export async function onRequestPost(context) {
     );
 
     const signatureValid = await verify(key, signature, bodyToken);
-    console.log("🔍 Signature valid:", signatureValid);
 
     if (!signatureValid) {
       console.error("❌ Invalid signature");
       throw new Error("Invalid CSRF token signature.");
     }
     
-    console.log("✅ CSRF validation passed");
     
   } catch (error) {
     console.error("CSRF Validation Failed:", error.message);
@@ -140,10 +176,42 @@ export async function onRequestPost(context) {
     );
   }
   // --- CSRF VALIDATION END ---
+  // --- SERVER-SIDE VALIDATION START ---
+try {
+    console.log("🔍 Starting server-side validation...");
+    const validationResult = validateFormData(formData);
 
+    if (!validationResult.isValid) {
+        console.error("❌ Server-side validation failed:", validationResult.errors);
+        return new Response(
+            JSON.stringify({
+                result: 'error',
+                message: 'Form verileri geçersiz. Lütfen alanları kontrol edip tekrar deneyin.',
+                errors: validationResult.errors,
+            }),
+            {
+                status: 400, // Bad Request
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
+    }
+    console.log("✅ Server-side validation passed.");
+} catch (error) {
+    console.error("Validation error:", error.message);
+    return new Response(
+        JSON.stringify({
+            result: 'error',
+            message: 'Form doğrulanırken bir hata oluştu.'
+        }),
+        {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        }
+    );
+}
+// --- SERVER-SIDE VALIDATION END ---
   // --- FORWARD TO GOOGLE SCRIPT ---
   try {
-    console.log("📤 Preparing to forward to Google Script...");
     
     // Remove CSRF token from form data before forwarding
     const cleanFormData = new FormData();
@@ -153,19 +221,14 @@ export async function onRequestPost(context) {
       }
     }
     
-    console.log("📋 Fields being sent to Google:", Array.from(cleanFormData.keys()));
     
     const googleResponse = await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       body: cleanFormData,
     });
-
-    console.log("📥 Google Script response status:", googleResponse.status);
-    console.log("📥 Google Script response headers:", Object.fromEntries(googleResponse.headers.entries()));
     
     // Read the response body as text first
     const responseText = await googleResponse.text();
-    console.log("📥 Google Script response body:", responseText.substring(0, 500));
     
     // Try to parse as JSON
     let responseData;
@@ -175,7 +238,6 @@ export async function onRequestPost(context) {
       console.error("Failed to parse Google Script response as JSON:", parseError);
       // If Google Script returns HTML or non-JSON, treat as success if status is 200/302
       if (googleResponse.status === 200 || googleResponse.status === 302) {
-        console.log("✅ Google Script returned non-JSON success response");
         return new Response(
           JSON.stringify({ result: 'success', message: 'Form submitted successfully' }), 
           { 
@@ -201,7 +263,6 @@ export async function onRequestPost(context) {
     // Since the data might have been saved despite the error, 
     // check if it's a response parsing issue
     if (error.message.includes('JSON')) {
-      console.log("⚠️ Data may have been saved despite JSON parsing error");
       return new Response(
         JSON.stringify({ 
           result: 'success', 
