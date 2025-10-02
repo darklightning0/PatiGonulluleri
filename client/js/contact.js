@@ -48,8 +48,6 @@ function initAdoptionForm() {
 
   async function setupCsrfToken() {
     try {
-      console.log('🔐 Fetching CSRF token...');
-      
       const response = await fetch('/api/token', {
         method: 'GET',
         credentials: 'same-origin',
@@ -326,7 +324,6 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
       if (data.csrfToken) {
         form.dataset.csrfToken = data.csrfToken;
         csrfTokenReady = true;
-        console.log('✅ CSRF token fetched on retry');
       }
     } catch (error) {
       console.error('Failed to fetch token on retry:', error);
@@ -350,9 +347,7 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
   const csrfToken = form.dataset.csrfToken;
   if (csrfToken) {
     formData.append('csrfToken', csrfToken);
-    console.log('🔑 CSRF token added to FormData:', csrfToken.substring(0, 8) + '...');
   } else {
-    console.error('❌ No CSRF token available');
     showNotification('Güvenlik hatası. Lütfen sayfayı yenileyin.', 'error');
     return;
   }
@@ -365,52 +360,74 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gönderiliyor...';
 
+  // file: client/js/contact.js
+
   try {
- 
     const formDataToSend = new FormData(form);
     const csrfToken = form.dataset.csrfToken;
     formDataToSend.append('csrfToken', csrfToken);
 
-
-    // Debug: Log all fields being sent
-    console.log('📋 Fields being sent:', Array.from(formDataToSend.keys()));
-    for (let [key, value] of formDataToSend.entries()) {
-        if (value instanceof File) {
-            console.log(`  - ${key}: ${value.name} (${value.size} bytes)`);
-        } else {
-            console.log(`  - ${key}: ${value}`);
-        }
-    }
+    // Debug log to see what's being sent
+    console.log('📋 Form data being sent to server:', Object.fromEntries(formDataToSend.entries()));
 
     const response = await fetch(ADOPTION_FORM_ENDPOINT, {
-      method: 'POST',
-      body: formDataToSend, // Send the FormData object directly
-      credentials: 'include'
+        method: 'POST',
+        body: formDataToSend,
+        credentials: 'include'
     });
 
     const result = await response.json();
 
+    // This is the key part: Check if the HTTP response status is an error
     if (!response.ok) {
-        // This part remains the same from our previous fix.
-        const errorMessages = result.errors ? result.errors.join('<br>') : (result.message || 'Bilinmeyen bir sunucu hatası oluştu.');
+        // If the server sent a specific list of errors, format them.
+        // Otherwise, use the general message from the server.
+        const errorMessages = result.errors 
+            ? result.errors.join('<br>') 
+            : (result.message || 'Bilinmeyen bir sunucu hatası oluştu.');
+        
+        // Throw a new error to be caught by the 'catch' block below
         throw new Error(errorMessages);
     }
 
-    if (result.result === 'success') {
-      showNotification('İlanınız başarıyla gönderildi! En kısa sürede yayınlanacaktır.', 'success');
-      form.reset();
-      // ... rest of the success logic remains the same
-      // ...
-    } else {
-      throw new Error(result.message || 'Bir hata oluştu');
+    // This code will only run if the response was successful (status 200-299)
+    showNotification('İlanınız başarıyla gönderildi! En kısa sürede yayınlanacaktır.', 'success');
+
+    // Reset form
+    form.reset();
+    delete form.dataset.csrfToken;
+    csrfTokenReady = false;
+    
+    const fileInput = form.querySelector('#photos');
+    if (fileInput) fileInput.value = '';
+    const districtSelect = form.querySelector('#district');
+    if (districtSelect) {
+        districtSelect.innerHTML = '<option value="">Önce şehir seçiniz</option>';
     }
-  } catch (error) {
+    goToStep(1);
+    form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+    
+    // Fetch a new token for the next submission
+    fetch('/api/token', {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json' }
+    }).then(res => res.json()).then(data => {
+        if (data.csrfToken) {
+            form.dataset.csrfToken = data.csrfToken;
+            csrfTokenReady = true;
+            console.log('✅ New CSRF token ready for next submission');
+        }
+    }).catch(err => console.error('Failed to fetch new token:', err));
+    
+} catch (error) {
     console.error('Form submission error:', error);
+    // The notification will now display the detailed error message
     showNotification(`İlan gönderilemedi:<br><br>${error.message}`, 'error');
-  } finally {
+} finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = '<i class="fas fa-paw"></i> İlan Gönder';
-  }
+}
 }
 
 // ===================
