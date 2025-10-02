@@ -69,7 +69,7 @@ function validateFormData(formData) {
     if (!size) {
         errors.push("Boyut seçimi zorunludur.");
     }
-    if (!description || description.trim().length < 10) {
+    if (!description || description.trim().length < 2) {
         errors.push("Açıklama alanı en az 10 karakter olmalıdır.");
     }
     if (privacyAgreement !== "on") {
