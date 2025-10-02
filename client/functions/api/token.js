@@ -24,7 +24,7 @@ async function sign(key, data) {
  * Handles GET requests to generate and send a CSRF token.
  */
 export async function onRequestGet(context) {
-  // ★★★ CHANGE: Read the secret key from Cloudflare environment variables ★★★
+  // â˜…â˜…â˜… CHANGE: Read the secret key from Cloudflare environment variables â˜…â˜…â˜…
   const SECRET_KEY = context.env.TOKEN_KEY;
 
   // Failsafe in case the environment variable is not set
@@ -64,7 +64,7 @@ export async function onRequestGet(context) {
     // 6. Set the signed token in a secure, HttpOnly cookie
     response.headers.set(
     "Set-Cookie",
-    `__csrf_token=${signedToken}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=3600`
+    `__csrf_token=${signedToken}; HttpOnly; Secure; SameSite=Lax; Path=/`
     );
 
     return response;

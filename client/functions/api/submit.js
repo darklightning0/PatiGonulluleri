@@ -35,7 +35,7 @@ export async function onRequestPost(context) {
   const { request, env } = context;
   const GOOGLE_SCRIPT_URL = env.GOOGLE_SCRIPT_URL;
 
-  // ★★★ CHANGE: Read the secret key from Cloudflare environment variables ★★★
+  // â˜…â˜…â˜… CHANGE: Read the secret key from Cloudflare environment variables â˜…â˜…â˜…
   const SECRET_KEY = env.TOKEN_KEY;
 
   // Failsafe in case the environment variable is not set
@@ -54,28 +54,28 @@ export async function onRequestPost(context) {
     const cookie = request.headers.get("Cookie");
     
     console.log("=== CSRF VALIDATION DEBUG ===");
-    console.log("📧 All form fields:", Array.from(formData.keys()));
-    console.log("🔑 Body token (first 20 chars):", bodyToken?.substring(0, 20));
-    console.log("🍪 Cookie header:", cookie);
+    console.log("ðŸ“§ All form fields:", Array.from(formData.keys()));
+    console.log("ðŸ”‘ Body token (first 20 chars):", bodyToken?.substring(0, 20));
+    console.log("ðŸª Cookie header:", cookie);
     
     const cookieToken = cookie?.match(/__csrf_token=([^;]+)/)?.[1];
-    console.log("🍪 Extracted cookie token (first 20 chars):", cookieToken?.substring(0, 20));
+    console.log("ðŸª Extracted cookie token (first 20 chars):", cookieToken?.substring(0, 20));
 
     if (!bodyToken) {
-      console.error("❌ No CSRF token in form body");
+      console.error("âŒ No CSRF token in form body");
       throw new Error("CSRF token not found in form body.");
     }
     
     if (!cookieToken) {
-      console.error("❌ No CSRF token in cookies");
+      console.error("âŒ No CSRF token in cookies");
       throw new Error("CSRF token not found in cookies.");
     }
 
     const [token, signature] = cookieToken.split(".");
-    console.log("🔐 Split cookie - token:", token?.substring(0, 20), "signature:", signature?.substring(0, 20));
+    console.log("ðŸ” Split cookie - token:", token?.substring(0, 20), "signature:", signature?.substring(0, 20));
 
     if (!token || !signature) {
-      console.error("❌ Cookie token is malformed");
+      console.error("âŒ Cookie token is malformed");
       throw new Error("CSRF cookie is malformed.");
     }
 
@@ -90,17 +90,17 @@ export async function onRequestPost(context) {
     const tokensMatch = bodyToken === token;
     const signatureValid = await verify(key, signature, bodyToken);
     
-    console.log("🔍 Tokens match:", tokensMatch);
-    console.log("🔍 Signature valid:", signatureValid);
+    console.log("ðŸ” Tokens match:", tokensMatch);
+    console.log("ðŸ” Signature valid:", signatureValid);
 
     const isValid = tokensMatch && signatureValid;
     
     if (!isValid) {
-      console.error("❌ CSRF validation failed");
+      console.error("âŒ CSRF validation failed");
       throw new Error("Invalid CSRF token.");
     }
     
-    console.log("✅ CSRF validation passed");
+    console.log("âœ… CSRF validation passed");
   } catch (error) {
     console.error("CSRF Validation Failed:", error.message);
     return new Response(
@@ -134,14 +134,14 @@ export async function onRequestPost(context) {
       headers.set('Content-Type', contentType);
     }
     
-    console.log("📤 Forwarding request to Google Script");
+    console.log("ðŸ“¤ Forwarding request to Google Script");
     const googleResponse = await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       headers: headers,
       body: request.body,
     });
 
-    console.log("📥 Google Script response status:", googleResponse.status);
+    console.log("Google Script response status:", googleResponse.status);
     
     return new Response(googleResponse.body, {
       status: googleResponse.status,
