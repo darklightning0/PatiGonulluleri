@@ -1,4 +1,3 @@
-
 /**
  * Contact Page JavaScript - FIXED CSRF IMPLEMENTATION
  * Handles form submissions, FAQ interactions, and contact functionality
@@ -844,6 +843,7 @@ function trackFormSubmission(type, data) {
     fields: Object.keys(data).length
   });
 }
+
 // ===================
 // EVENT HANDLERS
 // ===================
