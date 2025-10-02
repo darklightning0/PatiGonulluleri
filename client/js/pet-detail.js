@@ -6,6 +6,60 @@ let currentPet = null;
 let currentImageIndex = 0;
 let isPhoneVisible = false;
 
+const elements = {
+    // Breadcrumb & Title
+    petNameBreadcrumb: document.getElementById('pet-name-breadcrumb'),
+    petName: document.getElementById('pet-name'),
+    
+    // Quick Info
+    petBreed: document.getElementById('pet-breed'),
+    petAge: document.getElementById('pet-age'),
+    petLocation: document.getElementById('pet-location'),
+    petDate: document.getElementById('pet-date'),
+    petTypeBadge: document.getElementById('pet-type-badge'),
+    petSize: document.getElementById('pet-size'),
+    petGender: document.getElementById('pet-gender'),
+
+    // Badges & Sections
+    urgentBadge: document.getElementById('urgent-badge'),
+    healthTags: document.getElementById('health-tags'),
+    petDescription: document.getElementById('pet-description'),
+    specialNotesContainer: document.getElementById('special-notes-container'),
+
+    // Image Gallery
+    mainImage: document.getElementById('main-image'),
+    thumbnailsContainer: document.getElementById('thumbnails-container'),
+    totalImages: document.getElementById('total-images'),
+    currentImageNum: document.getElementById('current-image-num'),
+    prevImageBtn: document.getElementById('prev-image'),
+    nextImageBtn: document.getElementById('next-image'),
+
+    // Contact Section
+    caretaker: {
+        avatar: document.querySelector('.avatar-img'),
+        onlineStatus: document.querySelector('.online-status'),
+        name: document.querySelector('.caretaker-name'),
+        role: document.querySelector('.caretaker-role'),
+        phoneText: document.querySelector('.phone-text'),
+    },
+    callBtn: document.getElementById('call-btn'),
+    whatsappBtn: document.getElementById('whatsapp-btn'),
+    messageBtn: document.getElementById('message-btn'),
+    phoneDisplay: document.getElementById('phone-number'),
+    copyBtn: document.querySelector('.copy-btn'),
+
+    // Similar Pets
+    similarPetsContainer: document.getElementById('similar-pets-container'),
+    
+    // Modal
+    messageModal: document.getElementById('message-modal'),
+    closeMessageModalBtn: document.getElementById('close-message-modal'),
+    messageForm: document.getElementById('message-form'),
+    modalOverlay: document.querySelector('.modal-overlay'),
+
+    adoptionApplicationForm: document.getElementById('adoption-application-form'),
+};
+
 // ===================
 // INITIALIZATION
 // ===================
@@ -71,11 +125,11 @@ function updatePageContent() {
     const currentLang = getCurrentLanguage();
     
     // Update basic info
-    document.getElementById('pet-name-breadcrumb').textContent = currentPet.name;
-    document.getElementById('pet-name').textContent = currentPet.name;
-    document.getElementById('pet-breed').textContent = currentPet.breed;
-    document.getElementById('pet-age').textContent = `${currentPet.age} yaşında`;
-    document.getElementById('pet-location').textContent = currentPet.location;
+    elements.petNameBreadcrumb.textContent = currentPet.name;
+    elements.petName.textContent = currentPet.name;
+    elements.petBreed.textContent = currentPet.breed;
+    elements.petAge.textContent = `${currentPet.age} yaşında`;
+    elements.petLocation.textContent = currentPet.location;
     
     // Update translated fields
     updateTranslatedFields(currentLang);
@@ -87,10 +141,10 @@ function updatePageContent() {
         month: 'long', 
         day: 'numeric' 
     });
-    document.getElementById('pet-date').textContent = formattedDate;
+    elements.petDate.textContent = formattedDate;
     
     // Update urgent badge
-    const urgentBadge = document.getElementById('urgent-badge');
+    const urgentBadge = elements.UrgentBadge;
     if (currentPet.urgent) {
         urgentBadge.classList.remove('hidden');
     } else {
@@ -101,7 +155,7 @@ function updatePageContent() {
     updateHealthTags();
     
     // Update description
-    const descriptionContainer = document.getElementById('pet-description');
+    const descriptionContainer = elements.petDescription;
     const paragraphs = currentPet.description.split('\n\n');
     descriptionContainer.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
     
@@ -133,7 +187,7 @@ function updateTranslatedFields(lang) {
     };
     
     // Update type badge
-    const typeBadge = document.getElementById('pet-type-badge');
+    const typeBadge = elements.petTypeBadge;
     const typeText = translations.type[currentPet.type];
     if (typeText) {
         typeBadge.textContent = typeText[lang];
@@ -142,7 +196,7 @@ function updateTranslatedFields(lang) {
     }
     
     // Update size
-    const sizeElement = document.getElementById('pet-size');
+    const sizeElement = elements.petSize;
     const sizeText = translations.size[currentPet.size];
     if (sizeText) {
         sizeElement.textContent = sizeText[lang];
@@ -151,7 +205,7 @@ function updateTranslatedFields(lang) {
     }
     
     // Update gender
-    const genderElement = document.getElementById('pet-gender');
+    const genderElement = elements.petGender;
     const genderText = translations.gender[currentPet.gender];
     if (genderText) {
         genderElement.textContent = genderText[lang];
@@ -161,7 +215,7 @@ function updateTranslatedFields(lang) {
 }
 
 function updateHealthTags() {
-    const healthContainer = document.getElementById('health-tags');
+    const healthContainer = elements.healthTags;
     const healthTranslations = {
         'vaccinated': { tr: 'Aşılı', en: 'Vaccinated' },
         'sterilized': { tr: 'Kısırlaştırılmış', en: 'Sterilized' },
@@ -243,8 +297,8 @@ function getCurrentLanguage() {
 // ===================
 
 function initImageGallery() {
-    const prevBtn = document.getElementById('prev-image');
-    const nextBtn = document.getElementById('next-image');
+    const prevBtn = elements.prevImageBtn;
+    const nextBtn = elements.nextImageBtn;
     
     if (prevBtn && nextBtn) {
         prevBtn.addEventListener('click', showPreviousImage);
@@ -264,10 +318,10 @@ function initImageGallery() {
 function updateImageGallery() {
     if (!currentPet || !currentPet.images) return;
     
-    const mainImage = document.getElementById('main-image');
+    const mainImage = elements.mainImage;
     const thumbnailsContainer = document.querySelector('.thumbnails-container');
-    const totalImages = document.getElementById('total-images');
-    const currentImageNum = document.getElementById('current-image-num');
+    const totalImages = elements.totalImages;
+    const currentImageNum = elements.currentImageNum;
     
     // Update main image
     mainImage.src = currentPet.images[0];
@@ -299,9 +353,9 @@ function showImage(index) {
     const images = currentPet.images;
     if (index < 0 || index >= images.length) return;
     
-    const mainImage = document.getElementById('main-image');
+    const mainImage = elements.mainImage;
     const thumbnails = document.querySelectorAll('.thumbnail');
-    const currentImageNum = document.getElementById('current-image-num');
+    const currentImageNum = elements.currentImageNum;
     
     // Update main image
     mainImage.style.opacity = '0';
@@ -338,9 +392,9 @@ function showPreviousImage() {
 // ===================
 
 function initContactButtons() {
-    const callBtn = document.getElementById('call-btn');
-    const whatsappBtn = document.getElementById('whatsapp-btn');
-    const messageBtn = document.getElementById('message-btn');
+    const callBtn = elements.callBtn;
+    const whatsappBtn = elements.whatsappBtn;
+    const messageBtn = elements.messageBtn;
     const copyBtn = document.querySelector('.copy-btn');
     
     if (callBtn) {
@@ -362,7 +416,7 @@ function initContactButtons() {
 
 function handleCallClick() {
     const phoneNumber = document.querySelector('.phone-text').textContent;
-    const phoneDisplay = document.getElementById('phone-number');
+    const phoneDisplay = elements.phoneNumber;
     
     if (!isPhoneVisible) {
         // Show phone number
@@ -370,7 +424,7 @@ function handleCallClick() {
         isPhoneVisible = true;
         
         // Update button text
-        const callBtn = document.getElementById('call-btn');
+        const callBtn = elements.callBtn;
         callBtn.innerHTML = `
             <i class="fas fa-phone"></i>
             <span>Gizle</span>
@@ -385,7 +439,7 @@ function handleCallClick() {
         isPhoneVisible = false;
         
         // Reset button text
-        const callBtn = document.getElementById('call-btn');
+        const callBtn = elements.callBtn;
         callBtn.innerHTML = `
             <i class="fas fa-phone"></i>
             <span data-tr="Ara" data-en="Call">Ara</span>
@@ -408,12 +462,12 @@ function handleWhatsAppClick() {
 }
 
 function handleMessageClick() {
-    const modal = document.getElementById('message-modal');
+    const modal = elements.messageBtn;
     if (modal) {
         modal.classList.remove('hidden');
         
         // Pre-fill message
-        const messageText = document.getElementById('message-text');
+        const messageText = elements.messageText;
         if (messageText) {
             messageText.value = `Merhaba, ${currentPet.name} hakkında daha fazla bilgi alabilir miyim?`;
         }
@@ -458,10 +512,10 @@ function fallbackCopyPhone(text) {
 // ===================
 
 function initMessageModal() {
-    const modal = document.getElementById('message-modal');
-    const closeBtn = document.getElementById('close-message-modal');
+    const modal = elements.messageModal;
+    const closeBtn = elements.closeMessageModalBtn;
     const overlay = document.querySelector('.modal-overlay');
-    const messageForm = document.getElementById('message-form');
+    const messageForm = elements.messageForm;
     
     if (closeBtn) {
         closeBtn.addEventListener('click', closeMessageModal);
@@ -484,7 +538,7 @@ function initMessageModal() {
 }
 
 function closeMessageModal() {
-    const modal = document.getElementById('message-modal');
+    const modal = elements.messageModal;
     if (modal) {
         modal.classList.add('hidden');
     }
@@ -533,7 +587,7 @@ function handleMessageSubmit(e) {
 // ===================
 
 function initApplicationForm() {
-    const applicationForm = document.getElementById('adoption-application-form');
+    const applicationForm = elements.adoptionApplicationForm;
     
     if (applicationForm) {
         applicationForm.addEventListener('submit', handleApplicationSubmit);
@@ -675,7 +729,7 @@ function loadSimilarPets() {
         pet.type === currentPet.type
     ).slice(0, 3); // Show max 3 similar pets
 
-    const container = document.getElementById('similar-pets-container');
+    const container = elements.similarPetsContainer;
     if (!container) return;
 
     if (similarPets.length === 0) {

@@ -434,7 +434,7 @@ function createFeaturedArticleCard(article) {
                         </div>
                     </div>
                     <div class="article-author">
-                        <img src="${(article.author && article.author.avatar) ? article.author.avatar : ''}" alt="${(article.author && article.author.name) ? article.author.name : ''}" class="author-avatar">
+                        <img src="${(article.author && article.author.avatar) ? article.author.avatar : ''}" alt="${(article.author && article.author.name) ? article.author.name : ''}" class="author-avatar" loading="lazy">
                         <div class="author-info">
                             <h4>${(article.author && article.author.name) ? article.author.name : ''}</h4>
                             <p class="author-bio">${(article.author && article.author.bio && article.author.bio[currentLang]) ? article.author.bio[currentLang] : ''}</p>

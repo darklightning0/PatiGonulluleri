@@ -11,80 +11,6 @@ let currentLanguage = 'tr';
 let isScrolling = false;
 
 // ===================
-// LANGUAGE DATA
-// ===================
-
-const translations = {
-    tr: {
-        // Navigation
-        "Anasayfa": "Anasayfa",
-        "Hakkımızda": "Hakkımızda", 
-        "Sahiplen": "Sahiplen",
-        "Makaleler": "Makaleler",
-        "İletişim": "İletişim",
-        
-        // Hero Section
-        "Her Canın Sevgi Dolu Bir Yuva Hakkı Var": "Her Canın Sevgi Dolu Bir Yuva Hakkı Var",
-        "Sokak hayvanları ve barınak hayvanlarına yeni bir başlangıç vermenin zamanı geldi. Onların hikayesi sizinle devam etsin.": "Sokak hayvanları ve barınak hayvanlarına yeni bir başlangıç vermenin zamanı geldi. Onların hikayesi sizinle devam etsin.",
-        "Sahiplen": "Sahiplen",
-        "Keşfet": "Keşfet",
-        
-        // Pet Section
-        "Sahiplenmeye Hazır": "Sahiplenmeye Hazır",
-        "Bu güzel dostlarımız sıcak yuvalarını bekliyorlar": "Bu güzel dostlarımız sıcak yuvalarını bekliyorlar",
-        "Köpek": "Köpek",
-        "Kedi": "Kedi",
-        "3 yaşında, oyuncu ve çok sevecen. Çocuklarla çok iyi anlaşıyor.": "3 yaşında, oyuncu ve çok sevecen. Çocuklarla çok iyi anlaşıyor.",
-        "2 yaşında, sakin ve uysal. Kucakta sevgi almayı çok seviyor.": "2 yaşında, sakin ve uysal. Kucakta sevgi almayı çok seviyor.",
-        "1 yaşında, enerjik ve meraklı. Yeni maceralara hazır küçük kaşif.": "1 year old, energetic and curious. A little explorer ready for new adventures.",
-        "3 Yaş": "3 Years",
-        "2 Yaş": "2 Years",
-        "1 Yaş": "1 Year",
-        "Büyük": "Large",
-        "Orta": "Medium",
-        "Küçük": "Small",
-        "Daha Fazla": "Learn More",
-        "Tüm Hayvanları Gör": "See All Animals",
-        
-        // Features Section
-        "Size Uygun Dostları Keşfedin": "Discover Perfect Companions for You",
-        "Tercihlerinize göre en uygun hayvan arkadaşlarınızı bulmanızda yardımcı olalım.": "Let us help you find the most suitable animal friends according to your preferences.",
-        "E-posta Adresiniz": "Your Email Address",
-        "Tercih Ettiğiniz Hayvan": "Preferred Animal",
-        "Tercih Ettiğiniz Boyut": "Preferred Size",
-        "Tercih Ettiğiniz Yaş": "Preferred Age",
-        "Fark Etmez": "No Preference",
-        "Diğer": "Other",
-        "Genç (0-2 yaş)": "Young (0-2 years)",
-        "Yetişkin (2-7 yaş)": "Adult (2-7 years)",
-        "Yaşlı (7+ yaş)": "Senior (7+ years)",
-        "Bildirimlerimi Başlat": "Start My Notifications",
-        
-        // Mission
-        "Misyonumuz": "Our Mission",
-        "Sokakta yaşam mücadelesi veren her canın sıcak bir yuva bulması için çalışıyoruz. Her hayvan sevgi, bakım ve güvenlik hakkına sahiptir. Onları bekleyen ailelerle buluşturmak ve farkındalık yaratmak bizim en büyük amacımız.": "We work to ensure that every soul struggling to survive on the streets finds a warm home. Every animal has the right to love, care and safety. Our greatest goal is to bring them together with the families waiting for them and to create awareness.",
-        "Sahiplendirme": "Adoptions",
-        "Kurtarılan Hayvan": "Rescued Animals",
-        
-        // Articles
-        "Güncel Makaleler": "Latest Articles",
-        "Yeni Sahiplenilen Kediler İçin İlk Hafta Rehberi": "First Week Guide for Newly Adopted Cats",
-        "Yeni evine gelen kediler için adaptasyon süreci...": "The adaptation process for cats coming to their new home...",
-        "Sokak Hayvanlarına Nasıl Yardım Edebiliriz?": "How Can We Help Street Animals?",
-        "Basit adımlarla hayvan dostlarımızın hayatlarını kolaylaştırabiliriz...": "We can make life easier for our animal friends with simple steps...",
-        "Tüm Makaleleri Oku": "Read All Articles",
-        
-        // Footer
-        "Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş.": "A volunteer organization working to ensure every animal finds a loving home.",
-        "Hızlı Bağlantılar": "Quick Links",
-        "İletişim": "Contact",
-        "Yasal": "Legal",
-        "Gizlilik Sözleşmesi": "Privacy Policy",
-        "Kullanım Koşulları": "Terms of Use",
-        "KVKK Aydınlatma Metni": "KVKK Disclosure Text",
-        "© 2025 Pati Gönüllüleri. Tüm hakları saklıdır.": "© 2025 Pati Gönüllüleri. All rights reserved."
-    }
-};
 // INITIALIZATION
 // ===================
 
@@ -92,45 +18,61 @@ const translations = {
  * Initialize all functionality when DOM is loaded
  */
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize language switching
-    initLanguageToggle();
+    // Cache DOM elements for performance
+    const elements = {
+        header: document.querySelector('.header'),
+        mobileMenuBtn: document.querySelector('.mobile-menu-btn'),
+        nav: document.querySelector('.nav'),
+        navLinks: document.querySelectorAll('.nav-link'),
+        langButtons: document.querySelectorAll('.lang-btn'),
+        newsletterForm: document.getElementById('newsletter-form'),
+        emailInput: document.getElementById('email'),
+        scrollRevealElements: document.querySelectorAll('.pet-card, .feature-card, .stat-number'),
+        anchorLinks: document.querySelectorAll('a[href^="#"]'),
+        allImages: document.querySelectorAll('img'),
+        articlesContainer: document.querySelector('.articles-card .article-preview'),
+        featuredPetsContainer: document.getElementById('featured-pets')
+    };
+
+    console.log('🐾 Pati Gönüllüleri - Website Loaded');
+
+    // Initialize core functionality
+    initLanguageToggle(elements.langButtons);
     loadLanguagePreference();
-    
-    // Initialize navigation
-    initMobileNavigation();
-    updateActiveNavLink();
-    
-    // Initialize forms and validation
-    initFormValidation();
-    
-    // Initialize scroll effects
-    initScrollEffects();
-    initSmoothScrolling();
-    
-    // Initialize image loading
-    initImageLoading();
-    
-    // Load latest articles and featured pets
-    loadLatestArticles();
-    loadFeaturedPets();
-    
-    // Add resize listener for articles
-    window.addEventListener('resize', debounce(() => {
-        loadLatestArticles();
-    }, 250));
-    
-    // Initialize performance optimizations
+    initMobileNavigation(elements.mobileMenuBtn, elements.nav, elements.navLinks);
+    initFormValidation(elements.newsletterForm, elements.emailInput);
+    initScrollEffects(elements.header, elements.scrollRevealElements);
+    initSmoothScrolling(elements.anchorLinks, elements.header);
+    initImageLoading(elements.allImages);
     optimizeAnimations();
     
-    console.log('✨ All functionality initialized successfully');        
+    // Load dynamic content on the index page
+    if (elements.articlesContainer) {
+        loadLatestArticles(elements.articlesContainer);
+        window.addEventListener('resize', debounce(() => loadLatestArticles(elements.articlesContainer), 250));
+    }
+    if (elements.featuredPetsContainer) {
+        loadFeaturedPets(elements.featuredPetsContainer);
+    }
+    
+    // Add scroll reveal class to animated elements
+    elements.scrollRevealElements.forEach(element => {
+        element.classList.add('scroll-reveal');
+    });
+    
+    // Initialize active nav link based on current page
+    updateActiveNavLink(elements.navLinks);
+    
+    // Add loading complete class to body
+    setTimeout(() => {
+        document.body.classList.add('loaded');
+    }, 100);
 });
+
 // ===================
 // UTILITY FUNCTIONS
 // ===================
 
-/**
- * Debounce function to limit the rate of function execution
- */
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -143,22 +85,6 @@ function debounce(func, wait) {
     };
 }
 
-/**
- * Check if element is in viewport
- */
-function isInViewport(element) {
-    const rect = element.getBoundingClientRect();
-    return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-}
-
-/**
- * Animate number counting
- */
 function animateNumber(element, start, end, duration = 2000) {
     const startTime = performance.now();
     const range = end - start;
@@ -166,13 +92,9 @@ function animateNumber(element, start, end, duration = 2000) {
     function updateNumber(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing function for smooth animation
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         const currentNumber = Math.round(start + (range * easeOutQuart));
-        
         element.textContent = currentNumber + '+';
-        
         if (progress < 1) {
             requestAnimationFrame(updateNumber);
         }
@@ -185,91 +107,72 @@ function animateNumber(element, start, end, duration = 2000) {
 // LANGUAGE SWITCHING
 // ===================
 
-/**
- * Initialize language switching functionality
- */
-function initLanguageToggle() {
-    const langButtons = document.querySelectorAll('.lang-btn');
-    
+function initLanguageToggle(langButtons) {
     langButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const targetLang = btn.dataset.lang;
             if (targetLang !== currentLanguage) {
                 switchLanguage(targetLang);
-                updateLanguageButtons(targetLang);
             }
         });
     });
 }
 
 /**
- * Switch between languages
+ * Switch language and notify other scripts.
+ * @param {string} lang - The new language code ('tr' or 'en').
  */
 function switchLanguage(lang) {
     currentLanguage = lang;
     
-    // Update all translatable elements
+    // Update all static translatable elements
     const translatableElements = document.querySelectorAll('[data-tr][data-en]');
-    
     translatableElements.forEach(element => {
-        const trText = element.dataset.tr;
-        const enText = element.dataset.en;
-        
-        if (lang === 'tr') {
-            element.textContent = trText;
-        } else if (lang === 'en') {
-            element.textContent = enText;
+        const text = element.getAttribute(`data-${lang}`);
+        if (text) {
+            // Handle different element types
+            if (element.placeholder !== undefined) {
+                element.placeholder = text;
+            } else if (element.value !== undefined) {
+                element.value = text;
+            } else {
+                element.textContent = text;
+            }
         }
     });
-    
-    // Update form placeholders and other attributes if needed
-    updateFormTexts(lang);
     
     // Store language preference
     localStorage.setItem('preferredLanguage', lang);
+
+    // Update button states
+    updateLanguageButtons(lang);
     
-    // Add smooth transition effect
-    document.body.style.opacity = '0.8';
+    // Add smooth transition effect for visual feedback
+    document.body.style.transition = 'opacity 0.2s ease-in-out';
+    document.body.style.opacity = '0.9';
     setTimeout(() => {
         document.body.style.opacity = '1';
     }, 200);
+
+    // *** NEW IMPLEMENTATION: Notify other scripts of the language change ***
+    console.log(`Language changed to ${lang}. Dispatching 'languageChanged' event.`);
+    const event = new CustomEvent('languageChanged', { 
+        detail: { lang: currentLanguage } 
+    });
+    document.dispatchEvent(event);
 }
 
-/**
- * Update language button states
- */
+
 function updateLanguageButtons(activeLang) {
-    const langButtons = document.querySelectorAll('.lang-btn');
-    
-    langButtons.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.lang === activeLang) {
-            btn.classList.add('active');
-        }
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === activeLang);
     });
 }
 
-/**
- * Update form texts and placeholders
- */
-function updateFormTexts(lang) {
-    const emailInput = document.getElementById('email');
-    if (emailInput) {
-        emailInput.placeholder = lang === 'tr' 
-            ? 'ornek@email.com' 
-            : 'example@email.com';
-    }
-}
-
-/**
- * Load saved language preference
- */
 function loadLanguagePreference() {
     const savedLang = localStorage.getItem('preferredLanguage');
     if (savedLang && (savedLang === 'tr' || savedLang === 'en')) {
-        currentLanguage = savedLang;
         switchLanguage(savedLang);
-        updateLanguageButtons(savedLang);
     }
 }
 
@@ -277,385 +180,187 @@ function loadLanguagePreference() {
 // MOBILE NAVIGATION
 // ===================
 
-/**
- * Initialize mobile navigation
- */
-function initMobileNavigation() {
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const nav = document.querySelector('.nav');
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    if (mobileMenuBtn && nav) {
-        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
-        
-        // Close mobile menu when clicking on nav links
-        navLinks.forEach(link => {
-            link.addEventListener('click', closeMobileMenu);
-        });
-        
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!nav.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                closeMobileMenu();
-            }
-        });
-    }
-}
+function initMobileNavigation(mobileMenuBtn, nav, navLinks) {
+    if (!mobileMenuBtn || !nav) return;
 
-/**
- * Toggle mobile menu
- */
-function toggleMobileMenu() {
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const nav = document.querySelector('.nav');
-    
-    mobileMenuBtn.classList.toggle('active');
-    nav.classList.toggle('active');
-    
-    // Prevent body scroll when menu is open
-    if (nav.classList.contains('active')) {
-        document.body.style.overflow = 'hidden';
-    } else {
+    const closeMobileMenu = () => {
+        mobileMenuBtn.classList.remove('active');
+        nav.classList.remove('active');
         document.body.style.overflow = '';
-    }
-}
+    };
 
-/**
- * Close mobile menu
- */
-function closeMobileMenu() {
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const nav = document.querySelector('.nav');
+    mobileMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        mobileMenuBtn.classList.toggle('active');
+        nav.classList.toggle('active');
+        document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : '';
+    });
     
-    mobileMenuBtn.classList.remove('active');
-    nav.classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-// ===================
-// FORM VALIDATION
-// ===================
-
-/**
- * Initialize form validation
- */
-function initFormValidation() {
-    const newsletterForm = document.getElementById('newsletter-form');
+    navLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
     
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', handleNewsletterSubmit);
-        
-        // Real-time email validation
-        const emailInput = document.getElementById('email');
-        if (emailInput) {
-            emailInput.addEventListener('blur', validateEmail);
-            emailInput.addEventListener('input', clearEmailError);
+    document.addEventListener('click', (e) => {
+        if (nav.classList.contains('active') && !nav.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+            closeMobileMenu();
         }
+    });
+}
+
+// ===================
+// FORM VALIDATION & HANDLING
+// ===================
+
+function initFormValidation(newsletterForm, emailInput) {
+    if (!newsletterForm) return;
+
+    newsletterForm.addEventListener('submit', handleNewsletterSubmit);
+    
+    if (emailInput) {
+        emailInput.addEventListener('input', () => clearFormError(emailInput));
     }
 }
 
-/**
- * Handle newsletter form submission
- */
 function handleNewsletterSubmit(e) {
     e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    const email = formData.get('email');
-    const animalType = formData.get('animalType');
-    const size = formData.get('size');
-    const age = formData.get('age');
-    
-    // Validate email
+    const form = e.target;
+    const emailInput = form.querySelector('#email');
+    const email = emailInput.value.trim();
+
     if (!isValidEmail(email)) {
-        showFormError('email', currentLanguage === 'tr' ? 
-            'Lütfen geçerli bir e-posta adresi giriniz.' : 
-            'Please enter a valid email address.');
+        showFormError(emailInput, currentLanguage === 'tr' ? 'Lütfen geçerli bir e-posta adresi giriniz.' : 'Please enter a valid email address.');
         return;
     }
-    
-    // Show loading state
-    const submitBtn = e.target.querySelector('button[type="submit"]');
+
+    const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.textContent = currentLanguage === 'tr' ? 'Kaydediliyor...' : 'Saving...';
-    
-    // Simulate API call
+
     setTimeout(() => {
-        // Reset form
-        e.target.reset();
-        
-        // Show success message
-        showSuccessMessage(currentLanguage === 'tr' ? 
-            'Tercihleriniz kaydedildi! Size uygun hayvanlar hakkında bilgilendirme alacaksınız.' :
-            'Your preferences have been saved! You will receive notifications about suitable animals.');
-        
-        // Reset button
+        showSuccessMessage(currentLanguage === 'tr' ? 'Tercihleriniz kaydedildi!' : 'Your preferences have been saved!');
+        form.reset();
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
-        
-        // Log data for development (remove in production)
-        console.log('Newsletter signup:', { email, animalType, size, age });
-        
-    }, 2000);
+    }, 1500);
 }
 
-/**
- * Validate email format
- */
 function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-/**
- * Validate email input
- */
-function validateEmail(e) {
-    const email = e.target.value.trim();
-    if (email && !isValidEmail(email)) {
-        showFormError('email', currentLanguage === 'tr' ? 
-            'Geçerli bir e-posta adresi giriniz.' : 
-            'Please enter a valid email address.');
-    }
-}
-
-/**
- * Clear email error
- */
-function clearEmailError(e) {
-    clearFormError('email');
-}
-
-/**
- * Show form error
- */
-function showFormError(fieldName, message) {
-    const field = document.getElementById(fieldName);
-    if (field) {
-        field.style.borderColor = '#e74c3c';
-        
-        // Remove existing error
-        const existingError = field.parentNode.querySelector('.error-message');
-        if (existingError) {
-            existingError.remove();
-        }
-        
-        // Add error message
-        const errorDiv = document.createElement('div');
+function showFormError(field, message) {
+    field.style.borderColor = '#e74c3c';
+    let errorDiv = field.parentNode.querySelector('.error-message');
+    if (!errorDiv) {
+        errorDiv = document.createElement('div');
         errorDiv.className = 'error-message';
-        errorDiv.style.color = '#e74c3c';
-        errorDiv.style.fontSize = '14px';
-        errorDiv.style.marginTop = '4px';
-        errorDiv.textContent = message;
+        errorDiv.style.cssText = 'color: #e74c3c; font-size: 14px; margin-top: 4px;';
         field.parentNode.appendChild(errorDiv);
     }
+    errorDiv.textContent = message;
 }
 
-/**
- * Clear form error
- */
-function clearFormError(fieldName) {
-    const field = document.getElementById(fieldName);
-    if (field) {
-        field.style.borderColor = '';
-        const errorMessage = field.parentNode.querySelector('.error-message');
-        if (errorMessage) {
-            errorMessage.remove();
-        }
+function clearFormError(field) {
+    field.style.borderColor = '';
+    const errorDiv = field.parentNode.querySelector('.error-message');
+    if (errorDiv) {
+        errorDiv.remove();
     }
 }
 
-/**
- * Show success message
- */
 function showSuccessMessage(message) {
-    // Create success notification
     const notification = document.createElement('div');
     notification.className = 'success-notification';
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #27ae60;
-        color: white;
-        padding: 16px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 10000;
-        opacity: 0;
-        transform: translateX(100px);
-        transition: all 0.3s ease;
-        max-width: 300px;
-        font-size: 14px;
-        line-height: 1.4;
-    `;
-    
     notification.textContent = message;
+    notification.style.cssText = `position: fixed; top: 20px; right: 20px; background-color: #27ae60; color: white; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; opacity: 0; transform: translateX(100px); transition: all 0.3s ease; max-width: 300px;`;
     document.body.appendChild(notification);
-    
-    // Animate in
     setTimeout(() => {
         notification.style.opacity = '1';
         notification.style.transform = 'translateX(0)';
     }, 100);
-    
-    // Remove after delay
     setTimeout(() => {
         notification.style.opacity = '0';
         notification.style.transform = 'translateX(100px)';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
+        setTimeout(() => notification.remove(), 300);
     }, 4000);
 }
 
 // ===================
-// SCROLL EFFECTS
+// SCROLL & UI EFFECTS
 // ===================
 
-/**
- * Initialize scroll effects
- */
-function initScrollEffects() {
-    const header = document.querySelector('.header');
-    
-    // Header scroll effect
+function initScrollEffects(header, scrollRevealElements) {
+    if (!header) return;
+
     const handleScroll = debounce(() => {
-        if (window.scrollY > 100) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-        
-        // Reveal animations
-        revealOnScroll();
-    }, 10);
+        header.classList.toggle('scrolled', window.scrollY > 50);
+        revealOnScroll(scrollRevealElements);
+    }, 15);
     
-    window.addEventListener('scroll', handleScroll);
-    
-    // Initial check
-    revealOnScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    revealOnScroll(scrollRevealElements); // Initial check
 }
 
-/**
- * Reveal elements on scroll
- */
-function revealOnScroll() {
-    const revealElements = document.querySelectorAll('.scroll-reveal');
-    
-    revealElements.forEach(element => {
-        if (isElementInViewport(element) && !element.classList.contains('revealed')) {
-            element.classList.add('revealed');
-            
-            // Animate stat numbers when they become visible
-            if (element.classList.contains('stat-number')) {
-                const targetNumber = parseInt(element.textContent.replace('+', ''));
-                animateNumber(element, 0, targetNumber);
+function revealOnScroll(elements) {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                if (entry.target.classList.contains('stat-number')) {
+                    const targetNumber = parseInt(entry.target.textContent.replace('+', ''));
+                    animateNumber(entry.target, 0, targetNumber);
+                }
+                observer.unobserve(entry.target);
             }
-        }
-    });
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    elements.forEach(element => observer.observe(element));
 }
 
-/**
- * Check if element is in viewport (more precise version)
- */
-function isElementInViewport(element) {
-    const rect = element.getBoundingClientRect();
-    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-    
-    return (
-        rect.top <= windowHeight * 0.8 &&
-        rect.bottom >= 0
-    );
-}
-
-// ===================
-// SMOOTH SCROLLING
-// ===================
-
-/**
- * Initialize smooth scrolling for anchor links
- */
-function initSmoothScrolling() {
-    const anchorLinks = document.querySelectorAll('a[href^="#"]');
-    
+function initSmoothScrolling(anchorLinks, header) {
     anchorLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             const href = link.getAttribute('href');
-            
-            // Skip if href is just "#"
-            if (href === '#') return;
-            
-            e.preventDefault();
-            
-            const targetElement = document.querySelector(href);
-            if (targetElement) {
-                const headerHeight = document.querySelector('.header').offsetHeight;
-                const targetPosition = targetElement.offsetTop - headerHeight - 20;
-                
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-                
-                // Close mobile menu if open
-                closeMobileMenu();
+            if (href.startsWith('#') && href.length > 1) {
+                e.preventDefault();
+                const targetElement = document.querySelector(href);
+                if (targetElement) {
+                    const headerHeight = header.offsetHeight;
+                    const targetPosition = targetElement.offsetTop - headerHeight - 20;
+                    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                }
             }
         });
     });
 }
 
-// ===================
-// FEATURED PETS LOADING
-// ===================
-
-/**
- * Load and display featured pets
- */
-function loadFeaturedPets() {
-    // 1. Doğru konteyneri ID'si ile seç
-    const petsContainer = document.getElementById('featured-pets');
-    if (!petsContainer) {
-        return;
-    }
-
-    // Hayvanları sırala: Acil olanlar öne, sonra yeni eklenenler
-    const sortedPets = PETS_DATA.sort((a, b) => {
-        if (a.urgent && !b.urgent) return -1; // 'urgent' olan 'a' öne gelsin
-        if (!a.urgent && b.urgent) return 1; // 'urgent' olan 'b' öne gelsin
-        return new Date(b.dateAdded) - new Date(a.dateAdded); // Tarihe göre sırala (yeni olanlar önde)
+function updateActiveNavLink(navLinks) {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    navLinks.forEach(link => {
+        const linkPage = link.getAttribute('href').split('/').pop();
+        link.classList.toggle('active', linkPage === currentPage || (currentPage === 'index.html' && linkPage === ''));
     });
+}
 
-    // İlk 4 hayvanı al (veya istediğin kadar)
+// ===================
+// DYNAMIC CONTENT LOADING (for index.html)
+// ===================
+
+function loadFeaturedPets(petsContainer) {
+    if (typeof PETS_DATA === 'undefined') return;
+    const sortedPets = [...PETS_DATA].sort((a, b) => (b.urgent ? 1 : -1) || new Date(b.dateAdded) - new Date(a.dateAdded));
     const featuredPets = sortedPets.slice(0, 3);
     
-    // Mevcut içeriği temizle
-    petsContainer.innerHTML = '';
-    
-    // 2. Gereksiz iç fonksiyon olmadan doğrudan döngüyü çalıştır
-    featuredPets.forEach(pet => {
-        // Bu kısım senin dil çeviri kodun, doğru çalışıyor
-        const lang = document.documentElement.lang || 'tr';
-        const ageText = pet.age + (lang === 'tr' ? ' yaşında' : ' year' + (pet.age > 1 ? 's' : ''));
+    petsContainer.innerHTML = featuredPets.map(pet => {
+        const lang = currentLanguage;
+        const ageText = `${pet.age} ${lang === 'tr' ? 'yaşında' : 'year' + (pet.age > 1 ? 's' : '')}`;
         const petType = pet.type === 'dog' ? (lang === 'tr' ? 'Köpek' : 'Dog') : (lang === 'tr' ? 'Kedi' : 'Cat');
-        
-        // Boyut için senin kodunu daha okunabilir hale getirdim
-        let petSize;
-        if (pet.size === 'large') {
-            petSize = lang === 'tr' ? 'Büyük' : 'Large';
-        } else if (pet.size === 'medium') {
-            petSize = lang === 'tr' ? 'Orta' : 'Medium';
-        } else {
-            petSize = lang === 'tr' ? 'Küçük' : 'Small';
-        }
-        
-        const petHTML = `
+        const petSize = pet.size === 'large' ? (lang === 'tr' ? 'Büyük' : 'Large') : (pet.size === 'medium' ? (lang === 'tr' ? 'Orta' : 'Medium') : (lang === 'tr' ? 'Küçük' : 'Small'));
+
+        return `
             <div class="pet-card">
                 <div class="pet-image">
-                    <img src="${pet.image}" alt="${pet.name}">
+                    <img src="${pet.image}" alt="${pet.name}" loading="lazy">
                     ${pet.urgent ? `<span class="pet-badge urgent">${lang === 'tr' ? 'Acil' : 'Urgent'}</span>` : ''}
                     <span class="pet-badge ${pet.type.toLowerCase()}">${petType}</span>
                 </div>
@@ -673,187 +378,69 @@ function loadFeaturedPets() {
                 </div>
             </div>
         `;
-        // 3. HTML'i doğru konteynere ekle
-        petsContainer.insertAdjacentHTML('beforeend', petHTML);
-    });
+    }).join('');
 }
 
-
-// ===================
-// ARTICLES LOADING
-// ===================
-
-/**
- * Load and display latest articles
- */
-function loadLatestArticles() {
-    const articlesContainer = document.querySelector('.articles-card .article-preview');
-    if (!articlesContainer) return;
-
-    // Sort articles by id (assuming newer articles have higher IDs)
-    const sortedArticles = ARTICLES_DATA.sort((a, b) => b.id - a.id);
-    
-    // Get screen width to determine number of articles to show
-    const screenWidth = window.innerWidth;
-    const articlesToShow = screenWidth < 768 ? 3 : 5;
-    
-    // Get latest articles
+function loadLatestArticles(articlesContainer) {
+    if (typeof ARTICLES_DATA === 'undefined') return;
+    const sortedArticles = [...ARTICLES_DATA].sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+    const articlesToShow = window.innerWidth < 768 ? 2 : 3;
     const latestArticles = sortedArticles.slice(0, articlesToShow);
     
-    // Clear existing content
-    articlesContainer.innerHTML = '';
-    
-    // Add articles
-    latestArticles.forEach(article => {
-        const lang = currentLanguage || 'tr';
-        const articleHTML = `
-            <div class="mini-article">
-                <h4>
-                    <a href="article-detail.html?id=${article.id}&slug=${article.slug}">
-                        ${article.title[lang]}
-                    </a>
-                </h4>
-                <p>${article.summary[lang]}</p>
-            </div>
-        `;
-        articlesContainer.insertAdjacentHTML('beforeend', articleHTML);
-    });
+    articlesContainer.innerHTML = latestArticles.map(article => `
+        <div class="mini-article">
+            <h4><a href="article-detail.html?id=${article.id}">${article.title[currentLanguage]}</a></h4>
+            <p>${article.summary[currentLanguage]}</p>
+        </div>
+    `).join('');
 }
 
 // ===================
-// IMAGE LOADING
+// PERFORMANCE & ASSET HANDLING
 // ===================
 
-/**
- * Initialize lazy loading for images
- */
-function initImageLoading() {
-    const images = document.querySelectorAll('img');
-    
-    // Add loading animation class
+function initImageLoading(images) {
     images.forEach(img => {
-        img.classList.add('loading');
-        
-        img.addEventListener('load', () => {
-            img.classList.remove('loading');
+        if (img.complete) {
             img.classList.add('loaded');
-        });
-        
+        } else {
+            img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
+        }
         img.addEventListener('error', () => {
-            img.classList.remove('loading');
             img.classList.add('error');
-            // Set fallback image
-            img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDQwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjdGM0U3Ii8+CjxwYXRoIGQ9Ik0xNzUgMTEwSDIyNVYxNDBIMTc1VjExMFoiIGZpbGw9IiNCM0JCQUYiLz4KPHBhdGggZD0iTTE1MCA4MEgyNTBWMTcwSDE1MFY4MFoiIHN0cm9rZT0iI0IzQkJBRiIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNzI1MDM3IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPkdvcnNlbCBZdWtsZW5lbWVkaS90ZXh0Pgo8L3N2Zz4=';
+            // A simple, inline SVG placeholder to avoid broken image icons
+            img.src = 'data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27100%25%27%20height%3D%27100%25%27%20viewBox%3D%270%200%201%201%27%3E%3Crect%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F7F3E7%27/%3E%3C/svg%3E';
         });
     });
 }
 
-// ===================
-// PERFORMANCE OPTIMIZATION
-// ===================
-
-/**
- * Optimize animations for better performance
- */
 function optimizeAnimations() {
     let ticking = false;
+    const scrollRevealElements = document.querySelectorAll('.scroll-reveal');
     
-    function updateAnimations() {
-        // Batch DOM updates
-        revealOnScroll();
+    function updateOnScroll() {
+        revealOnScroll(scrollRevealElements);
         ticking = false;
     }
     
     function requestTick() {
         if (!ticking) {
-            requestAnimationFrame(updateAnimations);
+            requestAnimationFrame(updateOnScroll);
             ticking = true;
         }
     }
     
-    window.addEventListener('scroll', requestTick);
-}
-
-
-
-// ===================
-// INITIALIZATION
-// ===================
-
-/**
- * Initialize all functionality when DOM is loaded
- */
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🐾 Pati Gönüllüleri - Website Loaded');
-    
-    // Initialize core functionality
-    loadLanguagePreference();
-    initLanguageToggle();
-    initMobileNavigation();
-    initFormValidation();
-    initScrollEffects();
-    initSmoothScrolling();
-    initImageLoading();
-    optimizeAnimations();
-
-    
-    // Add scroll reveal class to animated elements
-    const animatedElements = document.querySelectorAll('.pet-card, .feature-card, .stat-number');
-    animatedElements.forEach(element => {
-        element.classList.add('scroll-reveal');
-    });
-    
-    // Initialize active nav link based on current page
-    updateActiveNavLink();
-    
-    // Add loading complete class to body
-    setTimeout(() => {
-        document.body.classList.add('loaded');
-    }, 100);
-});
-
-/**
- * Update active navigation link based on current page
- */
-function updateActiveNavLink() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        const href = link.getAttribute('href');
-        
-        if ((currentPage === 'index.html' || currentPage === '') && 
-            (href === '#' || href === 'index.html')) {
-            link.classList.add('active');
-        } else if (href.includes(currentPage.replace('.html', ''))) {
-            link.classList.add('active');
-        }
-    });
+    window.addEventListener('scroll', requestTick, { passive: true });
 }
 
 // ===================
 // ERROR HANDLING
 // ===================
 
-/**
- * Global error handler
- */
 window.addEventListener('error', (e) => {
-    console.error('JavaScript Error:', e.error);
-    // In production, you might want to send this to an error tracking service
+    console.error('Global JavaScript Error:', e.error);
 });
 
-/**
- * Handle unhandled promise rejections
- */
 window.addEventListener('unhandledrejection', (e) => {
     console.error('Unhandled Promise Rejection:', e.reason);
-    e.preventDefault();
 });
-
-// ===================
-// EXPORTS (for module usage)
-// ===================
-
-// If using as a module, export main functions

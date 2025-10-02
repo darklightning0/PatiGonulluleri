@@ -423,7 +423,7 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
 } catch (error) {
     console.error('Form submission error:', error);
     // The notification will now display the detailed error message
-    showNotification(`İlan gönderilemedi:<br><br>${error.message}`, 'error');
+    showNotification(`İlan gönderilemedi: ${error.message}`, 'error');
 } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = '<i class="fas fa-paw"></i> İlan Gönder';
