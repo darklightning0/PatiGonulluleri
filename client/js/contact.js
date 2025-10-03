@@ -273,6 +273,29 @@ function initAdoptionForm() {
   }
 }
 
+/**
+ * Convert file to base64 string
+ * @param {File} file - The file to convert
+ * @returns {Promise<string>} Base64 encoded string
+ */
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            // Get base64 string without the data:image/xxx;base64, prefix
+            const base64 = e.target.result.split(',')[1];
+            resolve(base64);
+        };
+        
+        reader.onerror = function(error) {
+            reject(error);
+        };
+        
+        reader.readAsDataURL(file);
+    });
+}
+
 function validateFileUpload(e) {
   const files = e.target.files;
   const maxFiles = 3;
@@ -367,6 +390,31 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     const csrfToken = form.dataset.csrfToken;
     formDataToSend.append('csrfToken', csrfToken);
 
+    // Handle file uploads and convert to base64
+    const fileInput = form.querySelector('#photos');
+    if (fileInput && fileInput.files.length > 0) {
+      const files = Array.from(fileInput.files);
+      const base64Promises = files.map(fileToBase64);
+      
+      try {
+        const base64Images = await Promise.all(base64Promises);
+        
+        // Remove the original file input from FormData
+        formDataToSend.delete('photos');
+        
+        // Add base64 encoded images
+        base64Images.forEach((base64, index) => {
+          formDataToSend.append(`photo${index + 1}`, base64);
+        });
+        
+        // Add number of photos for server validation
+        formDataToSend.append('photoCount', files.length);
+      } catch (error) {
+        console.error('Error converting images to base64:', error);
+        throw new Error('Fotoğraflar işlenirken bir hata oluştu. Lütfen tekrar deneyin.');
+      }
+    }
+
     // Debug log to see what's being sent
     console.log('📋 Form data being sent to server:', Object.fromEntries(formDataToSend.entries()));
 
@@ -398,8 +446,8 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     delete form.dataset.csrfToken;
     csrfTokenReady = false;
     
-    const fileInput = form.querySelector('#photos');
-    if (fileInput) fileInput.value = '';
+    const photoInput = form.querySelector('#photos');
+    if (photoInput) photoInput.value = '';
     const districtSelect = form.querySelector('#district');
     if (districtSelect) {
         districtSelect.innerHTML = '<option value="">Önce şehir seçiniz</option>';
@@ -423,7 +471,7 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
 } catch (error) {
     console.error('Form submission error:', error);
     // The notification will now display the detailed error message
-    showNotification(`İlan gönderilemedi: ${error.message}`, 'error');
+    showNotification(`İlan gönderilemedi:${error.message}`, 'error');
 } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = '<i class="fas fa-paw"></i> İlan Gönder';
