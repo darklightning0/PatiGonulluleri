@@ -1,8 +1,8 @@
 // js/firebase-data-service.js
 // This replaces your static pets-data.js and articles-data.js
 
-import { db, COLLECTIONS } from './firebase-config.js';
 import { 
+  getFirestore,
   collection, 
   doc, 
   getDoc, 
@@ -16,6 +16,13 @@ import {
   serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
+// Get db from window (set in index.html)
+const db = window.db;
+
+const COLLECTIONS = {
+  PETS: 'pets',
+  ARTICLES: 'articles'
+};
 // ====================
 // PETS SERVICE
 // ====================

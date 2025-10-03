@@ -2,7 +2,7 @@
  * Main JavaScript functionality for Pati Gönüllüleri website
  * Handles language switching, mobile navigation, form validation, and animations
  */
-import { CachedPetsService, CachedArticlesService } from '/js/firebase-data-service.js';
+import { CachedPetsService, CachedArticlesService } from './firebase-data-service.js';
 // ===================
 // GLOBAL VARIABLES
 // ===================
@@ -223,6 +223,7 @@ function initFormValidation(newsletterForm, emailInput) {
     }
 }
 
+// Line 239 in main.js - REPLACE ENTIRE FUNCTION
 function handleNewsletterSubmit(e) {
     e.preventDefault();
     const form = e.target;
@@ -230,21 +231,58 @@ function handleNewsletterSubmit(e) {
     const email = emailInput.value.trim();
 
     if (!isValidEmail(email)) {
-        showFormError(emailInput, currentLanguage === 'tr' ? 'Lütfen geçerli bir e-posta adresi giriniz.' : 'Please enter a valid email address.');
+        showFormError(emailInput, currentLanguage === 'tr' ? 
+            'Lütfen geçerli bir e-posta adresi giriniz.' : 
+            'Please enter a valid email address.');
         return;
     }
 
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
-    submitBtn.textContent = currentLanguage === 'tr' ? 'Kaydediliyor...' : 'Saving...';
+    submitBtn.textContent = currentLanguage === 'tr' ? 'Gönderiliyor...' : 'Sending...';
 
-    setTimeout(() => {
-        showSuccessMessage(currentLanguage === 'tr' ? 'Tercihleriniz kaydedildi!' : 'Your preferences have been saved!');
+    const animalType = form.querySelector('#animal-type').value;
+    const size = form.querySelector('#size').value;
+    const age = form.querySelector('#age').value;
+
+    // Call Pages Function API
+    fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email,
+            animalType,
+            size,
+            age
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.error || 'Subscription failed');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        showSuccessMessage(currentLanguage === 'tr' ? 
+            'Onay e-postası gönderildi! Lütfen e-postanızı kontrol edin.' : 
+            'Confirmation email sent! Please check your inbox.');
         form.reset();
+    })
+    .catch(error => {
+        console.error('Subscription error:', error);
+        showFormError(emailInput, error.message || (currentLanguage === 'tr' ? 
+            'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.' : 
+            'An error occurred. Please try again later.'));
+    })
+    .finally(() => {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
-    }, 1500);
+    });
 }
 
 function isValidEmail(email) {
