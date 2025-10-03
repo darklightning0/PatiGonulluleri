@@ -1,6 +1,6 @@
 // js/firebase-config.js
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Your Firebase configuration (get from Firebase Console)
 const firebaseConfig = {
@@ -10,7 +10,6 @@ const firebaseConfig = {
   storageBucket: "patigonulluleri-1193e.firebasestorage.app",
   messagingSenderId: "294256902955",
   appId: "1:294256902955:web:02435821978b5c0744bb6e",
-  measurementId: "G-J5TJC0NYHW"
 };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
