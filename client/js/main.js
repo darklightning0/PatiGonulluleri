@@ -2,7 +2,7 @@
  * Main JavaScript functionality for Pati Gönüllüleri website
  * Handles language switching, mobile navigation, form validation, and animations
  */
-
+import { CachedPetsService, CachedArticlesService } from '/js/firebase-data-service.js';
 // ===================
 // GLOBAL VARIABLES
 // ===================
