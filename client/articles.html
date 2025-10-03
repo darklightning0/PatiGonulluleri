@@ -255,8 +255,23 @@
     </footer>
 
     <!-- JavaScript -->
-    <script src="data/articles-data.js"></script>
-    <script src="js/main.js"></script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  
+  window.firebaseApp = initializeApp({
+  apiKey: "AIzaSyC89BdO9WqMc5ZXiqjoC652Lyy8-vsXZNo",
+  authDomain: "patigonulluleri-1193e.firebaseapp.com",
+  projectId: "patigonulluleri-1193e",
+  storageBucket: "patigonulluleri-1193e.firebasestorage.app",
+  messagingSenderId: "294256902955",
+  appId: "1:294256902955:web:02435821978b5c0744bb6e",
+  });
+  
+  window.db = getFirestore(window.firebaseApp);
+</script>
+<script type="module" src="js/firebase-data-service.js"></script>
+<script type="module" src="js/main.js"></script>
     <script src="js/articles.js"></script>
 </body>
 </html>

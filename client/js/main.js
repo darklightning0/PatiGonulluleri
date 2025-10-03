@@ -17,7 +17,7 @@ let isScrolling = false;
 /**
  * Initialize all functionality when DOM is loaded
  */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Cache DOM elements for performance
     const elements = {
         header: document.querySelector('.header'),
@@ -46,20 +46,24 @@ document.addEventListener('DOMContentLoaded', () => {
     initImageLoading(elements.allImages);
     optimizeAnimations();
     
-    // Load dynamic content on the index page
     if (elements.articlesContainer) {
-        loadLatestArticles(elements.articlesContainer);
-        window.addEventListener('resize', debounce(() => loadLatestArticles(elements.articlesContainer), 250));
+        await loadLatestArticles(elements.articlesContainer);
+        
+        // Reload on language change
+        document.addEventListener('languageChanged', () => {
+            loadLatestArticles(elements.articlesContainer);
+        });
     }
+    
     if (elements.featuredPetsContainer) {
-        loadFeaturedPets(elements.featuredPetsContainer);
+        await loadFeaturedPets(elements.featuredPetsContainer);
+        
+        // Reload on language change
+        document.addEventListener('languageChanged', () => {
+            loadFeaturedPets(elements.featuredPetsContainer);
+        });
     }
-    
-    // Add scroll reveal class to animated elements
-    elements.scrollRevealElements.forEach(element => {
-        element.classList.add('scroll-reveal');
-    });
-    
+
     // Initialize active nav link based on current page
     updateActiveNavLink(elements.navLinks);
     
@@ -346,53 +350,80 @@ function updateActiveNavLink(navLinks) {
 // DYNAMIC CONTENT LOADING (for index.html)
 // ===================
 
-function loadFeaturedPets(petsContainer) {
-    if (typeof PETS_DATA === 'undefined') return;
-    const sortedPets = [...PETS_DATA].sort((a, b) => (b.urgent ? 1 : -1) || new Date(b.dateAdded) - new Date(a.dateAdded));
-    const featuredPets = sortedPets.slice(0, 3);
-    
-    petsContainer.innerHTML = featuredPets.map(pet => {
-        const lang = currentLanguage;
-        const ageText = `${pet.age} ${lang === 'tr' ? 'yaşında' : 'year' + (pet.age > 1 ? 's' : '')}`;
-        const petType = pet.type === 'dog' ? (lang === 'tr' ? 'Köpek' : 'Dog') : (lang === 'tr' ? 'Kedi' : 'Cat');
-        const petSize = pet.size === 'large' ? (lang === 'tr' ? 'Büyük' : 'Large') : (pet.size === 'medium' ? (lang === 'tr' ? 'Orta' : 'Medium') : (lang === 'tr' ? 'Küçük' : 'Small'));
+async function loadFeaturedPets(petsContainer) {
+    try {
+        // Show loading state
+        petsContainer.innerHTML = '<div class="loading">Loading pets...</div>';
+        
+        // Fetch from Firebase
+        const featuredPets = await CachedPetsService.getFeatured(3);
+        
+        if (featuredPets.length === 0) {
+            petsContainer.innerHTML = '<p>No pets available at the moment.</p>';
+            return;
+        }
+        
+        petsContainer.innerHTML = featuredPets.map(pet => {
+            const lang = currentLanguage;
+            const ageText = `${pet.age} ${lang === 'tr' ? 'yaşında' : 'year' + (pet.age > 1 ? 's' : '')}`;
+            const petType = pet.type === 'dog' ? (lang === 'tr' ? 'Köpek' : 'Dog') : (lang === 'tr' ? 'Kedi' : 'Cat');
+            const petSize = pet.size === 'large' ? (lang === 'tr' ? 'Büyük' : 'Large') : 
+                           (pet.size === 'medium' ? (lang === 'tr' ? 'Orta' : 'Medium') : (lang === 'tr' ? 'Küçük' : 'Small'));
 
-        return `
-            <div class="pet-card">
-                <div class="pet-image">
-                    <img src="${pet.image}" alt="${pet.name}" loading="lazy">
-                    ${pet.urgent ? `<span class="pet-badge urgent">${lang === 'tr' ? 'Acil' : 'Urgent'}</span>` : ''}
-                    <span class="pet-badge ${pet.type.toLowerCase()}">${petType}</span>
-                </div>
-                <div class="pet-info">
-                    <h3 class="pet-name">${pet.name}</h3>
-                    <p class="pet-description">${pet.description.substring(0, 100)}...</p>
-                    <div class="pet-details">
-                        <span class="pet-age">${ageText}</span>
-                        <span class="pet-size">${petSize}</span>
+            return `
+                <div class="pet-card">
+                    <div class="pet-image">
+                        <img src="${pet.image}" alt="${pet.name}" loading="lazy">
+                        ${pet.urgent ? `<span class="pet-badge urgent">${lang === 'tr' ? 'Acil' : 'Urgent'}</span>` : ''}
+                        <span class="pet-badge ${pet.type.toLowerCase()}">${petType}</span>
                     </div>
-                    <a href="pet-detail.html?id=${pet.id}" class="btn btn-outline btn-sm">
-                        <i class="fas fa-paw"></i>
-                        <span data-tr="Daha Fazla" data-en="Learn More">${lang === 'tr' ? 'Daha Fazla' : 'Learn More'}</span>
-                    </a>
+                    <div class="pet-info">
+                        <h3 class="pet-name">${pet.name}</h3>
+                        <p class="pet-description">${pet.description.substring(0, 100)}...</p>
+                        <div class="pet-details">
+                            <span class="pet-age">${ageText}</span>
+                            <span class="pet-size">${petSize}</span>
+                        </div>
+                        <a href="pet-detail.html?id=${pet.id}" class="btn btn-outline btn-sm">
+                            <i class="fas fa-paw"></i>
+                            <span data-tr="Daha Fazla" data-en="Learn More">${lang === 'tr' ? 'Daha Fazla' : 'Learn More'}</span>
+                        </a>
+                    </div>
                 </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('Error loading featured pets:', error);
+        petsContainer.innerHTML = '<p class="error-message">Failed to load pets. Please try again later.</p>';
+    }
 }
 
-function loadLatestArticles(articlesContainer) {
-    if (typeof ARTICLES_DATA === 'undefined') return;
-    const sortedArticles = [...ARTICLES_DATA].sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
-    const articlesToShow = window.innerWidth < 768 ? 2 : 3;
-    const latestArticles = sortedArticles.slice(0, articlesToShow);
-    
-    articlesContainer.innerHTML = latestArticles.map(article => `
-        <div class="mini-article">
-            <h4><a href="article-detail.html?id=${article.id}">${article.title[currentLanguage]}</a></h4>
-            <p>${article.summary[currentLanguage]}</p>
-        </div>
-    `).join('');
+async function loadLatestArticles(articlesContainer) {
+    try {
+        // Show loading state
+        articlesContainer.innerHTML = '<div class="loading">Loading articles...</div>';
+        
+        // Fetch from Firebase
+        const articlesToShow = window.innerWidth < 768 ? 2 : 3;
+        const latestArticles = await CachedArticlesService.getLatest(articlesToShow);
+        
+        if (latestArticles.length === 0) {
+            articlesContainer.innerHTML = '<p>No articles available at the moment.</p>';
+            return;
+        }
+        
+        articlesContainer.innerHTML = latestArticles.map(article => `
+            <div class="mini-article">
+                <h4><a href="article-detail.html?id=${article.id}">${article.title[currentLanguage]}</a></h4>
+                <p>${article.summary[currentLanguage]}</p>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading articles:', error);
+        articlesContainer.innerHTML = '<p class="error-message">Failed to load articles. Please try again later.</p>';
+    }
 }
 
 // ===================
