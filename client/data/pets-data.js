@@ -1,9 +1,9 @@
 /**
  * Centralized Pet Data
  * Shared across all pages for consistency
- */
+ 
 curl -X POST http://localhost:8788/api/admin/pets \
-  -H "Authorization: Bearer a1lQqh23fkfOVba43jpVwoi6lTskbc87mvE45Raw" \
+  -H "Authorization: a1lQqh23fkfOVba43jpVwoi6lTskbc87mvE45Raw" \
   -H "Content-Type: application/json" \
   -d '{
         active: true,
@@ -42,9 +42,8 @@ curl -X POST http://localhost:8788/api/admin/pets \
             phone: "+90 (258) 234 56 78",
             responseTime: "11:00-19:00",
             location: "Merkez, İzmir",
-            languages: "Türkçe"
         }
-    }
+    }'*/
 const PETS_DATA = [
     {
         id: 1,
