@@ -25,7 +25,6 @@ async function initArticlesPage() {
     
     try {
         // Wait for ArticlesService to be ready
-        await waitForService('ArticlesService');
         
         await loadArticlesFromFirebase();
         
