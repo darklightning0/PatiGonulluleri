@@ -446,7 +446,7 @@ function createArticleCard(article) {
             ).join('') : '';
         
         return `
-            <div class="article-card" data-article-id="${article.id}" style="cursor: pointer;">
+            <a href="article-detail.html?id=${article.id}" class="article-card" data-article-id="${article.id}" style="text-decoration: none; color: inherit; cursor: pointer;">
                 <div class="article-image">
                     <img src="${article.image || ''}" alt="${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}" loading="lazy">
                     <div class="category-badge" data-tr="${(article.category && article.category.tr) ? article.category.tr : ''}" data-en="${(article.category && article.category.en) ? article.category.en : ''}">
