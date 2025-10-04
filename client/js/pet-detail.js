@@ -203,6 +203,8 @@ function updateHealthTags() {
 }
 
 function updateSpecialNotes(currentPet) {
+    console.log(currentPet);
+
   if (currentPet.specialNotes && typeof currentPet.specialNotes === 'object') {
     const specialNotes = currentPet.specialNotes;
     const noteArray = [
