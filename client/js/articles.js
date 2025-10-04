@@ -352,10 +352,15 @@ function loadArticles() {
                 
                 const cards = container.querySelectorAll('.article-card');
                 cards.forEach(card => {
-                    card.addEventListener('click', () => {
+                    console.log('Adding click handler to card:', card.dataset.articleId);
+                    card.addEventListener('click', (e) => {
+                        console.log('Card clicked:', card.dataset.articleId);
                         const articleId = card.dataset.articleId;
                         if (articleId) {
+                            console.log('Opening article:', articleId);
                             openArticle(articleId);
+                        } else {
+                            console.error('No article ID found on clicked card');
                         }
                     });
                 });
