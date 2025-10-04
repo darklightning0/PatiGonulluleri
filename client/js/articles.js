@@ -22,6 +22,9 @@ async function initArticlesPage() {
     console.log('📚 Initializing Articles Page with Firebase');
     
     try {
+        // Wait for ArticlesService to be ready
+        await waitForService('ArticlesService');
+        
         await loadArticlesFromFirebase();
         
         initSearchAndFilters();

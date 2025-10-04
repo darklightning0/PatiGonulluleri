@@ -62,6 +62,9 @@ async function initPetDetailPage() {
     }
 
     try {
+        // Wait for PetsService to be ready
+        await waitForService('PetsService');
+        
         await loadPetData(petId);
         initImageGallery();
         initContactButtons();
@@ -74,6 +77,25 @@ async function initPetDetailPage() {
         showNotification('Hayvan bilgileri yüklenemedi', 'error');
         setTimeout(() => window.location.href = 'adopt.html', 2000);
     }
+}
+
+function waitForService(serviceName, timeout = 5000) {
+    return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+        
+        const checkService = () => {
+            if (window[serviceName]) {
+                console.log(`${serviceName} is ready`);
+                resolve();
+            } else if (Date.now() - startTime > timeout) {
+                reject(new Error(`${serviceName} not available after ${timeout}ms`));
+            } else {
+                setTimeout(checkService, 100);
+            }
+        };
+        
+        checkService();
+    });
 }
 
 async function loadPetData(petId) {

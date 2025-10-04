@@ -33,6 +33,9 @@ const AdoptPageApp = {
         this.showLoadingState();
         
         try {
+            // Wait for PetsService to be ready
+            await this.waitForService('PetsService');
+            
             // Load pets from Firebase
             await this.loadPetsFromFirebase();
             
