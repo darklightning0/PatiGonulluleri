@@ -341,7 +341,10 @@ function loadArticles() {
             } else {
                 const articlesHTML = articlesToShow.map(article => {
                     try {
-                        return createArticleCard(article);
+                        console.log('Creating card for article:', article.id);
+                        const card = createArticleCard(article);
+                        console.log('Created card HTML:', card);
+                        return card;
                     } catch (error) {
                         console.warn('Error creating article card for article:', article.id, error);
                         return '';
@@ -351,18 +354,34 @@ function loadArticles() {
                 container.innerHTML = articlesHTML;
                 
                 const cards = container.querySelectorAll('.article-card');
+                console.log('Found article cards:', cards.length);
+                
                 cards.forEach(card => {
-                    console.log('Adding click handler to card:', card.dataset.articleId);
-                    card.addEventListener('click', (e) => {
-                        console.log('Card clicked:', card.dataset.articleId);
-                        const articleId = card.dataset.articleId;
+                    const articleId = card.getAttribute('data-article-id');
+                    console.log('Adding click handler to card:', articleId);
+                    
+                    // Add click handler to both the card and its children
+                    const handleClick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Card clicked:', articleId);
                         if (articleId) {
                             console.log('Opening article:', articleId);
                             openArticle(articleId);
                         } else {
                             console.error('No article ID found on clicked card');
                         }
-                    });
+                    };
+                    
+                    card.style.cursor = 'pointer';
+                    card.addEventListener('click', handleClick);
+                    
+                    // Also add click handler to title for better accessibility
+                    const titleElement = card.querySelector('.article-title');
+                    if (titleElement) {
+                        titleElement.style.cursor = 'pointer';
+                        titleElement.addEventListener('click', handleClick);
+                    }
                 });
             }
             
@@ -427,7 +446,7 @@ function createArticleCard(article) {
             ).join('') : '';
         
         return `
-            <div class="article-card" data-article-id="${article.id}">
+            <div class="article-card" data-article-id="${article.id}" style="cursor: pointer;">
                 <div class="article-image">
                     <img src="${article.image || ''}" alt="${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}" loading="lazy">
                     <div class="category-badge" data-tr="${(article.category && article.category.tr) ? article.category.tr : ''}" data-en="${(article.category && article.category.en) ? article.category.en : ''}">
