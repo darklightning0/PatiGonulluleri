@@ -66,10 +66,6 @@ export const PetsService = {
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      // Increment view count
-      await updateDoc(docRef, {
-        views: increment(1)
-      });
       
       return { id: docSnap.id, ...docSnap.data() };
     }
@@ -191,12 +187,7 @@ export const ArticlesService = {
     const docRef = doc(db, COLLECTIONS.ARTICLES, articleId.toString());
     const docSnap = await getDoc(docRef);
     
-    if (docSnap.exists()) {
-      // Increment view count
-      await updateDoc(docRef, {
-        actualViews: increment(1)
-      });
-      
+    if (docSnap.exists()) {      
       return { id: docSnap.id, ...docSnap.data() };
     }
     return null;
@@ -216,10 +207,6 @@ export const ArticlesService = {
     const snapshot = await getDocs(q);
     if (!snapshot.empty) {
       const doc = snapshot.docs[0];
-      // Increment view count
-      await updateDoc(doc.ref, {
-        actualViews: increment(1)
-      });
       return { id: doc.id, ...doc.data() };
     }
     return null;
