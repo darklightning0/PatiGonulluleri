@@ -2,6 +2,7 @@
  * Sahiplen (Adopt) Page JavaScript - Firebase Version
  * Handles filtering, sorting, pagination, and pet card generation using Firebase data
  */
+import { CachedPetsService } from './firebase-data-service.js';
 
 const AdoptPageApp = {
     state: {
@@ -33,8 +34,6 @@ const AdoptPageApp = {
         this.showLoadingState();
         
         try {
-            // Wait for PetsService to be ready
-            await this.waitForService('PetsService');
             
             // Load pets from Firebase
             await this.loadPetsFromFirebase();
@@ -78,7 +77,8 @@ const AdoptPageApp = {
                 throw new Error('PetsService not available');
             }
             
-            this.state.allPets = await window.PetsService.getAllPets();
+
+            this.state.allPets = await CachedPetsService.getAll();
             this.state.filteredPets = [...this.state.allPets];
             this.state.isLoading = false;
             
