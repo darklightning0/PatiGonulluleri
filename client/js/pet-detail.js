@@ -6,6 +6,8 @@ let currentPet = null;
 let currentImageIndex = 0;
 let isPhoneVisible = false;
 
+import { CachedPetsService } from './firebase-data-service.js';
+
 const elements = {
     petNameBreadcrumb: document.getElementById('pet-name-breadcrumb'),
     petName: document.getElementById('pet-name'),
@@ -62,8 +64,6 @@ async function initPetDetailPage() {
     }
 
     try {
-        // Wait for PetsService to be ready
-        await waitForService('PetsService');
         
         await loadPetData(petId);
         initImageGallery();
@@ -79,32 +79,11 @@ async function initPetDetailPage() {
     }
 }
 
-function waitForService(serviceName, timeout = 5000) {
-    return new Promise((resolve, reject) => {
-        const startTime = Date.now();
-        
-        const checkService = () => {
-            if (window[serviceName]) {
-                console.log(`${serviceName} is ready`);
-                resolve();
-            } else if (Date.now() - startTime > timeout) {
-                reject(new Error(`${serviceName} not available after ${timeout}ms`));
-            } else {
-                setTimeout(checkService, 100);
-            }
-        };
-        
-        checkService();
-    });
-}
 
 async function loadPetData(petId) {
     try {
-        if (typeof window.PetsService === 'undefined') {
-            throw new Error('PetsService not available');
-        }
-
-        currentPet = await window.PetsService.getPetById(petId);
+        
+        currentPet = await CachedPetsService.getById(petId);
         
         if (!currentPet) {
             throw new Error('Pet not found');
