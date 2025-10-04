@@ -76,7 +76,6 @@ class ArticleDetailManager {
         this.renderArticle(article);
         this.generateTOC();
         this.loadRelatedArticles();
-        this.updateViewCount();
         
         document.querySelector('.article-content').classList.add('fade-in-up');
     }
@@ -142,7 +141,6 @@ class ArticleDetailManager {
         
         document.getElementById('publish-date').textContent = this.formatDate(article.publishDate);
         document.getElementById('reading-time').textContent = `${article.readingTime} dk`;
-        document.getElementById('view-count').textContent = this.formatNumber(article.views);
         
         if (article.lastUpdated && article.lastUpdated !== article.publishDate) {
             document.getElementById('last-updated').style.display = 'flex';
@@ -449,11 +447,6 @@ class ArticleDetailManager {
         }, 1500);
     }
 
-    updateViewCount() {
-        if (this.currentArticle) {
-            document.getElementById('view-count').textContent = this.formatNumber(this.currentArticle.views);
-        }
-    }
 
     switchLanguage(lang) {
         if (lang === this.currentLang) return;

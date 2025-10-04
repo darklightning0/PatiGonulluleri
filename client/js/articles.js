@@ -49,16 +49,19 @@ async function initArticlesPage() {
 
 async function loadArticlesFromFirebase() {
     try {
-        
         allArticles = await CachedArticlesService.getAll();
         filteredArticles = [...allArticles];
         
         console.log(`Loaded ${allArticles.length} articles from Firebase`);
+        
+        // Log the loaded articles to inspect their structure
+        console.log('All articles:', allArticles);
     } catch (error) {
         console.error('Error loading articles from Firebase:', error);
         throw error;
     }
 }
+
 
 function initSearchAndFilters() {
     const searchInput = document.getElementById('search-input');
@@ -221,9 +224,6 @@ function applySorting() {
                 break;
             case 'oldest':
                 filteredArticles.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
-                break;
-            case 'most-read':
-                filteredArticles.sort((a, b) => (b.views || 0) - (a.views || 0));
                 break;
             case 'reading-time-asc':
                 filteredArticles.sort((a, b) => (a.readingTime || 0) - (b.readingTime || 0));
@@ -395,10 +395,6 @@ function createFeaturedArticleCard(article) {
                             <i class="fas fa-clock"></i>
                             <span>${article.readingTime || 0} <span data-tr="dk" data-en="min">dk</span></span>
                         </div>
-                        <div class="view-count">
-                            <i class="fas fa-eye"></i>
-                            <span>${formatNumber(article.views || 0)}</span>
-                        </div>
                     </div>
                     <div class="article-author">
                         <img src="${(article.author && article.author.avatar) ? article.author.avatar : ''}" alt="${(article.author && article.author.name) ? article.author.name : ''}" class="author-avatar" loading="lazy">
@@ -444,10 +440,6 @@ function createArticleCard(article) {
                         <div class="reading-time">
                             <i class="fas fa-clock"></i>
                             <span>${article.readingTime || 0} <span data-tr="dk" data-en="min">dk</span></span>
-                        </div>
-                        <div class="view-count">
-                            <i class="fas fa-eye"></i>
-                            <span>${formatNumber(article.views || 0)}</span>
                         </div>
                     </div>
                     <div class="article-tags">
