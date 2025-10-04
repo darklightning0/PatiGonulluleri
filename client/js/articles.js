@@ -1,11 +1,7 @@
 /**
- * Fixed Articles Page JavaScript
- * Handles search, filtering, view switching, and pagination
+ * Articles Page JavaScript - Firebase Version
+ * Handles search, filtering, view switching, and pagination with Firebase data
  */
-
-// ===================
-// GLOBAL VARIABLES
-// ===================
 
 let currentView = 'grid';
 let currentSearch = '';
@@ -18,49 +14,50 @@ let filteredArticles = [];
 let allArticles = [];
 let isLoading = false;
 
-// ===================
-// INITIALIZATION
-// ===================
-
 document.addEventListener('DOMContentLoaded', () => {
     initArticlesPage();
 });
 
-function initArticlesPage() {
-    console.log('📚 Initializing Articles Page');
+async function initArticlesPage() {
+    console.log('📚 Initializing Articles Page with Firebase');
     
-    // Check if ARTICLES_DATA is available
-    if (typeof ARTICLES_DATA === 'undefined') {
-        console.error('ARTICLES_DATA not found. Make sure articles-data.js is loaded.');
+    try {
+        await loadArticlesFromFirebase();
+        
+        initSearchAndFilters();
+        initViewToggle();
+        initNewsletterForm();
+        
+        loadFeaturedArticles();
+        applyFiltersAndSearch();
+        
+        setTimeout(() => {
+            updateCategoryFilterOptions();
+            updateSearchPlaceholder();
+        }, 100);
+        
+        console.log('✅ Articles Page Initialized');
+    } catch (error) {
+        console.error('Error initializing articles page:', error);
         showNotification('Makaleler yüklenemedi. Lütfen sayfayı yenileyin.', 'error');
-        return;
     }
-    
-    // Initialize with centralized data
-    allArticles = [...ARTICLES_DATA];
-    filteredArticles = [...allArticles];
-    
-    // Initialize components
-    initSearchAndFilters();
-    initViewToggle();
-    initNewsletterForm();
-    
-    // Load initial content
-    loadFeaturedArticles();
-    applyFiltersAndSearch();
-    
-    // Initialize language-dependent elements
-    setTimeout(() => {
-        updateCategoryFilterOptions();
-        updateSearchPlaceholder();
-    }, 100);
-    
-    console.log('✅ Articles Page Initialized');
 }
 
-// ===================
-// SEARCH AND FILTER FUNCTIONALITY
-// ===================
+async function loadArticlesFromFirebase() {
+    try {
+        if (typeof window.ArticlesService === 'undefined') {
+            throw new Error('ArticlesService not available');
+        }
+        
+        allArticles = await window.ArticlesService.getAllArticles();
+        filteredArticles = [...allArticles];
+        
+        console.log(`Loaded ${allArticles.length} articles from Firebase`);
+    } catch (error) {
+        console.error('Error loading articles from Firebase:', error);
+        throw error;
+    }
+}
 
 function initSearchAndFilters() {
     const searchInput = document.getElementById('search-input');
@@ -69,7 +66,6 @@ function initSearchAndFilters() {
     const sortFilter = document.getElementById('sort-filter');
     const clearFiltersBtn = document.getElementById('clear-filters');
     
-    // Search functionality
     if (searchInput) {
         searchInput.addEventListener('input', debounce(handleSearchInput, 300));
         searchInput.addEventListener('keypress', (e) => {
@@ -84,7 +80,6 @@ function initSearchAndFilters() {
         searchBtn.addEventListener('click', handleSearch);
     }
     
-    // Filter functionality
     if (categoryFilter) {
         categoryFilter.addEventListener('change', handleCategoryFilter);
     }
@@ -93,7 +88,6 @@ function initSearchAndFilters() {
         sortFilter.addEventListener('change', handleSortFilter);
     }
     
-    // Clear filters
     if (clearFiltersBtn) {
         clearFiltersBtn.addEventListener('click', clearAllFilters);
     }
@@ -134,7 +128,6 @@ function clearAllFilters() {
     currentCategory = '';
     currentSort = 'newest';
     
-    // Reset form elements
     const searchInput = document.getElementById('search-input');
     const categoryFilter = document.getElementById('category-filter');
     const sortFilter = document.getElementById('sort-filter');
@@ -163,18 +156,12 @@ function resetToFirstPage() {
     currentPage = 1;
 }
 
-// ===================
-// FILTERING AND SORTING LOGIC
-// ===================
-
 function applyFiltersAndSearch() {
     try {
         const currentLang = getCurrentLanguage();
         
-        // Start with all articles
         filteredArticles = [...allArticles];
         
-        // Apply search filter
         if (currentSearch) {
             filteredArticles = filteredArticles.filter(article => {
                 try {
@@ -201,7 +188,6 @@ function applyFiltersAndSearch() {
             });
         }
         
-        // Apply category filter
         if (currentCategory) {
             filteredArticles = filteredArticles.filter(article => {
                 try {
@@ -213,13 +199,8 @@ function applyFiltersAndSearch() {
             });
         }
         
-        // Apply sorting
         applySorting();
-        
-        // Calculate pagination
         calculatePagination();
-        
-        // Update display
         loadArticles();
         updateResultCount();
         renderPagination();
@@ -267,10 +248,6 @@ function calculatePagination() {
     }
 }
 
-// ===================
-// VIEW TOGGLE FUNCTIONALITY
-// ===================
-
 function initViewToggle() {
     const viewButtons = document.querySelectorAll('.view-btn');
     
@@ -286,26 +263,19 @@ function handleViewChange(e) {
     if (view !== currentView) {
         currentView = view;
         
-        // Update button states
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.classList.remove('active');
         });
         button.classList.add('active');
         
-        // Update container class
         const container = document.getElementById('articles-container');
         if (container) {
             container.className = `articles-container ${view}-view`;
         }
         
-        // Re-render articles with new view
         loadArticles();
     }
 }
-
-// ===================
-// ARTICLE RENDERING
-// ===================
 
 function loadFeaturedArticles() {
     const container = document.getElementById('featured-articles-container');
@@ -333,7 +303,6 @@ function loadFeaturedArticles() {
         
         container.innerHTML = articlesHTML;
         
-        // Add click handlers
         const cards = container.querySelectorAll('.featured-article-card');
         cards.forEach(card => {
             card.addEventListener('click', () => {
@@ -358,10 +327,8 @@ function loadArticles() {
     if (isLoading) return;
     isLoading = true;
     
-    // Show loading state
     container.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div><span>Makaleler yükleniyor...</span></div>';
     
-    // Simulate loading delay for better UX
     setTimeout(() => {
         try {
             const startIndex = (currentPage - 1) * articlesPerPage;
@@ -382,7 +349,6 @@ function loadArticles() {
                 
                 container.innerHTML = articlesHTML;
                 
-                // Add click handlers
                 const cards = container.querySelectorAll('.article-card');
                 cards.forEach(card => {
                     card.addEventListener('click', () => {
@@ -495,10 +461,6 @@ function createArticleCard(article) {
     }
 }
 
-// ===================
-// PAGINATION FUNCTIONALITY
-// ===================
-
 function renderPagination() {
     const paginationContainer = document.getElementById('pagination-controls');
     const paginationSection = document.getElementById('pagination-section');
@@ -514,7 +476,6 @@ function renderPagination() {
     
     let paginationHTML = '';
     
-    // Previous button
     if (currentPage > 1) {
         paginationHTML += `
             <button class="pagination-btn prev-btn" data-page="${currentPage - 1}">
@@ -524,7 +485,6 @@ function renderPagination() {
         `;
     }
     
-    // Page numbers
     const startPage = Math.max(1, currentPage - 2);
     const endPage = Math.min(totalPages, currentPage + 2);
     
@@ -550,7 +510,6 @@ function renderPagination() {
         paginationHTML += `<button class="pagination-btn page-btn" data-page="${totalPages}">${totalPages}</button>`;
     }
     
-    // Next button
     if (currentPage < totalPages) {
         paginationHTML += `
             <button class="pagination-btn next-btn" data-page="${currentPage + 1}">
@@ -562,7 +521,6 @@ function renderPagination() {
     
     paginationContainer.innerHTML = paginationHTML;
     
-    // Add click handlers
     const paginationBtns = paginationContainer.querySelectorAll('.pagination-btn');
     paginationBtns.forEach(btn => {
         btn.addEventListener('click', handlePaginationClick);
@@ -578,17 +536,12 @@ function handlePaginationClick(e) {
         loadArticles();
         renderPagination();
         
-        // Scroll to top of articles section
         const articlesSection = document.querySelector('.articles-section');
         if (articlesSection) {
             articlesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }
 }
-
-// ===================
-// EMPTY STATE MANAGEMENT
-// ===================
 
 function updateEmptyState() {
     const emptyState = document.getElementById('empty-state');
@@ -602,7 +555,6 @@ function updateEmptyState() {
         emptyState.classList.remove('hidden');
         articlesContainer.style.display = 'none';
         if (paginationSection) paginationSection.style.display = 'none';
-        // Keep newsletter visible even when no articles found
         if (newsletterSection) newsletterSection.style.display = 'block';
     } else {
         emptyState.classList.add('hidden');
@@ -610,14 +562,9 @@ function updateEmptyState() {
         if (paginationSection && totalPages > 1) {
             paginationSection.style.display = 'block';
         }
-        // Always keep newsletter visible
         if (newsletterSection) newsletterSection.style.display = 'block';
     }
 }
-
-// ===================
-// NEWSLETTER FORM
-// ===================
 
 function initNewsletterForm() {
     const newsletterForm = document.getElementById('articles-newsletter-form');
@@ -634,7 +581,6 @@ function handleNewsletterSubmit(e) {
     const email = formData.get('email');
     const consent = formData.get('consent');
     
-    // Validate
     if (!email || !isValidEmail(email)) {
         showNotification('Lütfen geçerli bir e-posta adresi giriniz.', 'error');
         return;
@@ -645,57 +591,38 @@ function handleNewsletterSubmit(e) {
         return;
     }
     
-    // Show loading
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Kaydediliyor...</span>';
     
-    // Simulate API call
     setTimeout(() => {
         console.log('Newsletter subscription:', { email, consent: true });
         
         showNotification('E-posta listemize başarıyla kaydoldunuz!', 'success');
         e.target.reset();
         
-        // Reset button
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
     }, 2000);
 }
-
-// ===================
-// ARTICLE NAVIGATION
-// ===================
 
 function openArticle(articleId) {
     try {
         const article = allArticles.find(a => a.id === parseInt(articleId));
         
         if (article) {
-            // Update view count
-            article.views = (article.views || 0) + 1;
-            
             const currentLang = getCurrentLanguage();
             const title = (article.title && article.title[currentLang]) ? article.title[currentLang] : 'Makale';
             
             console.log('Opening article:', title);
-            
-            // In real app, navigate to article detail page
             window.location.href = `article-detail.html?id=${articleId}`;
-            
-            // For demo, show notification
-            showNotification(`"${title}" makalesini açıyorsunuz...`, 'info');
         }
     } catch (error) {
         console.error('Error opening article:', error);
         showNotification('Makale açılırken hata oluştu.', 'error');
     }
 }
-
-// ===================
-// UTILITY FUNCTIONS
-// ===================
 
 function getCurrentLanguage() {
     return window.currentLanguage || 'tr';
@@ -759,7 +686,6 @@ function debounce(func, wait) {
 }
 
 function showNotification(message, type = 'info') {
-    // Remove existing notifications
     const existingNotifications = document.querySelectorAll('.notification');
     existingNotifications.forEach(notification => {
         if (notification.parentNode) {
@@ -767,7 +693,6 @@ function showNotification(message, type = 'info') {
         }
     });
     
-    // Create notification element
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.style.cssText = `
@@ -788,7 +713,6 @@ function showNotification(message, type = 'info') {
         line-height: 1.4;
     `;
     
-    // Set background color based on type
     switch (type) {
         case 'success':
             notification.style.backgroundColor = '#27ae60';
@@ -806,13 +730,11 @@ function showNotification(message, type = 'info') {
     notification.textContent = message;
     document.body.appendChild(notification);
     
-    // Animate in
     setTimeout(() => {
         notification.style.opacity = '1';
         notification.style.transform = 'translateX(0)';
     }, 100);
     
-    // Remove after delay
     setTimeout(() => {
         notification.style.opacity = '0';
         notification.style.transform = 'translateX(100px)';
@@ -824,13 +746,8 @@ function showNotification(message, type = 'info') {
     }, 4000);
 }
 
-// ===================
-// LANGUAGE CHANGE HANDLER
-// ===================
-
 function handleLanguageChange() {
     try {
-        // Re-render all content when language changes
         loadFeaturedArticles();
         applyFiltersAndSearch();
         updateCategoryFilterOptions();
@@ -857,10 +774,8 @@ function updateCategoryFilterOptions() {
         const currentLang = getCurrentLanguage();
         const currentValue = categoryFilter.value;
         
-        // Clear existing options
         categoryFilter.innerHTML = '';
         
-        // Re-add "All Categories" option
         const allOption = document.createElement('option');
         allOption.value = '';
         allOption.setAttribute('data-tr', 'Tüm Kategoriler');
@@ -868,7 +783,6 @@ function updateCategoryFilterOptions() {
         allOption.textContent = currentLang === 'tr' ? 'Tüm Kategoriler' : 'All Categories';
         categoryFilter.appendChild(allOption);
         
-        // Add predefined category options
         const predefinedCategories = [
             { tr: 'Sahiplendirme Rehberleri', en: 'Adoption Guides' },
             { tr: 'Toplumsal Farkındalık', en: 'Social Awareness' },
@@ -890,7 +804,6 @@ function updateCategoryFilterOptions() {
             categoryFilter.appendChild(option);
         });
         
-        // Restore previous selection if valid
         const availableCategories = Array.from(categoryFilter.options).map(opt => opt.value);
         if (currentValue && availableCategories.includes(currentValue)) {
             categoryFilter.value = currentValue;
@@ -900,24 +813,17 @@ function updateCategoryFilterOptions() {
     }
 }
 
-// ===================
-// ERROR HANDLING & INITIALIZATION
-// ===================
-
 window.addEventListener('error', (e) => {
     console.error('Articles page error:', e.error || e.message);
     
-    // Only show notification for actual errors, not null values
     if (e.error && e.error.message && e.error.message !== 'null') {
         showNotification('Bir hata oluştu. Lütfen sayfayı yenileyin.', 'error');
     }
 });
 
-// Handle unhandled promise rejections
 window.addEventListener('unhandledrejection', (e) => {
     console.error('Unhandled promise rejection:', e.reason);
     showNotification('Beklenmeyen bir hata oluştu.', 'error');
 });
 
-// Listen for language changes
 document.addEventListener('languageChanged', handleLanguageChange);

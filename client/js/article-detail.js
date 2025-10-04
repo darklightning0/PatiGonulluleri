@@ -1,6 +1,5 @@
 /**
- * Article Detail Page JavaScript
- * Handles article loading, TOC generation, sharing, and interactions
+ * Article Detail Page JavaScript - Firebase Version
  */
 
 class ArticleDetailManager {
@@ -12,32 +11,26 @@ class ArticleDetailManager {
         this.init();
     }
 
-    init() {
+    async init() {
         this.bindEvents();
-        this.loadArticleFromURL();
+        await this.loadArticleFromURL();
         this.initLanguageSupport();
     }
 
     bindEvents() {
-        // Share buttons
         document.getElementById('share-facebook')?.addEventListener('click', () => this.shareArticle('facebook'));
         document.getElementById('share-twitter')?.addEventListener('click', () => this.shareArticle('twitter'));
         document.getElementById('share-linkedin')?.addEventListener('click', () => this.shareArticle('linkedin'));
         document.getElementById('share-whatsapp')?.addEventListener('click', () => this.shareArticle('whatsapp'));
         document.getElementById('copy-link')?.addEventListener('click', () => this.copyArticleLink());
-
-        // Newsletter signup
         document.getElementById('sidebar-newsletter')?.addEventListener('submit', (e) => this.handleNewsletterSignup(e));
 
-        // Scroll events for TOC
         window.addEventListener('scroll', () => this.updateTOC());
         
-        // Language toggle
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.switchLanguage(e.target.dataset.lang));
         });
 
-        // Print functionality
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
                 e.preventDefault();
@@ -46,7 +39,7 @@ class ArticleDetailManager {
         });
     }
 
-    loadArticleFromURL() {
+    async loadArticleFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
         const articleId = urlParams.get('id');
 
@@ -57,46 +50,34 @@ class ArticleDetailManager {
 
         this.showLoading();
 
-        // Simulate loading delay (you can remove this in production)
-        setTimeout(() => {
-            const article = this.findArticle(parseInt(articleId));
+        try {
+            if (typeof window.ArticlesService === 'undefined') {
+                throw new Error('ArticlesService not available');
+            }
+
+            const article = await window.ArticlesService.getArticleById(articleId);
             
             if (article) {
-                this.loadArticle(article);
+                setTimeout(() => this.loadArticle(article), 500);
             } else {
                 this.showError();
             }
-        }, 500);
-    }
-
-    findArticle(id) {
-        // Get article from ARTICLES_DATA
-        if (typeof ARTICLES_DATA !== 'undefined') {
-            return ARTICLES_DATA.find(article => article.id === id);
+        } catch (error) {
+            console.error('Error loading article:', error);
+            this.showError();
         }
-        return null;
     }
 
     loadArticle(article) {
         this.currentArticle = article;
         this.hideLoading();
         
-        // Update page title and meta
         this.updatePageMeta(article);
-        
-        // Load article content
         this.renderArticle(article);
-        
-        // Generate table of contents
         this.generateTOC();
-        
-        // Load related content
         this.loadRelatedArticles();
-        
-        // Update view count
         this.updateViewCount();
         
-        // Add fade-in animation
         document.querySelector('.article-content').classList.add('fade-in-up');
     }
 
@@ -104,23 +85,19 @@ class ArticleDetailManager {
         const title = article.title[this.currentLang];
         const summary = article.summary[this.currentLang];
         
-        // Update page title
         document.title = `${title} - Pati Gönüllüleri`;
         document.getElementById('page-title').content = `${title} - Pati Gönüllüleri`;
         document.getElementById('page-description').content = summary;
         
-        // Update Open Graph meta
         document.getElementById('og-title').content = title;
         document.getElementById('og-description').content = summary;
         document.getElementById('og-image').content = article.image;
         document.getElementById('og-url').content = window.location.href;
         
-        // Update Twitter Card meta
         document.getElementById('twitter-title').content = title;
         document.getElementById('twitter-description').content = summary;
         document.getElementById('twitter-image').content = article.image;
         
-        // Update structured data
         const structuredData = {
             "@context": "https://schema.org",
             "@type": "Article",
@@ -145,13 +122,9 @@ class ArticleDetailManager {
     renderArticle(article) {
         const lang = this.currentLang;
         
-        // Update breadcrumb
         document.getElementById('article-breadcrumb-title').textContent = article.title[lang];
-        
-        // Update category badge
         document.getElementById('article-category').textContent = article.category[lang];
         
-        // Show/hide urgent badge
         const urgentBadge = document.getElementById('urgent-badge');
         if (article.urgent) {
             urgentBadge.classList.remove('hidden');
@@ -159,39 +132,31 @@ class ArticleDetailManager {
             urgentBadge.classList.add('hidden');
         }
         
-        // Update title
         document.getElementById('article-title').textContent = article.title[lang];
         
-        // Update author info
         document.getElementById('author-avatar').src = article.author.avatar;
         document.getElementById('author-avatar').alt = article.author.name;
         document.getElementById('author-name').textContent = article.author.name;
         const authorBio = typeof article.author.bio === 'object' ? article.author.bio[lang] : article.author.bio;
         document.getElementById('author-bio').textContent = authorBio;
         
-        // Update article stats
         document.getElementById('publish-date').textContent = this.formatDate(article.publishDate);
         document.getElementById('reading-time').textContent = `${article.readingTime} dk`;
         document.getElementById('view-count').textContent = this.formatNumber(article.views);
         
-        // Show/hide updated date
         if (article.lastUpdated && article.lastUpdated !== article.publishDate) {
             document.getElementById('last-updated').style.display = 'flex';
             document.getElementById('updated-date').textContent = this.formatDate(article.lastUpdated);
         }
         
-        // Update article image
         const articleImage = document.getElementById('article-image');
         articleImage.src = article.image;
         articleImage.alt = article.title[lang];
         
-        // Update article content
         document.getElementById('article-content').innerHTML = article.content[lang];
         
-        // Update tags
         this.renderTags(article.tags);
         
-        // Update sources
         if (article.sources && article.sources.length > 0) {
             this.renderSources(article.sources);
             document.getElementById('sources-section').style.display = 'block';
@@ -199,7 +164,6 @@ class ArticleDetailManager {
             document.getElementById('sources-section').style.display = 'none';
         }
         
-        // Update author card
         document.getElementById('author-card-avatar').src = article.author.avatar;
         document.getElementById('author-card-avatar').alt = article.author.name;
         document.getElementById('author-card-name').textContent = article.author.name;
@@ -208,7 +172,6 @@ class ArticleDetailManager {
         const authorCredentials = typeof article.author.credentials === 'object' ? article.author.credentials[lang] : article.author.credentials;
         document.getElementById('author-credentials').textContent = authorCredentials || '';
         
-        // Update author social links
         this.renderAuthorSocial(article.author.social);
     }
 
@@ -293,7 +256,6 @@ class ArticleDetailManager {
         tocHTML += '</ul>';
         tocContainer.innerHTML = tocHTML;
         
-        // Bind TOC click events
         document.querySelectorAll('.toc-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -306,7 +268,7 @@ class ArticleDetailManager {
     scrollToHeading(headingId) {
         const element = document.getElementById(headingId);
         if (element) {
-            const offset = 120; // Account for fixed header
+            const offset = 120;
             const elementPosition = element.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.pageYOffset - offset;
             
@@ -332,7 +294,6 @@ class ArticleDetailManager {
             }
         });
         
-        // Update active TOC link
         document.querySelectorAll('.toc-link').forEach((link, index) => {
             if (index === activeIndex) {
                 link.classList.add('active');
@@ -342,7 +303,7 @@ class ArticleDetailManager {
         });
     }
 
-    loadRelatedArticles() {
+    async loadRelatedArticles() {
         if (!this.currentArticle) {
             document.getElementById('similar-articles-section').style.display = 'none';
             return;
@@ -350,59 +311,60 @@ class ArticleDetailManager {
 
         const relatedContainer = document.getElementById('similar-articles-grid');
         
-        if (typeof ARTICLES_DATA === 'undefined') {
-            document.getElementById('similar-articles-section').style.display = 'none';
-            return;
-        }
+        try {
+            if (typeof window.ArticlesService === 'undefined') {
+                document.getElementById('similar-articles-section').style.display = 'none';
+                return;
+            }
 
-        // Find similar articles based on tag matching
-        const similarArticles = this.findSimilarArticles(this.currentArticle);
+            const allArticles = await window.ArticlesService.getAllArticles();
+            const similarArticles = this.findSimilarArticles(this.currentArticle, allArticles);
 
-        if (similarArticles.length === 0) {
-            document.getElementById('similar-articles-section').style.display = 'none';
-            return;
-        }
+            if (similarArticles.length === 0) {
+                document.getElementById('similar-articles-section').style.display = 'none';
+                return;
+            }
 
-        // Display 3-6 articles depending on available matches
-        const displayCount = Math.min(6, Math.max(3, similarArticles.length));
-        const articlesToShow = similarArticles.slice(0, displayCount);
+            const displayCount = Math.min(6, Math.max(3, similarArticles.length));
+            const articlesToShow = similarArticles.slice(0, displayCount);
 
-        relatedContainer.innerHTML = articlesToShow.map(article => {
-            const title = article.title[this.currentLang];
-            const category = article.category[this.currentLang];
-            return `
-                <div class="similar-article-card">
-                    <img src="${article.image}" alt="${title}" class="similar-article-card-image">
-                    <div class="similar-article-card-content">
-                        <span class="similar-article-card-category">${category}</span>
-                        <a href="article-detail.html?id=${article.id}" class="similar-article-card-title">${title}</a>
-                        <div class="similar-article-card-meta">
-                            <span><i class="fas fa-calendar-alt"></i> ${this.formatDate(article.publishDate)}</span>
-                            <span><i class="fas fa-clock"></i> ${article.readingTime} dk</span>
+            relatedContainer.innerHTML = articlesToShow.map(article => {
+                const title = article.title[this.currentLang];
+                const category = article.category[this.currentLang];
+                return `
+                    <div class="similar-article-card">
+                        <img src="${article.image}" alt="${title}" class="similar-article-card-image">
+                        <div class="similar-article-card-content">
+                            <span class="similar-article-card-category">${category}</span>
+                            <a href="article-detail.html?id=${article.id}" class="similar-article-card-title">${title}</a>
+                            <div class="similar-article-card-meta">
+                                <span><i class="fas fa-calendar-alt"></i> ${this.formatDate(article.publishDate)}</span>
+                                <span><i class="fas fa-clock"></i> ${article.readingTime} dk</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
-        }).join('');
-        
-        document.getElementById('similar-articles-section').style.display = 'block';
+                `;
+            }).join('');
+            
+            document.getElementById('similar-articles-section').style.display = 'block';
+        } catch (error) {
+            console.error('Error loading related articles:', error);
+            document.getElementById('similar-articles-section').style.display = 'none';
+        }
     }
 
-    findSimilarArticles(currentArticle) {
-        // Get current article tags (handle both object and string formats)
+    findSimilarArticles(currentArticle, allArticles) {
         const currentTags = currentArticle.tags.map(tag => 
             typeof tag === 'object' ? tag[this.currentLang].toLowerCase() : tag.toLowerCase()
         );
 
-        // Score all other articles based on tag matches
-        const scoredArticles = ARTICLES_DATA
-            .filter(article => article.id !== currentArticle.id) // Exclude current article
+        const scoredArticles = allArticles
+            .filter(article => article.id !== currentArticle.id)
             .map(article => {
                 const articleTags = article.tags.map(tag => 
                     typeof tag === 'object' ? tag[this.currentLang].toLowerCase() : tag.toLowerCase()
                 );
                 
-                // Count matching tags
                 const matchCount = articleTags.filter(tag => 
                     currentTags.includes(tag)
                 ).length;
@@ -413,9 +375,8 @@ class ArticleDetailManager {
                     publishDate: new Date(article.publishDate)
                 };
             })
-            .filter(item => item.matchCount > 0) // Only articles with at least 1 matching tag
+            .filter(item => item.matchCount > 0)
             .sort((a, b) => {
-                // Sort by match count (descending), then by date (newest first)
                 if (b.matchCount !== a.matchCount) {
                     return b.matchCount - a.matchCount;
                 }
@@ -458,7 +419,6 @@ class ArticleDetailManager {
             await navigator.clipboard.writeText(window.location.href);
             this.showNotification('Bağlantı kopyalandı!', 'success');
         } catch (err) {
-            // Fallback for older browsers
             const textArea = document.createElement('textarea');
             textArea.value = window.location.href;
             textArea.style.position = 'fixed';
@@ -485,7 +445,6 @@ class ArticleDetailManager {
             return;
         }
         
-        // Simulate API call
         this.showNotification('Abone olunuyor...', 'info');
         
         setTimeout(() => {
@@ -495,8 +454,6 @@ class ArticleDetailManager {
     }
 
     updateViewCount() {
-        // In a real application, this would make an API call to increment view count
-        // For now, just display the current count
         if (this.currentArticle) {
             document.getElementById('view-count').textContent = this.formatNumber(this.currentArticle.views);
         }
@@ -507,12 +464,10 @@ class ArticleDetailManager {
         
         this.currentLang = lang;
         
-        // Update language buttons
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.lang === lang);
         });
         
-        // Update all translatable elements
         document.querySelectorAll('[data-tr]').forEach(element => {
             const key = lang === 'tr' ? 'data-tr' : 'data-en';
             const translation = element.getAttribute(key);
@@ -525,7 +480,6 @@ class ArticleDetailManager {
             }
         });
         
-        // Reload article content if article is loaded
         if (this.currentArticle) {
             this.renderArticle(this.currentArticle);
             this.generateTOC();
@@ -534,11 +488,9 @@ class ArticleDetailManager {
     }
 
     initLanguageSupport() {
-        // Set initial language to Turkish
         this.switchLanguage('tr');
     }
 
-    // Utility Methods
     formatDate(dateString) {
         const date = new Date(dateString);
         const options = {
@@ -592,8 +544,7 @@ class ArticleDetailManager {
     }
 
     searchByTag(tag) {
-        // Redirect to articles page with tag filter
-        window.location.href = `makaleler.html?tag=${encodeURIComponent(tag)}`;
+        window.location.href = `articles.html?tag=${encodeURIComponent(tag)}`;
     }
 
     printArticle() {
@@ -617,7 +568,6 @@ class ArticleDetailManager {
     }
 
     showNotification(message, type = 'info') {
-        // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
         notification.innerHTML = `
@@ -625,7 +575,6 @@ class ArticleDetailManager {
             <span>${message}</span>
         `;
         
-        // Style the notification
         notification.style.cssText = `
             position: fixed;
             top: 100px;
@@ -646,7 +595,6 @@ class ArticleDetailManager {
         
         document.body.appendChild(notification);
         
-        // Remove notification after 3 seconds
         setTimeout(() => {
             notification.style.animation = 'slideOutRight 0.3s ease-in';
             setTimeout(() => {
@@ -684,12 +632,10 @@ class ArticleDetailManager {
     }
 }
 
-// Initialize the article detail manager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new ArticleDetailManager();
 });
 
-// Add notification animation styles
 const notificationStyles = `
     @keyframes slideInRight {
         from {
@@ -714,7 +660,6 @@ const notificationStyles = `
     }
 `;
 
-// Inject notification styles
 if (!document.getElementById('notification-styles')) {
     const styleSheet = document.createElement('style');
     styleSheet.id = 'notification-styles';
