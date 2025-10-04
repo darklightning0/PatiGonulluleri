@@ -2,6 +2,8 @@
  * Article Detail Page JavaScript - Firebase Version
  */
 
+import { CachedArticlesService, CachedPetsService } from './firebase-data-service.js';
+
 class ArticleDetailManager {
     constructor() {
         this.currentArticle = null;
@@ -74,11 +76,8 @@ class ArticleDetailManager {
         this.showLoading();
 
         try {
-            if (typeof window.ArticlesService === 'undefined') {
-                throw new Error('ArticlesService not available');
-            }
 
-            const article = await window.ArticlesService.getArticleById(articleId);
+            const article = await CachedPetsService.getById(articleId);
             
             if (article) {
                 setTimeout(() => this.loadArticle(article), 500);
@@ -335,12 +334,8 @@ class ArticleDetailManager {
         const relatedContainer = document.getElementById('similar-articles-grid');
         
         try {
-            if (typeof window.ArticlesService === 'undefined') {
-                document.getElementById('similar-articles-section').style.display = 'none';
-                return;
-            }
 
-            const allArticles = await window.ArticlesService.getAllArticles();
+            const allArticles = await CachedArticlesService.getAll();
             const similarArticles = this.findSimilarArticles(this.currentArticle, allArticles);
 
             if (similarArticles.length === 0) {

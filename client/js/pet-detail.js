@@ -651,7 +651,7 @@ async function loadSimilarPets() {
     if (!currentPet) return;
 
     try {
-        const allPets = await window.PetsService.getAllPets();
+        const allPets = await CachedPetsService.getAll();
         const similarPets = allPets
             .filter(pet => pet.id !== currentPet.id && pet.type === currentPet.type)
             .slice(0, 3);
