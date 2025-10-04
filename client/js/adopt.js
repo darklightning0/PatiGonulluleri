@@ -1,11 +1,9 @@
 /**
- * Sahiplen (Adopt) Page JavaScript - Refactored
- * Handles filtering, sorting, pagination, and pet card generation in a structured and performant way.
+ * Sahiplen (Adopt) Page JavaScript - Firebase Version
+ * Handles filtering, sorting, pagination, and pet card generation using Firebase data
  */
 
-// Encapsulate all functionality in a single object to avoid global scope pollution.
 const AdoptPageApp = {
-    // 1. STATE MANAGEMENT: Central place for all dynamic data.
     state: {
         allPets: [],
         filteredPets: [],
@@ -20,40 +18,84 @@ const AdoptPageApp = {
         currentView: 'grid',
         currentPage: 1,
         itemsPerPage: 6,
+        isLoading: true
     },
 
-    // 2. DOM ELEMENT CACHING: Query elements once for better performance.
     elements: {},
 
-    // 3. INITIALIZATION: Main entry point for the script.
-    init() {
-        console.log('🐾 Initializing Adopt Page App');
-        if (typeof PETS_DATA === 'undefined') {
-            this.showNotification('Hayvan verileri yüklenemedi. Lütfen sayfayı yenileyin.', 'error');
-            console.error('PETS_DATA not found.');
-            return;
-        }
-
-        // Set initial state from the global data source.
-        this.state.allPets = [...PETS_DATA];
-        this.state.filteredPets = [...this.state.allPets];
-
+    async init() {
+        console.log('🐾 Initializing Adopt Page App with Firebase');
+        
         this.cacheDOMElements();
         this.bindEvents();
-
-        // **LANGUAGE BUG FIX**: Delay the initial render slightly.
-        // This pushes the first render to the back of the event queue, giving
-        // main.js enough time to load the language preference from localStorage
-        // and set the global `window.currentLanguage` variable.
-        setTimeout(() => {
-            this.updateFilterCounts();
-            this.applyFiltersAndSort(); // This triggers the first render.
-            this.initMobileFilters();
-            console.log('✅ Adopt Page App Initialized');
-        }, 0); 
+        
+        // Show loading state
+        this.showLoadingState();
+        
+        try {
+            // Load pets from Firebase
+            await this.loadPetsFromFirebase();
+            
+            // Wait for language to be set
+            setTimeout(() => {
+                this.updateFilterCounts();
+                this.applyFiltersAndSort();
+                this.initMobileFilters();
+                console.log('✅ Adopt Page App Initialized');
+            }, 100);
+        } catch (error) {
+            console.error('Error initializing adopt page:', error);
+            this.showErrorState('Hayvan verileri yüklenemedi. Lütfen sayfayı yenileyin.');
+        }
     },
 
-    // Query all necessary DOM elements once and store them.
+    async loadPetsFromFirebase() {
+        try {
+            // Use the global PetsService from firebase-data-service.js
+            if (typeof window.PetsService === 'undefined') {
+                throw new Error('PetsService not available');
+            }
+            
+            this.state.allPets = await window.PetsService.getAllPets();
+            this.state.filteredPets = [...this.state.allPets];
+            this.state.isLoading = false;
+            
+            console.log(`Loaded ${this.state.allPets.length} pets from Firebase`);
+        } catch (error) {
+            console.error('Error loading pets from Firebase:', error);
+            this.state.isLoading = false;
+            throw error;
+        }
+    },
+
+    showLoadingState() {
+        const container = this.elements.petsContainer;
+        if (container) {
+            container.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <span>Hayvanlar yükleniyor...</span>
+                </div>
+            `;
+        }
+    },
+
+    showErrorState(message) {
+        const container = this.elements.petsContainer;
+        if (container) {
+            container.innerHTML = `
+                <div class="error-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Hata</h3>
+                    <p>${message}</p>
+                    <button onclick="location.reload()" class="btn-primary">
+                        <i class="fas fa-redo"></i> Yenile
+                    </button>
+                </div>
+            `;
+        }
+    },
+
     cacheDOMElements() {
         this.elements.petsContainer = document.getElementById('pets-container');
         this.elements.totalPets = document.getElementById('total-pets');
@@ -66,28 +108,35 @@ const AdoptPageApp = {
         this.elements.filtersContainer = document.querySelector('.filters-container');
     },
 
-    // Set up all event listeners for the page.
     bindEvents() {
-        this.elements.filterCheckboxes.forEach(checkbox => checkbox.addEventListener('change', this.handleFilterChange.bind(this)));
+        this.elements.filterCheckboxes.forEach(checkbox => 
+            checkbox.addEventListener('change', this.handleFilterChange.bind(this))
+        );
+        
         if (this.elements.clearFiltersBtn) {
             this.elements.clearFiltersBtn.addEventListener('click', this.clearAllFilters.bind(this));
         }
+        
         if (this.elements.sortSelect) {
             this.elements.sortSelect.addEventListener('change', this.handleSortChange.bind(this));
         }
-        this.elements.viewButtons.forEach(btn => btn.addEventListener('click', this.handleViewChange.bind(this)));
+        
+        this.elements.viewButtons.forEach(btn => 
+            btn.addEventListener('click', this.handleViewChange.bind(this))
+        );
+        
         if(this.elements.petsContainer) {
             this.elements.petsContainer.addEventListener('click', this.handlePetCardClick.bind(this));
         }
+        
         document.addEventListener('languageChanged', this.handleLanguageChange.bind(this));
     },
     
-    // 4. EVENT HANDLERS: Logic for user interactions.
     handleLanguageChange() {
         console.log('Language changed, re-rendering pets...');
-        this.applyFiltersAndSort(); // Re-run the main render process.
-        this.updateFilterCounts(); // Update text on filter counts.
-        this.updateMobileToggleText(); // Update mobile filter button text.
+        this.applyFiltersAndSort();
+        this.updateFilterCounts();
+        this.updateMobileToggleText();
     },
 
     handlePetCardClick(e) {
@@ -142,7 +191,6 @@ const AdoptPageApp = {
         this.renderPets();
     },
     
-    // 5. CORE LOGIC: Filtering, sorting, and rendering.
     applyFiltersAndSort() {
         const { animalType, age, size, gender, health } = this.state.currentFilters;
 
@@ -171,7 +219,6 @@ const AdoptPageApp = {
         });
     },
 
-    // 6. RENDERING: Updating the DOM.
     renderPets() {
         const { currentPage, itemsPerPage, filteredPets, currentView } = this.state;
         const container = this.elements.petsContainer;
@@ -181,7 +228,6 @@ const AdoptPageApp = {
 
         container.innerHTML = `<div class="loading-container"><div class="loading-spinner"></div><span>Yükleniyor...</span></div>`;
         
-        // Use a short timeout to allow the loading spinner to render before the main work.
         setTimeout(() => {
             if (petsToShow.length === 0) {
                 container.innerHTML = `
@@ -194,7 +240,7 @@ const AdoptPageApp = {
                 container.innerHTML = petsToShow.map(pet => this.createPetCard(pet, currentView)).join('');
             }
             this.renderPagination();
-            this.updateLanguageOnRender(); // Ensure all new text is in the correct language.
+            this.updateLanguageOnRender();
         }, 250);
     },
 
@@ -236,7 +282,7 @@ const AdoptPageApp = {
                         </div>
                     </div>
                 </div>`;
-        } else { // List View
+        } else {
             return `
                 <div class="adopt-pet-card" data-pet-id="${pet.id}">
                     ${imageHTML}
@@ -278,13 +324,11 @@ const AdoptPageApp = {
         };
         
         container.innerHTML = '';
-        const lang = this.getCurrentLanguage();
         
         container.appendChild(createButton(`<i class="fas fa-chevron-left"></i> <span data-tr="Önceki" data-en="Previous"></span>`, this.state.currentPage - 1, this.state.currentPage === 1, ['prev-btn']));
         
         const pageNumbersContainer = document.createElement('div');
         pageNumbersContainer.className = 'page-numbers';
-        // Simplified pagination for clarity
         for (let i = 1; i <= totalPages; i++) {
             const pageBtn = createButton(i, i, false, ['page-number']);
             if (i === this.state.currentPage) pageBtn.classList.add('active');
@@ -295,7 +339,6 @@ const AdoptPageApp = {
         container.appendChild(createButton(`<span data-tr="Sonraki" data-en="Next"></span> <i class="fas fa-chevron-right"></i>`, this.state.currentPage + 1, this.state.currentPage === totalPages, ['next-btn']));
     },
     
-    // 7. UTILITY & HELPER FUNCTIONS.
     updateResultCount() {
         if (this.elements.totalPets) {
             this.elements.totalPets.textContent = this.state.filteredPets.length;
@@ -414,6 +457,4 @@ const AdoptPageApp = {
     },
 };
 
-// Start the application once the DOM is ready.
 document.addEventListener('DOMContentLoaded', () => AdoptPageApp.init());
-

@@ -2,7 +2,49 @@
  * Centralized Pet Data
  * Shared across all pages for consistency
  */
-
+curl -X POST http://localhost:8788/api/admin/pets \
+  -H "Authorization: Bearer a1lQqh23fkfOVba43jpVwoi6lTskbc87mvE45Raw" \
+  -H "Content-Type: application/json" \
+  -d '{
+        active: true,
+        name: "Luna",
+        type: "cat",
+        breed: "Tekir",
+        age: 2,
+        ageGroup: "adult",
+        size: "medium",
+        gender: "female",
+        description: "2 yaşında, sakin ve uysal bir kedi. Kucakta sevgi almayı çok seviyor ve apartman dairesine uygun. Çok temiz ve bakımlı, diğer kedilerle de iyi geçiniyor.\n\nLuna çok sevecen ve sadık bir karakter. İnsanlara karşı son derece dostane ve ailesiyle güçlü bağlar kuruyor.",
+        image: "https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        images: [
+            "https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+        ],
+        thumbnails: [
+            "https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+            "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+            "https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
+        ],
+        health: ["vaccinated", "sterilized"],
+        urgent: false,
+        dateAdded: "2025-01-20",
+        location: "İzmir",
+        specialNotes: [
+            { icon: "fa-building", text: "Apartman yaşamına uygun" },
+            { icon: "fa-heart", text: "Çok sevecen ve uysal" },
+            { icon: "fa-cat", text: "Diğer kedilerle uyumlu" }
+        ],
+        caretaker: {
+            name: "Mehmet Bey",
+            role: "Gönüllü Bakıcı",
+            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
+            phone: "+90 (258) 234 56 78",
+            responseTime: "11:00-19:00",
+            location: "Merkez, İzmir",
+            languages: "Türkçe"
+        }
+    }
 const PETS_DATA = [
     {
         id: 1,
