@@ -82,18 +82,19 @@ async function initPetDetailPage() {
 
 async function loadPetData(petId) {
     try {
-
+        // Fetch the pet data
         currentPet = await CachedPetsService.getById(petId);
         
         if (!currentPet) {
             throw new Error('Pet not found');
         }
         
+        console.log('Pet data loaded:', currentPet); // Log for debugging
+        
+        // Update page content only if currentPet is not undefined or null
         updatePageContent();
         updatePageTitle();
         await loadSimilarPets();
-        
-        console.log('Pet data loaded:', currentPet);
     } catch (error) {
         console.error('Error loading pet:', error);
         throw error;
@@ -101,17 +102,25 @@ async function loadPetData(petId) {
 }
 
 function updatePageContent() {
+    if (!currentPet) {
+        console.error('currentPet is undefined');
+        return;  // Prevent proceeding if currentPet is not loaded
+    }
+
     const currentLang = getCurrentLanguage();
     
-    elements.petNameBreadcrumb.textContent = currentPet.name;
-    elements.petName.textContent = currentPet.name;
-    elements.petBreed.textContent = currentPet.breed;
-    elements.petAge.textContent = `${currentPet.age} yaşında`;
-    elements.petLocation.textContent = currentPet.location;
+    // Safely update the pet details
+    elements.petNameBreadcrumb.textContent = currentPet.name || 'Unknown Name';
+    elements.petName.textContent = currentPet.name || 'Unknown Name';
+    elements.petBreed.textContent = currentPet.breed || 'Unknown Breed';
+    elements.petAge.textContent = `${currentPet.age || 'Unknown'} yaşında`;
+    elements.petLocation.textContent = currentPet.location || 'Unknown Location';
     
+    // Update translated fields
     updateTranslatedFields(currentLang);
     
-    const dateAdded = new Date(currentPet.dateAdded);
+    // Format date safely
+    const dateAdded = currentPet.dateAdded ? new Date(currentPet.dateAdded) : new Date();
     const formattedDate = dateAdded.toLocaleDateString('tr-TR', { 
         year: 'numeric', 
         month: 'long', 
@@ -119,22 +128,20 @@ function updatePageContent() {
     });
     elements.petDate.textContent = formattedDate;
     
+    // Safely check if urgent property exists
     if (currentPet.urgent) {
         elements.urgentBadge.classList.remove('hidden');
     } else {
         elements.urgentBadge.classList.add('hidden');
     }
     
+    // Call other update functions
     updateHealthTags();
-    
-    const descriptionContainer = elements.petDescription;
-    const paragraphs = currentPet.description.split('\n\n');
-    descriptionContainer.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
-    
-    updateSpecialNotes();
+    updateSpecialNotes(); // Call the update special notes after currentPet is safely loaded
     updateCaretakerInfo();
     updateImageGallery();
 }
+
 
 function updateTranslatedFields(lang) {
     const translations = {
@@ -202,22 +209,32 @@ function updateHealthTags() {
     }).join('');
 }
 
-function updateSpecialNotes(currentPet) {
-    console.log(currentPet);
+function updateSpecialNotes() {
+    if (currentPet && currentPet.specialNotes && typeof currentPet.specialNotes === 'object') {
+        const specialNotes = currentPet.specialNotes;
+        console.log('Special Notes:', specialNotes); // Log for debugging
+        
+        // Assuming it's an array of objects
+        const noteArray = [
+            { icon: specialNotes.icon, text: specialNotes.text }
+        ];
+        
+        // Render special notes dynamically if they exist
+        noteArray.forEach(note => {
+            console.log(note.icon, note.text); // Log for debugging
+        });
 
-  if (currentPet.specialNotes && typeof currentPet.specialNotes === 'object') {
-    const specialNotes = currentPet.specialNotes;
-    const noteArray = [
-      { icon: specialNotes.icon, text: specialNotes.text }
-    ];
-    noteArray.map(note => {
-      console.log(note.icon, note.text);
-    });
-  } else {
-    console.warn('specialNotes is not an object or is missing:', currentPet.specialNotes);
-    currentPet.specialNotes = {};
-  }
+        // Render the notes in the UI (customize this as per your HTML structure)
+        elements.specialNotesContainer.innerHTML = noteArray.map(note => `
+            <div class="special-note">
+                <i class="${note.icon}"></i> <span>${note.text}</span>
+            </div>
+        `).join('');
+    } else {
+        console.warn('No special notes or invalid format:', currentPet.specialNotes);
+    }
 }
+
 
 function updateCaretakerInfo() {
     const caretaker = currentPet.caretaker;
