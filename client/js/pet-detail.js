@@ -82,7 +82,7 @@ async function initPetDetailPage() {
 
 async function loadPetData(petId) {
     try {
-        
+
         currentPet = await CachedPetsService.getById(petId);
         
         if (!currentPet) {
@@ -202,15 +202,19 @@ function updateHealthTags() {
     }).join('');
 }
 
-function updateSpecialNotes() {
-    const notesContainer = document.querySelector('.notes-content');
-    
-    notesContainer.innerHTML = currentPet.specialNotes.map(note => `
-        <div class="note-item">
-            <i class="fas ${note.icon}"></i>
-            <span>${note.text}</span>
-        </div>
-    `).join('');
+function updateSpecialNotes(currentPet) {
+  if (currentPet.specialNotes && typeof currentPet.specialNotes === 'object') {
+    const specialNotes = currentPet.specialNotes;
+    const noteArray = [
+      { icon: specialNotes.icon, text: specialNotes.text }
+    ];
+    noteArray.map(note => {
+      console.log(note.icon, note.text);
+    });
+  } else {
+    console.warn('specialNotes is not an object or is missing:', currentPet.specialNotes);
+    currentPet.specialNotes = {};
+  }
 }
 
 function updateCaretakerInfo() {
