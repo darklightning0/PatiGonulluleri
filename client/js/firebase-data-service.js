@@ -314,6 +314,16 @@ export const CachedPetsService = {
     const data = await PetsService.getAll();
     cache.set(cacheKey, data);
     return data;
+  },
+
+  async getById(petId) {
+    const cacheKey = `pet_${petId}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return cached;
+
+    const data = await PetsService.getById(petId);
+    if (data) cache.set(cacheKey, data);
+    return data;
   }
 };
 
