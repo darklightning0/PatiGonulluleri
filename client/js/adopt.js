@@ -51,33 +51,8 @@ const AdoptPageApp = {
         }
     },
 
-    waitForService(serviceName, timeout = 5000) {
-        return new Promise((resolve, reject) => {
-            const startTime = Date.now();
-            
-            const checkService = () => {
-                if (window[serviceName]) {
-                    console.log(`${serviceName} is ready`);
-                    resolve();
-                } else if (Date.now() - startTime > timeout) {
-                    reject(new Error(`${serviceName} not available after ${timeout}ms`));
-                } else {
-                    setTimeout(checkService, 100);
-                }
-            };
-            
-            checkService();
-        });
-    },
-
     async loadPetsFromFirebase() {
         try {
-            // Use the global PetsService from firebase-data-service.js
-            if (typeof window.PetsService === 'undefined') {
-                throw new Error('PetsService not available');
-            }
-            
-
             this.state.allPets = await CachedPetsService.getAll();
             this.state.filteredPets = [...this.state.allPets];
             this.state.isLoading = false;
