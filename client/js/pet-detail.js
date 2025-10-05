@@ -32,13 +32,12 @@ const elements = {
         onlineStatus: document.querySelector('.online-status'),
         name: document.querySelector('.caretaker-name'),
         role: document.querySelector('.caretaker-role'),
-        phoneText: document.querySelector('.phone-text'),
     },
     callBtn: document.getElementById('call-btn'),
     whatsappBtn: document.getElementById('whatsapp-btn'),
     messageBtn: document.getElementById('message-btn'),
     phoneDisplay: document.getElementById('phone-number'),
-    copyBtn: document.querySelector('.copy-btn'),
+    responseTime: document.getElementById('caretaker-response-time'),
     similarPetsContainer: document.getElementById('similar-pets-container'),
     messageModal: document.getElementById('message-modal'),
     closeMessageModalBtn: document.getElementById('close-message-modal'),
@@ -237,9 +236,10 @@ function updateCaretakerInfo() {
     const caretakerRole = document.querySelector('.caretaker-role');
     if (caretakerRole) caretakerRole.textContent = caretaker.role;
     
-    const phoneText = document.querySelector('.phone-text');
-    if (phoneText) {
-        phoneText.textContent = caretaker.phone;
+    // Populate caretaker response time if available, otherwise use default
+    const responseEl = document.getElementById('caretaker-response-time');
+    if (responseEl) {
+        responseEl.textContent = caretaker.responseTime || '09:00 - 21:00';
     }
 }
 
@@ -343,7 +343,7 @@ function initContactButtons() {
     const callBtn = elements.callBtn;
     const whatsappBtn = elements.whatsappBtn;
     const messageBtn = elements.messageBtn;
-    const copyBtn = document.querySelector('.copy-btn');
+    const responseEl = elements.responseTime;
     
     if (callBtn) {
         callBtn.addEventListener('click', handleCallClick);
@@ -357,47 +357,29 @@ function initContactButtons() {
         messageBtn.addEventListener('click', handleMessageClick);
     }
     
-    if (copyBtn) {
-        copyBtn.addEventListener('click', handleCopyPhone);
-    }
+    // response time element is static; no event handlers needed
 }
 
 function handleCallClick() {
-    const phoneNumber = document.querySelector('.phone-text').textContent;
-    const phoneDisplay = elements.phoneNumber;
-    
-    if (!isPhoneVisible) {
-        phoneDisplay.classList.remove('hidden');
-        isPhoneVisible = true;
-        
-        const callBtn = elements.callBtn;
-        callBtn.innerHTML = `
-            <i class="fas fa-phone"></i>
-            <span>Gizle</span>
-            <small>Telefonu gizle</small>
-        `;
-        
-        console.log('Phone number revealed for pet:', currentPet.id);
+    const phoneNumber = currentPet && currentPet.caretaker && (currentPet.caretaker.phone || currentPet.caretaker.phoneNumber);
+    if (phoneNumber) {
+        window.location.href = `tel:${phoneNumber}`;
     } else {
-        phoneDisplay.classList.add('hidden');
-        isPhoneVisible = false;
-        
-        const callBtn = elements.callBtn;
-        callBtn.innerHTML = `
-            <i class="fas fa-phone"></i>
-            <span data-tr="Ara" data-en="Call">Ara</span>
-            <small data-tr="Hemen görüş" data-en="Talk now">Hemen görüş</small>
-        `;
+        showNotification('Telefon numarası mevcut değil. Lütfen mesaj veya e-posta ile iletişime geçin.', 'info');
     }
 }
 
+
 function handleWhatsAppClick() {
     if (!currentPet) return;
-    
-    const phoneNumber = currentPet.caretaker.phone.replace(/\D/g, '');
+    const rawPhone = currentPet.caretaker.phone || currentPet.caretaker.phoneNumber || '';
+    const phoneNumber = rawPhone.replace(/\D/g, '');
+    if (!phoneNumber) {
+        showNotification('WhatsApp için telefon numarası mevcut değil.', 'info');
+        return;
+    }
     const message = encodeURIComponent(`Merhaba, ${currentPet.name} hakkında bilgi alabilir miyim?`);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
-    
     window.open(whatsappUrl, '_blank');
     
     console.log('WhatsApp contact initiated for pet:', currentPet.id);
@@ -416,36 +398,12 @@ function handleMessageClick() {
 }
 
 function handleCopyPhone() {
-    const phoneText = document.querySelector('.phone-text').textContent;
-    
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(phoneText).then(() => {
-            showNotification('Telefon numarası kopyalandı!', 'success');
-        }).catch(() => {
-            fallbackCopyPhone(phoneText);
-        });
-    } else {
-        fallbackCopyPhone(phoneText);
-    }
+    // Copy phone removed from UI; keep function as no-op
+    showNotification('Telefon kopyalama kaldırıldı', 'info');
 }
 
 function fallbackCopyPhone(text) {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    textArea.style.position = 'fixed';
-    textArea.style.opacity = '0';
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    
-    try {
-        document.execCommand('copy');
-        showNotification('Telefon numarası kopyalandı!', 'success');
-    } catch (err) {
-        showNotification('Kopyalama başarısız oldu', 'error');
-    }
-    
-    document.body.removeChild(textArea);
+    // No-op fallback since phone copy was removed
 }
 
 function initMessageModal() {
