@@ -242,22 +242,13 @@ function handleNewsletterSubmit(e) {
     submitBtn.disabled = true;
     submitBtn.textContent = currentLanguage === 'tr' ? 'Gönderiliyor...' : 'Sending...';
 
-    const animalType = form.querySelector('#animal-type').value;
-    const size = form.querySelector('#size').value;
-    const age = form.querySelector('#age').value;
-
-    // Call Pages Function API
+    // Call Pages Function API - only send email now (no preferences)
     fetch('/api/subscribe', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            email,
-            animalType,
-            size,
-            age
-        })
+        body: JSON.stringify({ email })
     })
     .then(async response => {
         // Read raw text so we never error when body is empty or non-JSON

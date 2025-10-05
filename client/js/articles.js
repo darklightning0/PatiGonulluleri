@@ -566,16 +566,31 @@ function handleNewsletterSubmit(e) {
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Kaydediliyor...</span>';
-    
-    setTimeout(() => {
-        console.log('Newsletter subscription:', { email, consent: true });
-        
+
+    fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    })
+    .then(async res => {
+        const text = await res.text().catch(() => '');
+        let data = null;
+        try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
+        if (!res.ok) throw new Error((data && (data.error || data.message)) || text || 'Subscription failed');
+        return data;
+    })
+    .then(() => {
         showNotification('E-posta listemize başarıyla kaydoldunuz!', 'success');
         e.target.reset();
-        
+    })
+    .catch(err => {
+        console.error('Newsletter subscribe error', err);
+        showNotification('Abone olurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'error');
+    })
+    .finally(() => {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
-    }, 2000);
+    });
 }
 
 function getCurrentLanguage() {

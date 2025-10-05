@@ -440,11 +440,27 @@ class ArticleDetailManager {
         }
         
         this.showNotification('Abone olunuyor...', 'info');
-        
-        setTimeout(() => {
+
+        fetch('/api/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        })
+        .then(async res => {
+            const text = await res.text().catch(() => '');
+            let data = null;
+            try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
+            if (!res.ok) throw new Error((data && (data.error || data.message)) || text || 'Subscription failed');
+            return data;
+        })
+        .then(() => {
             this.showNotification('Başarıyla abone oldunuz!', 'success');
             e.target.reset();
-        }, 1500);
+        })
+        .catch(err => {
+            console.error('Article newsletter signup error', err);
+            this.showNotification('Abone olurken bir hata oluştu.', 'error');
+        });
     }
 
 

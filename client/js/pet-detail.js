@@ -567,19 +567,36 @@ function handleApplicationSubmit(e) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Gönderiliyor...</span>';
     submitBtn.disabled = true;
     
-    setTimeout(() => {
-        console.log('Application submitted:', applicationData);
-        
+    // Include caretaker email when available
+    if (currentPet && currentPet.caretaker && currentPet.caretaker.email) {
+        applicationData.caretakerEmail = currentPet.caretaker.email;
+    }
+
+    fetch('/api/adoption', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(applicationData)
+    })
+    .then(async res => {
+        const text = await res.text().catch(() => '');
+        let data = null;
+        try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
+        if (!res.ok) throw new Error((data && (data.error || data.message)) || text || 'Failed to submit');
+        return data;
+    })
+    .then(() => {
         showNotification('Başvurunuz alındı! Sahiplendirme ekibimiz en kısa sürede sizinle iletişime geçecektir.', 'success');
-        
         e.target.reset();
-        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    })
+    .catch(err => {
+        console.error('Application submit error:', err);
+        showNotification('Başvuru gönderilemedi. Lütfen daha sonra tekrar deneyin.', 'error');
+    })
+    .finally(() => {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-    }, 2000);
+    });
 }
 
 function initShareButton() {

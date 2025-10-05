@@ -29,8 +29,8 @@ export async function onRequestPost(context) {
   const { request, env } = context;
 
   try {
-    const data = await request.json();
-    const { email, animalType, size, age } = data || {};
+  const data = await request.json();
+  const { email } = data || {};
 
     if (!email || !isValidEmail(email)) {
       return jsonResponse({ error: 'Invalid email' }, 400);
@@ -42,20 +42,20 @@ export async function onRequestPost(context) {
       return jsonResponse({ error: 'Too many attempts. Please try again in an hour.' }, 429);
     }
 
-    const token = crypto.randomUUID();
-    const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+    const unsubscribeToken = crypto.randomUUID();
 
+    // Upsert into subscriptions table - if email exists and is inactive, reactivate
     await env.DB.prepare(`
-      INSERT INTO pending_subscriptions (email, token, preferences, expires_at, created_at)
-      VALUES (?, ?, ?, ?, ?)
-    `).bind(email, token, JSON.stringify({ animalType, size, age }), expiresAt, Date.now()).run();
-
+      INSERT INTO subscriptions (email, preferences, unsubscribe_token, is_active, created_at)
+      VALUES (?, ?, ?, 1, ?)
+      ON CONFLICT(email) DO UPDATE SET is_active = 1, unsubscribe_token = excluded.unsubscribe_token
+    `).bind(email, JSON.stringify({}), unsubscribeToken, Date.now()).run();
     await env.RATE_LIMIT.put(rateLimitKey, (parseInt(emailAttempts || '0') + 1).toString(), { expirationTtl: 3600 });
 
-    // Send email but don't block the response if the mail provider is slow
-    sendConfirmationEmail(env, email, token).catch(err => console.error('sendConfirmationEmail error:', err));
+  // Send a welcome email (non-blocking)
+  sendWelcomeEmail(env, email).catch(err => console.error('sendWelcomeEmail error:', err));
 
-    return jsonResponse({ message: 'Confirmation email sent. Please check your inbox.' }, 200);
+  return jsonResponse({ message: 'Subscribed successfully. Welcome email sent.' }, 200);
 
   } catch (err) {
     console.error('Subscription handler error:', err);
@@ -78,9 +78,13 @@ function jsonResponse(payload, status = 200) {
 }
 
 async function sendConfirmationEmail(env, email, token) {
-  const confirmUrl = `${env.FRONTEND_URL}/api/confirm?token=${token}`;
-  console.log('sendConfirmationEmail: sending to', email);
+  // Deprecated: confirmation flow. Keep function as informational fallback.
+  console.log('sendConfirmationEmail called but confirmation flow is deprecated for this project');
+  return { ok: true };
+}
 
+async function sendWelcomeEmail(env, email) {
+  console.log('sendWelcomeEmail: sending welcome to', email);
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -89,34 +93,22 @@ async function sendConfirmationEmail(env, email, token) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Pati Gönüllüleri <noreply@patigonulluleri.com>',
+        from: env.WELCOME_FROM || 'Pati Gönüllüleri <noreply@patigonulluleri.com>',
         to: email,
-        subject: 'Aboneliğinizi Onaylayın',
-        html: `
-          <h2>Hoş Geldiniz!</h2>
-          <p>Aboneliğinizi onaylamak için tıklayın:</p>
-          <a href="${confirmUrl}" style="display: inline-block; padding: 12px 24px; background-color: #E98532; color: white; text-decoration: none; border-radius: 8px;">Aboneliği Onayla</a>
-          <p style="margin-top:20px; color:#666; font-size:14px;">Bu linkin geçerlilik süresi 24 saattir.</p>
-        `
+        subject: env.WELCOME_SUBJECT || 'Pati Gönüllüleri - Aboneliğinize Hoşgeldiniz',
+        html: env.WELCOME_HTML || `<p>Hoşgeldiniz! Pati Gönüllüleri e-posta listesine kaydoldunuz. Yeni makaleler ve duyurular için bizi takip edin.</p>`
       })
     });
 
-    let text;
-    try {
-      text = await res.text();
-    } catch (e) {
-      text = '<no body>';
-    }
-
+    const text = await res.text().catch(() => '<no-body>');
     if (!res.ok) {
-      console.error('Resend API error', res.status, text);
+      console.error('Resend welcome error', res.status, text);
     } else {
-      // Log the response body (might be JSON)
-      console.log('Resend API success', res.status, text);
+      console.log('Resend welcome success', res.status, text);
     }
     return { ok: res.ok, status: res.status, body: text };
   } catch (err) {
-    console.error('sendConfirmationEmail fetch failed', err);
+    console.error('sendWelcomeEmail failed', err);
     throw err;
   }
 }
