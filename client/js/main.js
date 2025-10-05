@@ -259,13 +259,22 @@ function handleNewsletterSubmit(e) {
             age
         })
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(data.error || 'Subscription failed');
-            });
+    .then(async response => {
+        // Read raw text so we never error when body is empty or non-JSON
+        const text = await response.text();
+        let data = null;
+        try {
+            data = text ? JSON.parse(text) : null;
+        } catch (err) {
+            data = null; // leave as null if parse fails
         }
-        return response.json();
+
+        if (!response.ok) {
+            const message = (data && (data.error || data.message)) || text || 'Subscription failed';
+            throw new Error(message);
+        }
+
+        return data;
     })
     .then(data => {
         showSuccessMessage(currentLanguage === 'tr' ? 
