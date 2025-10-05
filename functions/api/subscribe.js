@@ -7,22 +7,32 @@
 export async function onRequest(context) {
   const { request } = context;
 
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      }
-    });
-  }
+  // Top-level guard: ensure any unexpected error returns JSON and is logged,
+  // rather than letting Cloudflare return an HTML 502 page which the client can't parse.
+  try {
+    console.log('subscribe.onRequest - method=', request.method);
 
-  if (request.method !== 'POST') {
-    return jsonResponse({ error: 'Method Not Allowed' }, 405);
-  }
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        }
+      });
+    }
 
-  return onRequestPost(context);
+    if (request.method !== 'POST') {
+      return jsonResponse({ error: 'Method Not Allowed' }, 405);
+    }
+
+    return await onRequestPost(context);
+  } catch (err) {
+    console.error('subscribe.onRequest unexpected error:', err && (err.stack || err.message) || err);
+    // Return JSON so the frontend can handle and show a proper message
+    return jsonResponse({ error: 'Internal server error' }, 500);
+  }
 }
 
 export async function onRequestPost(context) {
