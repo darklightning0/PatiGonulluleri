@@ -271,10 +271,16 @@ function handleNewsletterSubmit(e) {
     return data;
 })
     .then(data => {
+    if (data && data.alreadySubscribed) {
+        showSuccessMessage(currentLanguage === 'tr' ? 
+            'Bu e-posta adresi zaten listemizde kayıtlı!' : 
+            'This email is already on our list!');
+    } else {
         showSuccessMessage(currentLanguage === 'tr' ? 
             'E-posta listemize başarıyla kayıt oldunuz! Teşekkürler.' : 
             'You have been subscribed to our mailing list. Thank you.');
-        form.reset();
+    }
+    form.reset();
 
         // Additional UX: briefly disable the submit button to avoid accidental duplicate clicks
         submitBtn.disabled = true;

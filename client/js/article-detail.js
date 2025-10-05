@@ -453,10 +453,14 @@ class ArticleDetailManager {
             if (!res.ok) throw new Error((data && (data.error || data.message)) || text || 'Subscription failed');
             return data;
         })
-        .then(() => {
-            this.showNotification('Başarıyla abone oldunuz!', 'success');
-            e.target.reset();
-        })
+.then(data => {
+    if (data && data.alreadySubscribed) {
+        this.showNotification('Bu e-posta adresi zaten listemizde kayıtlı!', 'info');
+    } else {
+        this.showNotification('Başarıyla abone oldunuz!', 'success');
+    }
+    e.target.reset();
+})
         .catch(err => {
             console.error('Article newsletter signup error', err);
             this.showNotification('Abone olurken bir hata oluştu.', 'error');

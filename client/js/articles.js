@@ -14,7 +14,6 @@ let articlesPerPage = 6;
 let totalPages = 1;
 let filteredArticles = [];
 let allArticles = [];
-let isLoading = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     initArticlesPage();
@@ -583,10 +582,14 @@ function handleNewsletterSubmit(e) {
         if (!res.ok) throw new Error((data && (data.error || data.message)) || text || 'Subscription failed');
         return data;
     })
-    .then(() => {
+   .then(data => {
+    if (data && data.alreadySubscribed) {
+        showNotification('Bu e-posta adresi zaten listemizde kayıtlı!', 'info');
+    } else {
         showNotification('E-posta listemize başarıyla kaydoldunuz!', 'success');
-        e.target.reset();
-    })
+    }
+    e.target.reset();
+})
     .catch(err => {
         console.error('Newsletter subscribe error', err);
         showNotification('Abone olurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'error');

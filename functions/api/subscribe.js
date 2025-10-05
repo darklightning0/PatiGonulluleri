@@ -73,34 +73,43 @@ export async function onRequestPost(context) {
     try {
   const now = Date.now();
   
-  console.log('Attempting DB insert for email:', email);
-  console.log('DB binding exists:', !!env.DB);
-  
-  const stmt = env.DB.prepare(`
-    INSERT INTO subscriptions (email, preferences, unsubscribe_token, confirmed_at, is_active, created_at)
-    VALUES (?, ?, ?, ?, 1, ?)
-    ON CONFLICT(email) DO UPDATE SET is_active = 1, unsubscribe_token = excluded.unsubscribe_token, confirmed_at = excluded.confirmed_at
-  `);
-  
-  console.log('Statement prepared, binding values...');
-  const bound = stmt.bind(email, JSON.stringify({}), unsubscribeToken, now, now);
-  
-  console.log('Executing query...');
-  const result = await bound.run();
-  
-  console.log('DB insert successful:', result);
-  
-  // Reset rate limit counter on success
+  // Check if email already exists and is active
+  const existing = await env.DB.prepare(
+    'SELECT id, is_active FROM subscriptions WHERE email = ?'
+  ).bind(email).first();
+
+  if (existing && existing.is_active === 1) {
+    console.log('Email already subscribed:', email);
+    return jsonResponse({ 
+      message: 'Bu e-posta adresi zaten kayıtlı. Teşekkürler!',
+      alreadySubscribed: true 
+    }, 200);
+  }
+
+  if (existing && existing.is_active === 0) {
+    // Reactivate inactive subscription
+    await env.DB.prepare(
+      'UPDATE subscriptions SET is_active = 1, unsubscribe_token = ?, confirmed_at = ? WHERE email = ?'
+    ).bind(unsubscribeToken, now, email).run();
+    
+    console.log('Reactivated subscription for:', email);
+  } else {
+    // Insert new subscription
+    await env.DB.prepare(
+      'INSERT INTO subscriptions (email, preferences, unsubscribe_token, confirmed_at, is_active, created_at) VALUES (?, ?, ?, ?, 1, ?)'
+    ).bind(email, JSON.stringify({}), unsubscribeToken, now, now).run();
+    
+    console.log('Created new subscription for:', email);
+  }
+
+  // Reset rate limit counter
   if (env.RATE_LIMIT) {
     const rateLimitKey = `ratelimit:${email}`;
     await env.RATE_LIMIT.put(rateLimitKey, '0', { expirationTtl: 3600 });
   }
 } catch (dbErr) {
-  console.error('DB upsert error in subscribe:', dbErr);
-  console.error('Error message:', dbErr.message);
-  console.error('Error stack:', dbErr.stack);
-  console.error('Error details:', JSON.stringify(dbErr, null, 2));
-  return jsonResponse({ error: 'Database error while creating subscription', details: dbErr.message }, 500);
+  console.error('DB error in subscribe:', dbErr);
+  return jsonResponse({ error: 'Database error while creating subscription' }, 500);
 }
 
     // Send welcome email (non-blocking) - only if API key exists
