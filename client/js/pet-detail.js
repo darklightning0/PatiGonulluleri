@@ -21,7 +21,6 @@ const elements = {
     urgentBadge: document.getElementById('urgent-badge'),
     healthTags: document.getElementById('health-tags'),
     petDescription: document.getElementById('pet-description'),
-    specialNotesContainer: document.getElementById('special-notes-container'),
     mainImage: document.getElementById('main-image'),
     thumbnailsContainer: document.getElementById('thumbnails-container'),
     totalImages: document.getElementById('total-images'),
@@ -104,7 +103,7 @@ async function loadPetData(petId) {
 function updatePageContent() {
     if (!currentPet) {
         console.error('currentPet is undefined');
-        return;  // Prevent proceeding if currentPet is not loaded
+        return;
     }
 
     const currentLang = getCurrentLanguage();
@@ -115,6 +114,9 @@ function updatePageContent() {
     elements.petBreed.textContent = currentPet.breed || 'Unknown Breed';
     elements.petAge.textContent = `${currentPet.age || 'Unknown'} yaşında`;
     elements.petLocation.textContent = currentPet.location || 'Unknown Location';
+    
+    // Add description
+    elements.petDescription.textContent = currentPet.description || 'Açıklama bulunamadı.';
     
     // Update translated fields
     updateTranslatedFields(currentLang);
@@ -137,7 +139,6 @@ function updatePageContent() {
     
     // Call other update functions
     updateHealthTags();
-    updateSpecialNotes(); // Call the update special notes after currentPet is safely loaded
     updateCaretakerInfo();
     updateImageGallery();
 }
@@ -196,7 +197,14 @@ function updateHealthTags() {
     const allHealthOptions = ['vaccinated', 'sterilized', 'microchipped'];
     
     healthContainer.innerHTML = allHealthOptions.map(health => {
-        const hasHealth = currentPet.health.includes(health);
+        // Handle both old array format and new map format
+        let hasHealth = false;
+        if (Array.isArray(currentPet.health)) {
+            hasHealth = currentPet.health.includes(health);
+        } else if (typeof currentPet.health === 'object') {
+            hasHealth = currentPet.health[health] === true;
+        }
+        
         const healthText = healthTranslations[health];
         const statusClass = hasHealth ? 'verified' : 'not-verified';
         const iconClass = hasHealth ? 'fas fa-check-circle' : 'fas fa-times-circle';
@@ -208,33 +216,6 @@ function updateHealthTags() {
         `;
     }).join('');
 }
-
-function updateSpecialNotes() {
-    if (currentPet && currentPet.specialNotes && typeof currentPet.specialNotes === 'object') {
-        const specialNotes = currentPet.specialNotes;
-        console.log('Special Notes:', specialNotes); // Log for debugging
-        
-        // Assuming it's an array of objects
-        const noteArray = [
-            { icon: specialNotes.icon, text: specialNotes.text }
-        ];
-        
-        // Render special notes dynamically if they exist
-        noteArray.forEach(note => {
-            console.log(note.icon, note.text); // Log for debugging
-        });
-
-        // Render the notes in the UI (customize this as per your HTML structure)
-        elements.specialNotesContainer.innerHTML = noteArray.map(note => `
-            <div class="special-note">
-                <i class="${note.icon}"></i> <span>${note.text}</span>
-            </div>
-        `).join('');
-    } else {
-        console.warn('No special notes or invalid format:', currentPet.specialNotes);
-    }
-}
-
 
 function updateCaretakerInfo() {
     const caretaker = currentPet.caretaker;
@@ -534,8 +515,7 @@ Bu mesaj Pati Gönüllüleri web sitesi üzerinden gönderilmiştir.
 Hayvan: ${currentPet.name} (ID: ${currentPet.id})
     `.trim();
     
-    // Get caretaker email
-    const caretakerEmail = currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
+    const caretakerEmail = currentPet.caretaker.mail || currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
     
     // Create mailto link
     const mailtoLink = `mailto:${caretakerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -622,8 +602,8 @@ ID: ${currentPet.id}
 Tarih: ${new Date().toLocaleDateString('tr-TR')}
     `.trim();
     
-    // Get caretaker email
-    const caretakerEmail = currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
+    // Get caretaker email - handle both 'email' and 'mail' field names
+    const caretakerEmail = currentPet.caretaker.mail || currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
     
     // Create mailto link
     const mailtoLink = `mailto:${caretakerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -739,15 +719,27 @@ function createSimilarPetCard(pet) {
     const currentLang = getCurrentLanguage();
     const translatedData = translatePetData(pet, currentLang);
     const urgentBadge = pet.urgent ? `<div class="pet-urgent-badge" data-tr="ACİL" data-en="URGENT">ACİL</div>` : '';
-    const healthTags = pet.health.map(health => {
-        const healthTranslations = {
-            'vaccinated': { tr: 'Aşılı', en: 'Vaccinated' },
-            'sterilized': { tr: 'Kısırlaştırılmış', en: 'Sterilized' },
-            'microchipped': { tr: 'Çipli', en: 'Microchipped' }
-        };
+    const healthTags = (() => {
+    const healthTranslations = {
+        'vaccinated': { tr: 'Aşılı', en: 'Vaccinated' },
+        'sterilized': { tr: 'Kısırlaştırılmış', en: 'Sterilized' },
+        'microchipped': { tr: 'Çipli', en: 'Microchipped' }
+    };
+    
+    const healthArray = [];
+    if (Array.isArray(pet.health)) {
+        healthArray.push(...pet.health);
+    } else if (typeof pet.health === 'object') {
+        Object.keys(pet.health).forEach(key => {
+            if (pet.health[key] === true) healthArray.push(key);
+        });
+    }
+    
+    return healthArray.map(health => {
         const healthText = healthTranslations[health] ? healthTranslations[health][currentLang] : health;
         return `<span class="pet-tag">${healthText}</span>`;
     }).join('');
+})();
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
