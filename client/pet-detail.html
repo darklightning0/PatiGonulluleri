@@ -206,42 +206,32 @@
                             </div>
 
                             <!-- Current Caretaker Info -->
-                            <div class="caretaker-info">
-                                <div class="caretaker-avatar">
-                                    <img src="" alt="" class="avatar-img">
-                                    <div class="online-status"></div>
-                                </div>
-                                <div class="caretaker-details">
-                                    <h4 class="caretaker-name"></h4>
-                                    <div class="caretaker-role" data-tr="Geçici Bakıcı" data-en="Foster Caretaker"></div>
-                                </div>
-                            </div>
-
-                            <!-- Contact Methods -->
                             <div class="contact-methods">
-                                <button class="contact-btn primary" id="call-btn">
-                                    <i class="fas fa-phone"></i>
-                                    <span data-tr="Ara" data-en="Call">Ara</span>
-                                    <small data-tr="Hemen görüş" data-en="Talk now">Hemen görüş</small>
-                                </button>
-                                
-                                <button class="contact-btn secondary" id="whatsapp-btn">
-                                    <i class="fab fa-whatsapp"></i>
-                                    <span>WhatsApp</span>
-                                    <small data-tr="Mesaj gönder" data-en="Send message">Mesaj gönder</small>
-                                </button>
-                                
-                                <button class="contact-btn secondary" id="message-btn">
-                                    <i class="fas fa-envelope"></i>
-                                    <span data-tr="E-Posta" data-en="EMail">E-Posta</span>
-                                    <small data-tr="E-Posta gönder" data-en="Send Email">E-Posta gönder</small>
-                                </button>
-                            </div>
-
-                            <!-- Caretaker response time (always visible). Phone number removed per UX request -->
-                            <div id="caretaker-response-time" class="phone-note">
-                                09:00 - 21:00
-                            </div>
+    <div class="call-wrapper">
+        <button class="contact-btn primary" id="call-btn">
+            <i class="fas fa-phone"></i>
+            <span data-tr="Ara" data-en="Call">Ara</span>
+            <small data-tr="Hemen görüş" data-en="Talk now">Hemen görüş</small>
+        </button>
+        <div id="caretaker-response-time" class="availability-note">
+            <i class="fas fa-clock"></i>
+            <span data-tr="Müsait saatler" data-en="Available times">Müsait saatler</span>:&nbsp;
+            <span class="availability-hours">09:00 - 21:00</span>
+        </div>
+    </div>
+    
+    <button class="contact-btn secondary" id="whatsapp-btn">
+        <i class="fab fa-whatsapp"></i>
+        <span>WhatsApp</span>
+        <small data-tr="Mesaj gönder" data-en="Send message">Mesaj gönder</small>
+    </button>
+    
+    <button class="contact-btn secondary" id="message-btn">
+        <i class="fas fa-envelope"></i>
+        <span data-tr="E-Posta" data-en="EMail">E-Posta</span>
+        <small data-tr="E-Posta gönder" data-en="Send Email">Send Email</small>
+    </button>
+</div>
 
                             <!-- Safety Notice -->
                             <div class="safety-notice">

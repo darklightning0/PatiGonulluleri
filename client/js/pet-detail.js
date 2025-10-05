@@ -235,11 +235,10 @@ function updateCaretakerInfo() {
 
     const caretakerRole = document.querySelector('.caretaker-role');
     if (caretakerRole) caretakerRole.textContent = caretaker.role;
-    
-    // Populate caretaker response time if available, otherwise use default
-    const responseEl = document.getElementById('caretaker-response-time');
-    if (responseEl) {
-        responseEl.textContent = caretaker.responseTime || '09:00 - 21:00';
+ 
+    const responseHoursEl = document.querySelector('.availability-hours');
+    if (responseHoursEl) {
+        responseHoursEl.textContent = caretaker.responseTime || '19:00 - 23:00';
     }
 }
 

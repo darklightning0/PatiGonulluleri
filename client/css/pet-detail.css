@@ -619,6 +619,36 @@
    PHONE NUMBER DISPLAY
    =================== */
 
+.call-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Adds a small space between the button and the note */
+}
+
+.availability-note {
+    font-size: 13px;
+    color: var(--medium-gray);
+    text-align: center;
+    padding: 8px 12px;
+    background-color: var(--light-cream);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid rgba(179, 187, 175, 0.3);
+}
+
+.availability-note i {
+    color: var(--accent-orange);
+    font-size: 12px;
+}
+
+.availability-hours {
+    font-weight: 600;
+    color: var(--primary-brown);
+}
+
 .phone-number {
     padding: 16px;
     background-color: var(--light-cream);
