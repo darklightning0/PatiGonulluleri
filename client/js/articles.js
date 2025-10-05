@@ -319,80 +319,50 @@ function loadFeaturedArticles() {
 }
 
 function loadArticles() {
-    const container = document.getElementById('articles-container');
-    if (!container) {
-        console.error('Articles container not found');
-        return;
-    }
-    
-    if (isLoading) return;
-    isLoading = true;
-    
-    container.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div><span>Makaleler yükleniyor...</span></div>';
+    const { currentPage, itemsPerPage, filteredArticles } = this.state;
+    const container = this.elements.articlesContainer;
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const articlesToShow = filteredArticles.slice(startIndex, startIndex + itemsPerPage);
+
+    container.innerHTML = `<div class="loading-container"><div class="loading-spinner"></div><span>Yükleniyor...</span></div>`;
     
     setTimeout(() => {
-        try {
-            const startIndex = (currentPage - 1) * articlesPerPage;
-            const endIndex = startIndex + articlesPerPage;
-            const articlesToShow = filteredArticles.slice(startIndex, endIndex);
+        if (articlesToShow.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <h3>Sonuç Bulunamadı</h3>
+                    <p>Seçtiğiniz filtrelere uygun makale bulunamadı.</p>
+                </div>`;
+        } else {
+            container.innerHTML = articlesToShow.map(article => this.createArticleCard(article)).join('');
             
-            if (articlesToShow.length === 0) {
-                container.innerHTML = '';
-            } else {
-                const articlesHTML = articlesToShow.map(article => {
-                    try {
-                        console.log('Creating card for article:', article.id);
-                        const card = createArticleCard(article);
-                        console.log('Created card HTML:', card);
-                        return card;
-                    } catch (error) {
-                        console.warn('Error creating article card for article:', article.id, error);
-                        return '';
-                    }
-                }).filter(html => html !== '').join('');
+            // Add click handlers AFTER rendering
+            const articleCards = container.querySelectorAll('.article-card');
+            console.log('Found article cards:', articleCards.length);
+            
+            articleCards.forEach(card => {
+                const articleId = card.dataset.articleId;
+                console.log('Adding click handler to card:', articleId);
                 
-                container.innerHTML = articlesHTML;
-                
-                const cards = container.querySelectorAll('.article-card');
-                console.log('Found article cards:', cards.length);
-                
-                cards.forEach(card => {
-                    const articleId = card.getAttribute('data-article-id');
-                    console.log('Adding click handler to card:', articleId);
+                card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('Card clicked:', articleId);
+                    console.log('Opening article:', articleId);
                     
-                    // Add click handler to both the card and its children
-                    const handleClick = (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Card clicked:', articleId);
-                        if (articleId) {
-                            console.log('Opening article:', articleId);
-                            openArticle(articleId);
-                        } else {
-                            console.error('No article ID found on clicked card');
-                        }
-                    };
-                    
-                    card.style.cursor = 'pointer';
-                    card.addEventListener('click', handleClick);
-                    
-                    // Also add click handler to title for better accessibility
-                    const titleElement = card.querySelector('.article-title');
-                    if (titleElement) {
-                        titleElement.style.cursor = 'pointer';
-                        titleElement.addEventListener('click', handleClick);
-                    }
+                    // Use window.location.href for navigation
+                    window.location.href = `article-detail.html?id=${articleId}`;
                 });
-            }
-            
-            isLoading = false;
-        } catch (error) {
-            console.error('Error loading articles:', error);
-            container.innerHTML = '<div class="loading-container"><span>Makaleler yüklenirken hata oluştu.</span></div>';
-            showNotification('Makaleler yüklenirken hata oluştu.', 'error');
-            isLoading = false;
+                
+                // Make the card look clickable
+                card.style.cursor = 'pointer';
+            });
         }
-    }, 200);
+        
+        this.renderPagination();
+        this.updateLanguageOnRender();
+    }, 250);
 }
 
 function createFeaturedArticleCard(article) {
@@ -437,45 +407,42 @@ function createFeaturedArticleCard(article) {
 }
 
 function createArticleCard(article) {
-    try {
-        const currentLang = getCurrentLanguage();
-        
-        const tags = (article.tags && Array.isArray(article.tags) && article.tags.length > 0) ? 
-            article.tags.slice(0, 3).map(tag => 
-                `<span class="article-tag">${(tag && tag[currentLang]) ? tag[currentLang] : ''}</span>`
-            ).join('') : '';
-        
-        return `
-            <a href="article-detail.html?id=${article.id}" class="article-card" data-article-id="${article.id}" style="text-decoration: none; color: inherit; cursor: pointer;">
-                <div class="article-image">
-                    <img src="${article.image || ''}" alt="${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}" loading="lazy">
-                    <div class="category-badge" data-tr="${(article.category && article.category.tr) ? article.category.tr : ''}" data-en="${(article.category && article.category.en) ? article.category.en : ''}">
-                        ${(article.category && article.category[currentLang]) ? article.category[currentLang] : ''}
-                    </div>
-                </div>
-                <div class="article-content">
-                    <h3 class="article-title">${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}</h3>
-                    <p class="article-summary">${(article.summary && article.summary[currentLang]) ? article.summary[currentLang] : ''}</p>
-                    <div class="article-meta">
-                        <div class="article-date">
-                            <i class="fas fa-calendar"></i>
-                            <span>${formatDate(article.publishDate, currentLang)}</span>
-                        </div>
-                        <div class="reading-time">
-                            <i class="fas fa-clock"></i>
-                            <span>${article.readingTime || 0} <span data-tr="dk" data-en="min">dk</span></span>
-                        </div>
-                    </div>
-                    <div class="article-tags">
-                        ${tags}
-                    </div>
+    const lang = this.getCurrentLanguage();
+    const translated = this.translateArticleData(article, lang);
+    
+    const categoryName = translated.category;
+    const publishDate = this.formatDate(article.publishDate, lang);
+    const readingTime = article.readingTime || 5;
+    const tags = article.tags.map(tag => `<span class="article-tag">${tag}</span>`).join('');
+    
+    const cardHTML = `
+        <div class="article-card" data-article-id="${article.id}">
+            <div class="article-image">
+                <img src="${article.featuredImage}" alt="${translated.title}" loading="lazy">
+                <div class="category-badge" data-tr="${article.category.tr}" data-en="${article.category.en}">
+                    ${categoryName}
                 </div>
             </div>
-        `;
-    } catch (error) {
-        console.error('Error creating article card:', error);
-        return '';
-    }
+            <div class="article-content">
+                <h3 class="article-title">${translated.title}</h3>
+                <p class="article-summary">${translated.summary}</p>
+                <div class="article-meta">
+                    <div class="article-date">
+                        <i class="fas fa-calendar"></i>
+                        <span>${publishDate}</span>
+                    </div>
+                    <div class="reading-time">
+                        <i class="fas fa-clock"></i>
+                        <span>${readingTime} <span data-tr="dk" data-en="min">dk</span></span>
+                    </div>
+                </div>
+                <div class="article-tags">${tags}</div>
+            </div>
+        </div>
+    `;
+    
+    console.log('Created card HTML:', cardHTML);
+    return cardHTML;
 }
 
 function renderPagination() {
