@@ -360,11 +360,15 @@ function initContactButtons() {
 }
 
 function handleCallClick() {
-    const phoneNumber = currentPet && currentPet.caretaker && (currentPet.caretaker.phone || currentPet.caretaker.phoneNumber);
-    if (phoneNumber) {
-        window.location.href = `tel:${phoneNumber}`;
+    // Get the raw phone number from the pet's caretaker data
+    const rawPhoneNumber = currentPet && currentPet.caretaker && (currentPet.caretaker.phone || currentPet.caretaker.phoneNumber); //
+    
+    if (rawPhoneNumber) {
+        const cleanedPhoneNumber = rawPhoneNumber.replace(/[\s()-]/g, '');
+        
+        window.location.href = `tel:${cleanedPhoneNumber}`; 
     } else {
-        showNotification('Telefon numarası mevcut değil. Lütfen mesaj veya e-posta ile iletişime geçin.', 'info');
+        showNotification('Telefon numarası mevcut değil. Lütfen mesaj veya e-posta ile iletişime geçin.', 'info'); //
     }
 }
 
