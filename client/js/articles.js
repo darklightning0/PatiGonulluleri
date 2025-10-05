@@ -304,21 +304,7 @@ function loadFeaturedArticles() {
         
         container.innerHTML = articlesHTML;
         
-        const cards = container.querySelectorAll('.featured-article-card');
-        cards.forEach(card => {
-            card.style.cursor = 'pointer'; // Add visual feedback
-            card.addEventListener('click', (e) => {
-                e.preventDefault();
-                const articleId = card.dataset.articleId;
-                console.log('Featured card clicked, article ID:', articleId);
-                if (articleId) {
-                    console.log('Navigating to article-detail.html?id=' + articleId);
-                    window.location.href = `article-detail.html?id=${articleId}`;
-                } else {
-                    console.error('No article ID found on card');
-                }
-            });
-        });
+        // No click handler needed; <a> handles navigation natively
     } catch (error) {
         console.error('Error loading featured articles:', error);
     }
@@ -409,9 +395,8 @@ function loadArticles() {
 function createFeaturedArticleCard(article) {
     try {
         const currentLang = getCurrentLanguage();
-        
         return `
-            <div class="featured-article-card" data-article-id="${article.id}">
+            <a href="article-detail.html?id=${article.id}" class="featured-article-card" data-article-id="${article.id}" style="text-decoration:none;color:inherit;">
                 <div class="article-image">
                     <img src="${article.image || ''}" alt="${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}" loading="lazy">
                     <div class="category-badge" data-tr="${(article.category && article.category.tr) ? article.category.tr : ''}" data-en="${(article.category && article.category.en) ? article.category.en : ''}">
@@ -439,7 +424,7 @@ function createFeaturedArticleCard(article) {
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         `;
     } catch (error) {
         console.error('Error creating featured article card:', error);
