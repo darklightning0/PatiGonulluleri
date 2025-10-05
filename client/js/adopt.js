@@ -189,20 +189,27 @@ const AdoptPageApp = {
     },
     
     applyFiltersAndSort() {
-        const { animalType, age, size, gender, health } = this.state.currentFilters;
+    const { animalType, age, size, gender, health } = this.state.currentFilters;
 
-        let filtered = this.state.allPets.filter(pet => 
+    let filtered = this.state.allPets.filter(pet => {
+        // Handle health as both array (old) and object (new)
+        const petHealthArray = Array.isArray(pet.health) 
+            ? pet.health 
+            : Object.keys(pet.health).filter(key => pet.health[key] === true);
+        
+        return (
             (animalType.length === 0 || animalType.includes(pet.type)) &&
             (age.length === 0 || age.includes(pet.ageGroup)) &&
             (size.length === 0 || size.includes(pet.size)) &&
             (gender.length === 0 || gender.includes(pet.gender)) &&
-            (health.length === 0 || health.every(h => pet.health.includes(h)))
+            (health.length === 0 || health.every(h => petHealthArray.includes(h)))
         );
+    });
 
-        this.state.filteredPets = this.applySorting(filtered);
-        this.renderPets();
-        this.updateResultCount();
-    },
+    this.state.filteredPets = this.applySorting(filtered);
+    this.renderPets();
+    this.updateResultCount();
+},
 
     applySorting(pets) {
         return [...pets].sort((a, b) => {
@@ -245,7 +252,14 @@ const AdoptPageApp = {
         const lang = this.getCurrentLanguage();
         const translated = this.translatePetData(pet, lang);
         const urgentBadge = pet.urgent ? `<div class="pet-urgent-badge" data-tr="ACİL" data-en="URGENT"></div>` : '';
-        const healthTags = pet.health.map(h => `<span class="pet-tag">${this.translateHealth(h, lang)}</span>`).join('');
+        // Handle both array and object health format
+const petHealthArray = Array.isArray(pet.health) 
+    ? pet.health 
+    : Object.keys(pet.health).filter(key => pet.health[key] === true);
+
+const healthTags = petHealthArray.map(h => 
+    `<span class="pet-tag">${this.translateHealth(h, lang)}</span>`
+).join('');
         const date = new Date(pet.dateAdded).toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
         const imageHTML = `
@@ -346,23 +360,29 @@ const AdoptPageApp = {
         this.state.currentPage = 1;
     },
 
-    updateFilterCounts() {
-        const counts = this.state.allPets.reduce((acc, pet) => {
-            acc.animalType[pet.type] = (acc.animalType[pet.type] || 0) + 1;
-            acc.age[pet.ageGroup] = (acc.age[pet.ageGroup] || 0) + 1;
-            acc.size[pet.size] = (acc.size[pet.size] || 0) + 1;
-            acc.gender[pet.gender] = (acc.gender[pet.gender] || 0) + 1;
-            pet.health.forEach(h => acc.health[h] = (acc.health[h] || 0) + 1);
-            return acc;
-        }, { animalType: {}, age: {}, size: {}, gender: {}, health: {} });
+updateFilterCounts() {
+    const counts = this.state.allPets.reduce((acc, pet) => {
+        acc.animalType[pet.type] = (acc.animalType[pet.type] || 0) + 1;
+        acc.age[pet.ageGroup] = (acc.age[pet.ageGroup] || 0) + 1;
+        acc.size[pet.size] = (acc.size[pet.size] || 0) + 1;
+        acc.gender[pet.gender] = (acc.gender[pet.gender] || 0) + 1;
+        
+        // Handle both array and object health format
+        const petHealthArray = Array.isArray(pet.health) 
+            ? pet.health 
+            : Object.keys(pet.health).filter(key => pet.health[key] === true);
+        
+        petHealthArray.forEach(h => acc.health[h] = (acc.health[h] || 0) + 1);
+        return acc;
+    }, { animalType: {}, age: {}, size: {}, gender: {}, health: {} });
 
-        this.elements.filterCheckboxes.forEach(cb => {
-            const { name, value } = cb;
-            const countSpan = cb.parentElement.querySelector('.count');
-            if (!countSpan) return;
-            countSpan.textContent = `(${(counts[name]?.[value]) || (value === 'all' ? this.state.allPets.length : 0)})`;
-        });
-    },
+    this.elements.filterCheckboxes.forEach(cb => {
+        const { name, value } = cb;
+        const countSpan = cb.parentElement.querySelector('.count');
+        if (!countSpan) return;
+        countSpan.textContent = `(${(counts[name]?.[value]) || (value === 'all' ? this.state.allPets.length : 0)})`;
+    });
+},
     
     initMobileFilters() {
         const { filtersSidebar, filtersContainer } = this.elements;
