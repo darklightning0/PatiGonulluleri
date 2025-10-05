@@ -39,25 +39,38 @@ export async function onRequestPost(context) {
   const { request, env } = context;
 
   try {
-  const data = await request.json();
-  const { email } = data || {};
+    let data;
+    try {
+      data = await request.json();
+    } catch (jsonErr) {
+      console.error('JSON parse error:', jsonErr);
+      return jsonResponse({ error: 'Invalid JSON in request body' }, 400);
+    }
+
+    const { email } = data || {};
 
     if (!email || !isValidEmail(email)) {
       return jsonResponse({ error: 'Invalid email' }, 400);
     }
 
-    const rateLimitKey = `ratelimit:${email}`;
-    const emailAttempts = await env.RATE_LIMIT.get(rateLimitKey);
-    // Allow up to 6 attempts per hour for normal signups (less aggressive)
-    if (emailAttempts && parseInt(emailAttempts) >= 6) {
-      return jsonResponse({ error: 'Too many attempts. Please try again in an hour.' }, 429);
+    // Check if KV is available before using it
+    if (env.RATE_LIMIT) {
+      const rateLimitKey = `ratelimit:${email}`;
+      const emailAttempts = await env.RATE_LIMIT.get(rateLimitKey);
+      if (emailAttempts && parseInt(emailAttempts) >= 6) {
+        return jsonResponse({ error: 'Too many attempts. Please try again in an hour.' }, 429);
+      }
     }
 
     const unsubscribeToken = crypto.randomUUID();
 
-    // Upsert into subscriptions table - if email exists and is inactive, reactivate
+    // Check if DB is available
+    if (!env.DB) {
+      console.error('DB binding not found');
+      return jsonResponse({ error: 'Database not configured' }, 500);
+    }
+
     try {
-      // confirmed_at is required by the DB schema; set to now
       const now = Date.now();
       await env.DB.prepare(`
         INSERT INTO subscriptions (email, preferences, unsubscribe_token, confirmed_at, is_active, created_at)
@@ -65,17 +78,24 @@ export async function onRequestPost(context) {
         ON CONFLICT(email) DO UPDATE SET is_active = 1, unsubscribe_token = excluded.unsubscribe_token, confirmed_at = excluded.confirmed_at
       `).bind(email, JSON.stringify({}), unsubscribeToken, now, now).run();
 
-      // Reset the per-email attempt counter on successful subscription so a retry doesn't permanently block
-      await env.RATE_LIMIT.put(rateLimitKey, '0', { expirationTtl: 3600 });
+      // Reset rate limit counter on success (only if KV available)
+      if (env.RATE_LIMIT) {
+        const rateLimitKey = `ratelimit:${email}`;
+        await env.RATE_LIMIT.put(rateLimitKey, '0', { expirationTtl: 3600 });
+      }
     } catch (dbErr) {
       console.error('DB upsert error in subscribe:', dbErr && dbErr.message ? dbErr.message : dbErr);
-      return jsonResponse({ error: 'Database error while creating subscription' }, 502);
+      return jsonResponse({ error: 'Database error while creating subscription' }, 500);
     }
 
-  // Send a welcome email (non-blocking)
-  sendWelcomeEmail(env, email).catch(err => console.error('sendWelcomeEmail error:', err));
+    // Send welcome email (non-blocking) - only if API key exists
+    if (env.RESEND_API_KEY) {
+      sendWelcomeEmail(env, email).catch(err => console.error('sendWelcomeEmail error:', err));
+    } else {
+      console.warn('RESEND_API_KEY not configured, skipping welcome email');
+    }
 
-  return jsonResponse({ message: 'Subscribed successfully. Welcome email sent.' }, 200);
+    return jsonResponse({ message: 'Subscribed successfully.' }, 200);
 
   } catch (err) {
     console.error('Subscription handler error:', err);

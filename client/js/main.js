@@ -244,29 +244,32 @@ function handleNewsletterSubmit(e) {
 
     // Call Pages Function API - only send email now (no preferences)
     fetch('/api/subscribe', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email })
-    })
-    .then(async response => {
-        // Read raw text so we never error when body is empty or non-JSON
-        const text = await response.text();
-        let data = null;
-        try {
-            data = text ? JSON.parse(text) : null;
-        } catch (err) {
-            data = null; // leave as null if parse fails
-        }
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email })
+})
+.then(async response => {
+    const text = await response.text();
+    console.log('Response status:', response.status);
+    console.log('Response body:', text);
+    
+    let data = null;
+    try {
+        data = text ? JSON.parse(text) : null;
+    } catch (err) {
+        console.error('Failed to parse response as JSON:', err);
+        data = null;
+    }
 
-        if (!response.ok) {
-            const message = (data && (data.error || data.message)) || text || 'Subscription failed';
-            throw new Error(message);
-        }
+    if (!response.ok) {
+        const message = (data && (data.error || data.message)) || text || 'Subscription failed';
+        throw new Error(message);
+    }
 
-        return data;
-    })
+    return data;
+})
     .then(data => {
         showSuccessMessage(currentLanguage === 'tr' ? 
             'E-posta listemize başarıyla kayıt oldunuz! Teşekkürler.' : 

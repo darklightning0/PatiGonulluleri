@@ -21,6 +21,11 @@ id = "5b85cacbce7d442b8e6aa496986cced7"
 [vars]
 FRONTEND_URL = "https://patigonulluleri.com"
 FIREBASE_PROJECT_ID = "patigonulluleri-1193e"
+WELCOME_FROM = "Pati Gönüllüleri <noreply@patigonulluleri.com>"
+WELCOME_SUBJECT = "Pati Gönüllüleri - Aboneliğinize Hoşgeldiniz"
+WELCOME_HTML = "<p>Hoşgeldiniz! Pati Gönüllüleri e-posta listesine kaydoldunuz.</p>"
+BROADCAST_FROM = "Pati Gönüllüleri <noreply@patigonulluleri.com>"
+ADOPTION_FROM = "Pati Gönüllüleri <noreply@patigonulluleri.com>"
 
 # Secrets (set via: wrangler secret put SECRET_NAME)
 # - RESEND_API_KEY
