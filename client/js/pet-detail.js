@@ -360,15 +360,32 @@ function initContactButtons() {
 }
 
 function handleCallClick() {
+    if (!currentPet || !currentPet.caretaker) {
+        showNotification('Telefon numarası mevcut değil. Lütfen mesaj veya e-posta ile iletişime geçin.', 'info');
+        return;
+    }
+    
     // Get the raw phone number from the pet's caretaker data
-    const rawPhoneNumber = currentPet && currentPet.caretaker && (currentPet.caretaker.phone || currentPet.caretaker.phoneNumber); //
+    const rawPhoneNumber = currentPet.caretaker.phone || currentPet.caretaker.phoneNumber;
     
     if (rawPhoneNumber) {
-        const cleanedPhoneNumber = rawPhoneNumber.replace(/[\s()-]/g, '');
+        // Remove all non-digit characters except the leading +
+        let cleanedPhoneNumber = rawPhoneNumber.toString().trim();
         
-        window.location.href = `tel:${cleanedPhoneNumber}`; 
+        // If it starts with +, keep it and remove other non-digits
+        if (cleanedPhoneNumber.startsWith('+')) {
+            cleanedPhoneNumber = '+' + cleanedPhoneNumber.substring(1).replace(/\D/g, '');
+        } else {
+            // Remove all non-digits
+            cleanedPhoneNumber = cleanedPhoneNumber.replace(/\D/g, '');
+        }
+        
+        // Open the phone dialer with the number
+        window.location.href = `tel:${cleanedPhoneNumber}`;
+        
+        console.log('Call initiated for:', cleanedPhoneNumber);
     } else {
-        showNotification('Telefon numarası mevcut değil. Lütfen mesaj veya e-posta ile iletişime geçin.', 'info'); //
+        showNotification('Telefon numarası mevcut değil. Lütfen mesaj veya e-posta ile iletişime geçin.', 'info');
     }
 }
 
