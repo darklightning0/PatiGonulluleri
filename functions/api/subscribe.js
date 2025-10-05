@@ -71,22 +71,37 @@ export async function onRequestPost(context) {
     }
 
     try {
-      const now = Date.now();
-      await env.DB.prepare(`
-        INSERT INTO subscriptions (email, preferences, unsubscribe_token, confirmed_at, is_active, created_at)
-        VALUES (?, ?, ?, ?, 1, ?)
-        ON CONFLICT(email) DO UPDATE SET is_active = 1, unsubscribe_token = excluded.unsubscribe_token, confirmed_at = excluded.confirmed_at
-      `).bind(email, JSON.stringify({}), unsubscribeToken, now, now).run();
-
-      // Reset rate limit counter on success (only if KV available)
-      if (env.RATE_LIMIT) {
-        const rateLimitKey = `ratelimit:${email}`;
-        await env.RATE_LIMIT.put(rateLimitKey, '0', { expirationTtl: 3600 });
-      }
-    } catch (dbErr) {
-      console.error('DB upsert error in subscribe:', dbErr && dbErr.message ? dbErr.message : dbErr);
-      return jsonResponse({ error: 'Database error while creating subscription' }, 500);
-    }
+  const now = Date.now();
+  
+  console.log('Attempting DB insert for email:', email);
+  console.log('DB binding exists:', !!env.DB);
+  
+  const stmt = env.DB.prepare(`
+    INSERT INTO subscriptions (email, preferences, unsubscribe_token, confirmed_at, is_active, created_at)
+    VALUES (?, ?, ?, ?, 1, ?)
+    ON CONFLICT(email) DO UPDATE SET is_active = 1, unsubscribe_token = excluded.unsubscribe_token, confirmed_at = excluded.confirmed_at
+  `);
+  
+  console.log('Statement prepared, binding values...');
+  const bound = stmt.bind(email, JSON.stringify({}), unsubscribeToken, now, now);
+  
+  console.log('Executing query...');
+  const result = await bound.run();
+  
+  console.log('DB insert successful:', result);
+  
+  // Reset rate limit counter on success
+  if (env.RATE_LIMIT) {
+    const rateLimitKey = `ratelimit:${email}`;
+    await env.RATE_LIMIT.put(rateLimitKey, '0', { expirationTtl: 3600 });
+  }
+} catch (dbErr) {
+  console.error('DB upsert error in subscribe:', dbErr);
+  console.error('Error message:', dbErr.message);
+  console.error('Error stack:', dbErr.stack);
+  console.error('Error details:', JSON.stringify(dbErr, null, 2));
+  return jsonResponse({ error: 'Database error while creating subscription', details: dbErr.message }, 500);
+}
 
     // Send welcome email (non-blocking) - only if API key exists
     if (env.RESEND_API_KEY) {
