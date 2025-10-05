@@ -503,32 +503,51 @@ function handleMessageSubmit(e) {
     e.preventDefault();
     
     const formData = new FormData(e.target);
-    const messageData = {
-        name: formData.get('name'),
-        phone: formData.get('phone'),
-        email: formData.get('email'),
-        message: formData.get('message'),
-        petId: currentPet.id,
-        petName: currentPet.name
-    };
+    const name = formData.get('name');
+    const phone = formData.get('phone');
+    const email = formData.get('email');
+    const message = formData.get('message');
     
-    const submitBtn = e.target.querySelector('.submit-btn');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Gönderiliyor...</span>';
-    submitBtn.disabled = true;
+    // Validate required fields
+    if (!name || !email || !message) {
+        showNotification('Lütfen tüm gerekli alanları doldurun', 'error');
+        return;
+    }
     
-    setTimeout(() => {
-        console.log('Message sent:', messageData);
-        
-        showNotification('Mesajınız gönderildi! En kısa sürede dönüş yapılacaktır.', 'success');
-        
-        closeMessageModal();
-        e.target.reset();
-        
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        
-    }, 2000);
+    // Build email content
+    const subject = `${currentPet.name} Hakkında Bilgi Talebi - ${name}`;
+    const body = `
+Merhaba,
+
+${currentPet.name} hakkında bilgi almak istiyorum.
+
+--- İletişim Bilgileri ---
+Ad Soyad: ${name}
+E-posta: ${email}
+Telefon: ${phone || 'Belirtilmedi'}
+
+--- Mesaj ---
+${message}
+
+---
+Bu mesaj Pati Gönüllüleri web sitesi üzerinden gönderilmiştir.
+Hayvan: ${currentPet.name} (ID: ${currentPet.id})
+    `.trim();
+    
+    // Get caretaker email
+    const caretakerEmail = currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
+    
+    // Create mailto link
+    const mailtoLink = `mailto:${caretakerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Open default email client
+    window.location.href = mailtoLink;
+    
+    // Close modal and reset form
+    closeMessageModal();
+    e.target.reset();
+    
+    showNotification('E-posta uygulamanız açılıyor...', 'success');
 }
 
 function initApplicationForm() {
@@ -550,53 +569,74 @@ function handleApplicationSubmit(e) {
         livingSituation: formData.get('livingSituation'),
         experience: formData.get('experience'),
         notes: formData.get('notes'),
-        agreement: formData.get('agreement') === 'on',
-        petId: currentPet.id,
-        petName: currentPet.name,
-        timestamp: new Date().toISOString()
+        agreement: formData.get('agreement') === 'on'
     };
     
+    // Validate required fields
     if (!applicationData.name || !applicationData.phone || !applicationData.email || 
         !applicationData.livingSituation || !applicationData.experience || !applicationData.agreement) {
         showNotification('Lütfen tüm gerekli alanları doldurun', 'error');
         return;
     }
     
-    const submitBtn = e.target.querySelector('.submit-btn');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Gönderiliyor...</span>';
-    submitBtn.disabled = true;
+    // Get translated values for living situation and experience
+    const livingSituationOptions = {
+        'apartment': 'Apartman dairesi',
+        'house-with-garden': 'Bahçeli ev',
+        'house-no-garden': 'Bahçesiz ev',
+        'farm': 'Çiftlik/Köy evi'
+    };
     
-    // Include caretaker email when available
-    if (currentPet && currentPet.caretaker && currentPet.caretaker.email) {
-        applicationData.caretakerEmail = currentPet.caretaker.email;
-    }
+    const experienceOptions = {
+        'first-time': 'İlk defa hayvan sahipleneceğim',
+        'some-experience': 'Daha önce hayvan besledim',
+        'experienced': 'Çok deneyimliyim'
+    };
+    
+    // Build email content
+    const subject = `Sahiplendirme Başvurusu - ${currentPet.name} - ${applicationData.name}`;
+    const body = `
+Merhaba,
 
-    fetch('/api/adoption', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(applicationData)
-    })
-    .then(async res => {
-        const text = await res.text().catch(() => '');
-        let data = null;
-        try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
-        if (!res.ok) throw new Error((data && (data.error || data.message)) || text || 'Failed to submit');
-        return data;
-    })
-    .then(() => {
-        showNotification('Başvurunuz alındı! Sahiplendirme ekibimiz en kısa sürede sizinle iletişime geçecektir.', 'success');
-        e.target.reset();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    })
-    .catch(err => {
-        console.error('Application submit error:', err);
-        showNotification('Başvuru gönderilemedi. Lütfen daha sonra tekrar deneyin.', 'error');
-    })
-    .finally(() => {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    });
+${currentPet.name} için sahiplendirme başvurusu yapmak istiyorum.
+
+--- Başvuru Sahibi Bilgileri ---
+Ad Soyad: ${applicationData.name}
+Telefon: ${applicationData.phone}
+E-posta: ${applicationData.email}
+
+--- Yaşam Durumu ---
+Konut Tipi: ${livingSituationOptions[applicationData.livingSituation] || applicationData.livingSituation}
+Deneyim: ${experienceOptions[applicationData.experience] || applicationData.experience}
+
+--- Ek Notlar ---
+${applicationData.notes || 'Ek not bulunmamaktadır.'}
+
+--- Onay ---
+✓ Sahiplendirme koşullarını kabul ediyorum
+
+---
+Bu başvuru Pati Gönüllüleri web sitesi üzerinden gönderilmiştir.
+Hayvan: ${currentPet.name}
+ID: ${currentPet.id}
+Tarih: ${new Date().toLocaleDateString('tr-TR')}
+    `.trim();
+    
+    // Get caretaker email
+    const caretakerEmail = currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
+    
+    // Create mailto link
+    const mailtoLink = `mailto:${caretakerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Open default email client
+    window.location.href = mailtoLink;
+    
+    // Reset form and show notification
+    e.target.reset();
+    showNotification('E-posta uygulamanız açılıyor...', 'success');
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function initShareButton() {
