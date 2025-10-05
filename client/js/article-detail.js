@@ -55,7 +55,7 @@ class ArticleDetailManager {
 
         try {
 
-            const article = await CachedPetsService.getById(articleId);
+            const article = await CachedArticlesService.getById(articleId);
             
             if (article) {
                 setTimeout(() => this.loadArticle(article), 500);
