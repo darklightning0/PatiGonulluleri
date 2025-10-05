@@ -333,5 +333,36 @@ export const CachedArticlesService = {
     const data = await ArticlesService.getAll();
     cache.set(cacheKey, data);
     return data;
+  },
+
+  async getById(articleId) {
+    const cacheKey = `article_${articleId}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return cached;
+
+    const data = await ArticlesService.getById(articleId);
+    if (data) cache.set(cacheKey, data);
+    return data;
+  },
+
+  async getBySlug(slug) {
+    const cacheKey = `article_slug_${slug}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return cached;
+
+    const data = await ArticlesService.getBySlug(slug);
+    if (data) cache.set(cacheKey, data);
+    return data;
+  },
+
+  async filterByCategory(categoryTr) {
+    const cacheKey = `articles_category_${categoryTr}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return cached;
+
+    const data = await ArticlesService.filterByCategory(categoryTr);
+    cache.set(cacheKey, data);
+    return data;
   }
+
 };

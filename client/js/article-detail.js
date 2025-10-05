@@ -2,7 +2,7 @@
  * Article Detail Page JavaScript - Firebase Version
  */
 
-import { CachedArticlesService, CachedPetsService } from './firebase-data-service.js';
+import { CachedArticlesService } from './firebase-data-service.js';
 
 class ArticleDetailManager {
     constructor() {
