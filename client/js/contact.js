@@ -757,22 +757,36 @@ function handleNewsletterSubmit(e) {
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-  setTimeout(() => {
-    const newsletterData = {
-      email: email,
-      timestamp: new Date().toISOString(),
-      type: 'newsletter_signup'
-    };
+  // POST to /api/subscribe - only send email (no preferences)
+  fetch('/api/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  })
+  .then(async (response) => {
+    const text = await response.text().catch(() => '');
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch (err) { data = null; }
 
-    console.log('Newsletter signup:', newsletterData);
+    if (!response.ok) {
+      const message = (data && (data.error || data.message)) || text || 'Subscription failed';
+      throw new Error(message);
+    }
+
     showNotification(getCurrentLanguage() === 'tr' ?
       'E-posta listemize başarıyla kaydoldunuz!' :
       'Successfully subscribed to our email list!', 'success');
     e.target.reset();
+    trackFormSubmission('newsletter', { email, timestamp: new Date().toISOString() });
+  })
+  .catch(err => {
+    console.error('Newsletter subscribe error', err);
+    showNotification(err.message || 'Subscription failed', 'error');
+  })
+  .finally(() => {
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalHTML;
-    trackFormSubmission('newsletter', newsletterData);
-  }, 1500);
+  });
 }
 
 // ===================

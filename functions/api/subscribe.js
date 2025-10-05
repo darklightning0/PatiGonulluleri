@@ -38,7 +38,8 @@ export async function onRequestPost(context) {
 
     const rateLimitKey = `ratelimit:${email}`;
     const emailAttempts = await env.RATE_LIMIT.get(rateLimitKey);
-    if (emailAttempts && parseInt(emailAttempts) >= 3) {
+    // Allow up to 6 attempts per hour for normal signups (less aggressive)
+    if (emailAttempts && parseInt(emailAttempts) >= 6) {
       return jsonResponse({ error: 'Too many attempts. Please try again in an hour.' }, 429);
     }
 
@@ -50,7 +51,9 @@ export async function onRequestPost(context) {
       VALUES (?, ?, ?, 1, ?)
       ON CONFLICT(email) DO UPDATE SET is_active = 1, unsubscribe_token = excluded.unsubscribe_token
     `).bind(email, JSON.stringify({}), unsubscribeToken, Date.now()).run();
-    await env.RATE_LIMIT.put(rateLimitKey, (parseInt(emailAttempts || '0') + 1).toString(), { expirationTtl: 3600 });
+
+    // Reset the per-email attempt counter on successful subscription so a retry doesn't permanently block
+    await env.RATE_LIMIT.put(rateLimitKey, '0', { expirationTtl: 3600 });
 
   // Send a welcome email (non-blocking)
   sendWelcomeEmail(env, email).catch(err => console.error('sendWelcomeEmail error:', err));
