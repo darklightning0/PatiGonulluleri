@@ -1,74 +1,65 @@
-// functions/api/subscribe.js
-// Cloudflare Pages Function for subscription
+// Clean Cloudflare Pages Function for subscription
+
+// Handles OPTIONS preflight and POST requests. Always returns JSON for both
+// success and error responses and includes CORS headers so the frontend
+// can safely parse error bodies.
+
+export async function onRequest(context) {
+  const { request } = context;
+
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
+    });
+  }
+
+  if (request.method !== 'POST') {
+    return jsonResponse({ error: 'Method Not Allowed' }, 405);
+  }
+
+  return onRequestPost(context);
+}
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  
+
   try {
     const data = await request.json();
-    const { email, animalType, size, age } = data;
+    const { email, animalType, size, age } = data || {};
 
-    // Validate email
-    if (!isValidEmail(email)) {
-      return new Response(JSON.stringify({ error: 'Invalid email' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+    if (!email || !isValidEmail(email)) {
+      return jsonResponse({ error: 'Invalid email' }, 400);
     }
 
-    // Rate limiting check
-    const ip = request.headers.get('CF-Connecting-IP');
     const rateLimitKey = `ratelimit:${email}`;
-    const ipKey = `ip:${ip}`;
-    
-    // Check email rate limit (3 per hour)
     const emailAttempts = await env.RATE_LIMIT.get(rateLimitKey);
     if (emailAttempts && parseInt(emailAttempts) >= 3) {
-      return new Response(JSON.stringify({ 
-        error: 'Too many attempts. Please try again in an hour.' 
-      }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return jsonResponse({ error: 'Too many attempts. Please try again in an hour.' }, 429);
     }
 
-    // Generate confirmation token
     const token = crypto.randomUUID();
-    const expiresAt = Date.now() + (24 * 60 * 60 * 1000);
+    const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
 
-    // Store pending subscription in D1
     await env.DB.prepare(`
       INSERT INTO pending_subscriptions (email, token, preferences, expires_at, created_at)
       VALUES (?, ?, ?, ?, ?)
-    `).bind(
-      email,
-      token,
-      JSON.stringify({ animalType, size, age }),
-      expiresAt,
-      Date.now()
-    ).run();
+    `).bind(email, token, JSON.stringify({ animalType, size, age }), expiresAt, Date.now()).run();
 
-    // Update rate limit
-    await env.RATE_LIMIT.put(rateLimitKey, (parseInt(emailAttempts || '0') + 1).toString(), {
-      expirationTtl: 3600
-    });
+    await env.RATE_LIMIT.put(rateLimitKey, (parseInt(emailAttempts || '0') + 1).toString(), { expirationTtl: 3600 });
 
-    // Send confirmation email
-    await sendConfirmationEmail(env, email, token);
+    // Send email but don't block the response if the mail provider is slow
+    sendConfirmationEmail(env, email, token).catch(err => console.error('sendConfirmationEmail error:', err));
 
-    return new Response(JSON.stringify({ 
-      message: 'Confirmation email sent. Please check your inbox.' 
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return jsonResponse({ message: 'Confirmation email sent. Please check your inbox.' }, 200);
 
-  } catch (error) {
-    console.error('Subscription error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+  } catch (err) {
+    console.error('Subscription handler error:', err);
+    return jsonResponse({ error: 'Internal server error' }, 500);
   }
 }
 
@@ -76,9 +67,19 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function jsonResponse(payload, status = 200) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  });
+}
+
 async function sendConfirmationEmail(env, email, token) {
   const confirmUrl = `${env.FRONTEND_URL}/api/confirm?token=${token}`;
-  
+
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -92,12 +93,8 @@ async function sendConfirmationEmail(env, email, token) {
       html: `
         <h2>Hoş Geldiniz!</h2>
         <p>Aboneliğinizi onaylamak için tıklayın:</p>
-        <a href="${confirmUrl}" style="display: inline-block; padding: 12px 24px; background-color: #E98532; color: white; text-decoration: none; border-radius: 8px;">
-          Aboneliği Onayla
-        </a>
-        <p style="margin-top: 20px; color: #666; font-size: 14px;">
-          Bu linkin geçerlilik süresi 24 saattir.
-        </p>
+        <a href="${confirmUrl}" style="display: inline-block; padding: 12px 24px; background-color: #E98532; color: white; text-decoration: none; border-radius: 8px;">Aboneliği Onayla</a>
+        <p style="margin-top:20px; color:#666; font-size:14px;">Bu linkin geçerlilik süresi 24 saattir.</p>
       `
     })
   });
