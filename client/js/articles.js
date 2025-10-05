@@ -552,6 +552,9 @@ function handleNewsletterSubmit(e) {
     const email = formData.get('email');
     const consent = formData.get('consent');
     
+    console.log('Article form - email:', email); // Debug log
+    console.log('Article form - consent:', consent); // Debug log
+    
     if (!email || !isValidEmail(email)) {
         showNotification('Lütfen geçerli bir e-posta adresi giriniz.', 'error');
         return;
@@ -574,6 +577,7 @@ function handleNewsletterSubmit(e) {
     })
     .then(async res => {
         const text = await res.text().catch(() => '');
+        console.log('Response text:', text); // Debug log
         let data = null;
         try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
         if (!res.ok) throw new Error((data && (data.error || data.message)) || text || 'Subscription failed');
