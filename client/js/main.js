@@ -269,9 +269,13 @@ function handleNewsletterSubmit(e) {
     })
     .then(data => {
         showSuccessMessage(currentLanguage === 'tr' ? 
-            'Onay e-postası gönderildi! Lütfen e-postanızı kontrol edin.' : 
-            'Confirmation email sent! Please check your inbox.');
+            'E-posta listemize başarıyla kayıt oldunuz! Teşekkürler.' : 
+            'You have been subscribed to our mailing list. Thank you.');
         form.reset();
+
+        // Additional UX: briefly disable the submit button to avoid accidental duplicate clicks
+        submitBtn.disabled = true;
+        setTimeout(() => { submitBtn.disabled = false; }, 3000);
     })
     .catch(error => {
         console.error('Subscription error:', error);

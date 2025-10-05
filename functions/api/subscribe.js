@@ -46,14 +46,21 @@ export async function onRequestPost(context) {
     const unsubscribeToken = crypto.randomUUID();
 
     // Upsert into subscriptions table - if email exists and is inactive, reactivate
-    await env.DB.prepare(`
-      INSERT INTO subscriptions (email, preferences, unsubscribe_token, is_active, created_at)
-      VALUES (?, ?, ?, 1, ?)
-      ON CONFLICT(email) DO UPDATE SET is_active = 1, unsubscribe_token = excluded.unsubscribe_token
-    `).bind(email, JSON.stringify({}), unsubscribeToken, Date.now()).run();
+    try {
+      // confirmed_at is required by the DB schema; set to now
+      const now = Date.now();
+      await env.DB.prepare(`
+        INSERT INTO subscriptions (email, preferences, unsubscribe_token, confirmed_at, is_active, created_at)
+        VALUES (?, ?, ?, ?, 1, ?)
+        ON CONFLICT(email) DO UPDATE SET is_active = 1, unsubscribe_token = excluded.unsubscribe_token, confirmed_at = excluded.confirmed_at
+      `).bind(email, JSON.stringify({}), unsubscribeToken, now, now).run();
 
-    // Reset the per-email attempt counter on successful subscription so a retry doesn't permanently block
-    await env.RATE_LIMIT.put(rateLimitKey, '0', { expirationTtl: 3600 });
+      // Reset the per-email attempt counter on successful subscription so a retry doesn't permanently block
+      await env.RATE_LIMIT.put(rateLimitKey, '0', { expirationTtl: 3600 });
+    } catch (dbErr) {
+      console.error('DB upsert error in subscribe:', dbErr && dbErr.message ? dbErr.message : dbErr);
+      return jsonResponse({ error: 'Database error while creating subscription' }, 502);
+    }
 
   // Send a welcome email (non-blocking)
   sendWelcomeEmail(env, email).catch(err => console.error('sendWelcomeEmail error:', err));
