@@ -79,23 +79,44 @@ function jsonResponse(payload, status = 200) {
 
 async function sendConfirmationEmail(env, email, token) {
   const confirmUrl = `${env.FRONTEND_URL}/api/confirm?token=${token}`;
+  console.log('sendConfirmationEmail: sending to', email);
 
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      from: 'Pati Gönüllüleri <noreply@patigonulluleri.com>',
-      to: email,
-      subject: 'Aboneliğinizi Onaylayın',
-      html: `
-        <h2>Hoş Geldiniz!</h2>
-        <p>Aboneliğinizi onaylamak için tıklayın:</p>
-        <a href="${confirmUrl}" style="display: inline-block; padding: 12px 24px; background-color: #E98532; color: white; text-decoration: none; border-radius: 8px;">Aboneliği Onayla</a>
-        <p style="margin-top:20px; color:#666; font-size:14px;">Bu linkin geçerlilik süresi 24 saattir.</p>
-      `
-    })
-  });
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'Pati Gönüllüleri <noreply@patigonulluleri.com>',
+        to: email,
+        subject: 'Aboneliğinizi Onaylayın',
+        html: `
+          <h2>Hoş Geldiniz!</h2>
+          <p>Aboneliğinizi onaylamak için tıklayın:</p>
+          <a href="${confirmUrl}" style="display: inline-block; padding: 12px 24px; background-color: #E98532; color: white; text-decoration: none; border-radius: 8px;">Aboneliği Onayla</a>
+          <p style="margin-top:20px; color:#666; font-size:14px;">Bu linkin geçerlilik süresi 24 saattir.</p>
+        `
+      })
+    });
+
+    let text;
+    try {
+      text = await res.text();
+    } catch (e) {
+      text = '<no body>';
+    }
+
+    if (!res.ok) {
+      console.error('Resend API error', res.status, text);
+    } else {
+      // Log the response body (might be JSON)
+      console.log('Resend API success', res.status, text);
+    }
+    return { ok: res.ok, status: res.status, body: text };
+  } catch (err) {
+    console.error('sendConfirmationEmail fetch failed', err);
+    throw err;
+  }
 }

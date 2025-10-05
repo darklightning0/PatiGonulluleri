@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS pending_subscriptions (
     created_at INTEGER NOT NULL
 );
 
-CREATE INDEX idx_pending_token ON pending_subscriptions(token);
-CREATE INDEX idx_pending_expires ON pending_subscriptions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_pending_token ON pending_subscriptions(token);
+CREATE INDEX IF NOT EXISTS idx_pending_expires ON pending_subscriptions(expires_at);
 
 -- Active subscriptions
 CREATE TABLE IF NOT EXISTS subscriptions (
@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     created_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
 );
 
-CREATE INDEX idx_subscriptions_email ON subscriptions(email);
-CREATE INDEX idx_subscriptions_active ON subscriptions(is_active);
-CREATE INDEX idx_subscriptions_unsubscribe ON subscriptions(unsubscribe_token);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_email ON subscriptions(email);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_active ON subscriptions(is_active);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_unsubscribe ON subscriptions(unsubscribe_token);
 
 -- Pets table (extended from your existing data)
 CREATE TABLE IF NOT EXISTS pets (
@@ -49,9 +49,9 @@ CREATE TABLE IF NOT EXISTS pets (
     created_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
 );
 
-CREATE INDEX idx_pets_date_added ON pets(date_added);
-CREATE INDEX idx_pets_notification ON pets(notification_sent);
-CREATE INDEX idx_pets_type ON pets(type);
+CREATE INDEX IF NOT EXISTS idx_pets_date_added ON pets(date_added);
+CREATE INDEX IF NOT EXISTS idx_pets_notification ON pets(notification_sent);
+CREATE INDEX IF NOT EXISTS idx_pets_type ON pets(type);
 
 -- Article subscriptions (for future use)
 CREATE TABLE IF NOT EXISTS article_subscriptions (
@@ -76,8 +76,8 @@ CREATE TABLE IF NOT EXISTS email_log (
     sent_at INTEGER NOT NULL
 );
 
-CREATE INDEX idx_email_log_recipient ON email_log(recipient);
-CREATE INDEX idx_email_log_sent_at ON email_log(sent_at);
+CREATE INDEX IF NOT EXISTS idx_email_log_recipient ON email_log(recipient);
+CREATE INDEX IF NOT EXISTS idx_email_log_sent_at ON email_log(sent_at);
 
 -- Rate limiting table (prevent abuse)
 CREATE TABLE IF NOT EXISTS rate_limits (
@@ -87,4 +87,4 @@ CREATE TABLE IF NOT EXISTS rate_limits (
     blocked_until INTEGER
 );
 
-CREATE INDEX idx_rate_limits_blocked ON rate_limits(blocked_until);
+CREATE INDEX IF NOT EXISTS idx_rate_limits_blocked ON rate_limits(blocked_until);
