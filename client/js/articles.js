@@ -306,10 +306,16 @@ function loadFeaturedArticles() {
         
         const cards = container.querySelectorAll('.featured-article-card');
         cards.forEach(card => {
-            card.addEventListener('click', () => {
+            card.style.cursor = 'pointer'; // Add visual feedback
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
                 const articleId = card.dataset.articleId;
+                console.log('Featured card clicked, article ID:', articleId);
                 if (articleId) {
-                    openArticle(articleId);
+                    console.log('Navigating to article-detail.html?id=' + articleId);
+                    window.location.href = `article-detail.html?id=${articleId}`;
+                } else {
+                    console.error('No article ID found on card');
                 }
             });
         });
@@ -585,23 +591,6 @@ function handleNewsletterSubmit(e) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
     }, 2000);
-}
-
-function openArticle(articleId) {
-    try {
-        const article = allArticles.find(a => a.id === parseInt(articleId));
-        
-        if (article) {
-            const currentLang = getCurrentLanguage();
-            const title = (article.title && article.title[currentLang]) ? article.title[currentLang] : 'Makale';
-            
-            console.log('Opening article:', title);
-            window.location.href = `article-detail.html?id=${articleId}`;
-        }
-    } catch (error) {
-        console.error('Error opening article:', error);
-        showNotification('Makale açılırken hata oluştu.', 'error');
-    }
 }
 
 function getCurrentLanguage() {
