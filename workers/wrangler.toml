@@ -9,7 +9,3 @@ crons = ["0 * * * *"]
 FIREBASE_PROJECT_ID = "patigonulluleri-1193e"
 FRONTEND_URL = "https://patigonulluleri.com"
 
-[[d1_databases]]
-binding = "DB"
-database_name = "pago-subscriptions"
-database_id = "e8e77fa4-7875-4ca9-bb70-685d6371f2d0"
