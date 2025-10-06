@@ -57,20 +57,27 @@ export async function onRequestPost(context) {
     }
 
     // Check if Resend API is configured
-    if (!env.RESEND_API_KEY || !env.RESEND_AUDIENCE_ID) {
-      console.error('Resend API configuration missing');
-      return jsonResponse({ error: 'Service not configured' }, 500);
-    }
+    if (!env.RESEND_API_KEY) {
+  console.error('RESEND_API_KEY is missing');
+  return jsonResponse({ error: 'Service not configured: Missing API key' }, 500);
+}
+if (!env.RESEND_AUDIENCE_ID) {
+  console.error('RESEND_AUDIENCE_ID is missing');
+  return jsonResponse({ error: 'Service not configured: Missing Audience ID' }, 500);
+}
 
     try {
       // Check if contact already exists in Resend Audience
-      const getContactRes = await fetch(`https://api.resend.com/audiences/${env.RESEND_AUDIENCE_ID}/contacts`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const getContactRes = await fetch(
+  `https://api.resend.com/audiences/${env.RESEND_AUDIENCE_ID}/contacts?limit=100`, 
+  {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    }
+  }
+);
 
       let existingContact = null;
       if (getContactRes.ok) {
@@ -100,10 +107,15 @@ export async function onRequestPost(context) {
           });
 
           if (!updateRes.ok) {
-            const errorText = await updateRes.text().catch(() => '<no-body>');
-            console.error('Failed to resubscribe contact:', updateRes.status, errorText);
-            return jsonResponse({ error: 'Failed to update subscription' }, 500);
-          }
+  const errorText = await updateRes.text().catch(() => '<no-body>');
+  console.error('Failed to resubscribe contact:', updateRes.status, errorText);
+  // MORE DETAILED ERROR
+  return jsonResponse({ 
+    error: 'Failed to update subscription', 
+    details: errorText,
+    status: updateRes.status 
+  }, 500);
+}
 
           console.log('Reactivated subscription for:', email);
         }
@@ -121,11 +133,16 @@ export async function onRequestPost(context) {
           })
         });
 
-        if (!createRes.ok) {
-          const errorText = await createRes.text().catch(() => '<no-body>');
-          console.error('Failed to create contact:', createRes.status, errorText);
-          return jsonResponse({ error: 'Failed to create subscription' }, 500);
-        }
+if (!createRes.ok) {
+  const errorText = await createRes.text().catch(() => '<no-body>');
+  console.error('Failed to create contact:', createRes.status, errorText);
+  // MORE DETAILED ERROR
+  return jsonResponse({ 
+    error: 'Failed to create subscription', 
+    details: errorText,
+    status: createRes.status 
+  }, 500);
+}
 
         console.log('Created new subscription for:', email);
       }
@@ -137,9 +154,16 @@ export async function onRequestPost(context) {
       }
 
     } catch (apiErr) {
-      console.error('Resend API error in subscribe:', apiErr);
-      return jsonResponse({ error: 'Service error while creating subscription' }, 500);
-    }
+  console.error('Resend API error in subscribe:', {
+    message: apiErr.message,
+    stack: apiErr.stack,
+    email: email
+  });
+  return jsonResponse({ 
+    error: 'Service error while creating subscription',
+    message: apiErr.message 
+  }, 500);
+}
 
     // Send welcome email (non-blocking)
     sendWelcomeEmail(env, email).catch(err => console.error('sendWelcomeEmail error:', err));
