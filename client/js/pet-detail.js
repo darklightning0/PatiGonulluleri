@@ -356,7 +356,6 @@ function initContactButtons() {
         messageBtn.addEventListener('click', handleMessageClick);
     }
     
-    // response time element is static; no event handlers needed
 }
 
 function handleCallClick() {

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abonelikten Çıkış - Pati Gönüllüleri</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .unsubscribe-section {
+            min-height: calc(100vh - 200px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 20px 80px;
+            background: linear-gradient(135deg, var(--cream-bg) 0%, var(--light-cream) 100%);
+        }
+
+        .unsubscribe-container {
+            max-width: 600px;
+            width: 100%;
+            background-color: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 60px 40px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .unsubscribe-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--sage-green), var(--dark-sage));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 36px;
+            color: var(--white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .unsubscribe-container h1 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-brown);
+            margin-bottom: 20px;
+        }
+
+        .unsubscribe-container p {
+            color: var(--medium-gray);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .unsubscribe-message {
+            background-color: var(--light-cream);
+            border-left: 4px solid var(--sage-green);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .unsubscribe-message p {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .action-buttons .btn {
+            min-width: 180px;
+        }
+
+        @media (max-width: 480px) {
+            .unsubscribe-container {
+                padding: 40px 25px;
+            }
+
+            .unsubscribe-container h1 {
+                font-size: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="nav-wrapper">
+                <!-- Logo -->
+                <a href="index.html" class="logo">
+                    <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                    <span class="logo-text">Pati Gönüllüleri</span>
+                </a>
+
+                <!-- Navigation -->
+                <nav class="nav" role="navigation">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link" data-tr="Anasayfa" data-en="Home">Anasayfa</a></li>
+                        <li><a href="about.html" class="nav-link" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="adopt.html" class="nav-link" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="articles.html" class="nav-link" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="contact.html" class="nav-link" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                    
+                    <!-- Language Toggle -->
+                    <div class="language-toggle">
+                        <button class="lang-btn active" data-lang="tr">TR</button>
+                        <button class="lang-btn" data-lang="en">EN</button>
+                    </div>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" aria-label="Toggle mobile menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Unsubscribe Section -->
+    <main>
+        <section class="unsubscribe-section">
+            <div class="unsubscribe-container">
+                <div class="unsubscribe-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                
+                <h1 data-tr="Abonelikten Çıkış Başarılı" data-en="Successfully Unsubscribed">
+                    Abonelikten Çıkış Başarılı
+                </h1>
+                
+                <p data-tr="E-posta listemizden başarıyla çıkarıldınız." data-en="You have been successfully removed from our email list.">
+                    E-posta listemizden başarıyla çıkarıldınız.
+                </p>
+
+                <div class="unsubscribe-message">
+                    <p data-tr="Artık bizden e-posta bildirimleri almayacaksınız. Bizi tercih ettiğiniz için teşekkür ederiz. Sokak hayvanlarına yardım etmek için hala birlikte çalışabiliriz!" data-en="You will no longer receive email notifications from us. Thank you for choosing us. We can still work together to help street animals!">
+                        Artık bizden e-posta bildirimleri almayacaksınız. Bizi tercih ettiğiniz için teşekkür ederiz. Sokak hayvanlarına yardım etmek için hala birlikte çalışabiliriz!
+                    </p>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="index.html" class="btn btn-primary" data-tr="Ana Sayfaya Dön" data-en="Back to Home">
+                        <i class="fas fa-home"></i>
+                        Ana Sayfaya Dön
+                    </a>
+                    <a href="adopt.html" class="btn btn-secondary" data-tr="Hayvanları Gör" data-en="View Animals">
+                        <i class="fas fa-paw"></i>
+                        Hayvanları Gör
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section footer-brand">
+                    <div class="logo">
+                        <img src="assets/logo.png" alt="Pati Gönüllüleri Logo" class="logo-img">
+                    </div>
+                    <p class="footer-description" data-tr="Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş." data-en="A volunteer organization working to ensure every animal finds a loving home.">
+                        Her hayvanın sevgi dolu bir yuva bulması için çalışan gönüllü bir kuruluş.
+                    </p>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.instagram.com/pago_35" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Hızlı Bağlantılar" data-en="Quick Links">Hızlı Bağlantılar</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html" data-tr="Hakkımızda" data-en="About Us">Hakkımızda</a></li>
+                        <li><a href="adopt.html" data-tr="Sahiplen" data-en="Adopt">Sahiplen</a></li>
+                        <li><a href="articles.html" data-tr="Makaleler" data-en="Articles">Makaleler</a></li>
+                        <li><a href="contact.html" data-tr="İletişim" data-en="Contact">İletişim</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="İletişim" data-en="Contact">İletişim</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> iletisim@patigonulluleri.com</p>
+                        <p><i class="fas fa-map-marker-alt"></i> İzmir, Türkiye</p>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 data-tr="Yasal" data-en="Legal">Yasal</h4>
+                    <ul class="footer-links">
+                        <li><a href="gizlilik.html" data-tr="Gizlilik Sözleşmesi" data-en="Privacy Policy">Gizlilik Sözleşmesi</a></li>
+                        <li><a href="kullanim.html" data-tr="Kullanım Koşulları" data-en="Terms of Use">Kullanım Koşulları</a></li>
+                        <li><a href="kvkk.html" data-tr="KVKK Aydınlatma Metni" data-en="KVKK Disclosure Text">KVKK Aydınlatma Metni</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p data-tr="© 2025 Pati Gönüllüleri. Tüm hakları saklıdır." data-en="© 2025 Pati Volunteers. All rights reserved.">&copy; 2025 Pati Gönüllüleri. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for mobile menu and language toggle -->
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const nav = document.querySelector('.nav');
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenuBtn.classList.toggle('active');
+                nav.classList.toggle('active');
+            });
+        }
+
+        // Language toggle
+        const langBtns = document.querySelectorAll('.lang-btn');
+        const currentLang = localStorage.getItem('language') || 'tr';
+
+        // Set active language button
+        langBtns.forEach(btn => {
+            if (btn.dataset.lang === currentLang) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // Update text content based on language
+        function updateLanguage(lang) {
+            document.querySelectorAll('[data-tr][data-en]').forEach(element => {
+                element.textContent = element.dataset[lang];
+            });
+        }
+
+        updateLanguage(currentLang);
+
+        langBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.dataset.lang;
+                langBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                localStorage.setItem('language', lang);
+                updateLanguage(lang);
+            });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
