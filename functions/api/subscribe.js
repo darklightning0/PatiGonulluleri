@@ -1,14 +1,9 @@
-// Clean Cloudflare Pages Function for subscription
-
-// Handles OPTIONS preflight and POST requests. Always returns JSON for both
-// success and error responses and includes CORS headers so the frontend
-// can safely parse error bodies.
+// Clean Cloudflare Pages Function for subscription using Resend Audience API
+// Required env vars: RESEND_API_KEY, RESEND_AUDIENCE_ID
 
 export async function onRequest(context) {
   const { request } = context;
 
-  // Top-level guard: ensure any unexpected error returns JSON and is logged,
-  // rather than letting Cloudflare return an HTML 502 page which the client can't parse.
   try {
     console.log('subscribe.onRequest - method=', request.method);
 
@@ -30,7 +25,6 @@ export async function onRequest(context) {
     return await onRequestPost(context);
   } catch (err) {
     console.error('subscribe.onRequest unexpected error:', err && (err.stack || err.message) || err);
-    // Return JSON so the frontend can handle and show a proper message
     return jsonResponse({ error: 'Internal server error' }, 500);
   }
 }
@@ -53,7 +47,7 @@ export async function onRequestPost(context) {
       return jsonResponse({ error: 'Invalid email' }, 400);
     }
 
-    // Check if KV is available before using it
+    // Check if KV is available for rate limiting
     if (env.RATE_LIMIT) {
       const rateLimitKey = `ratelimit:${email}`;
       const emailAttempts = await env.RATE_LIMIT.get(rateLimitKey);
@@ -62,62 +56,93 @@ export async function onRequestPost(context) {
       }
     }
 
-    const unsubscribeToken = crypto.randomUUID();
-
-    // Check if DB is available
-    if (!env.DB) {
-      console.error('DB binding not found');
-      return jsonResponse({ error: 'Database not configured' }, 500);
+    // Check if Resend API is configured
+    if (!env.RESEND_API_KEY || !env.RESEND_AUDIENCE_ID) {
+      console.error('Resend API configuration missing');
+      return jsonResponse({ error: 'Service not configured' }, 500);
     }
 
     try {
-  const now = Date.now();
-  
-  // Check if email already exists and is active
-  const existing = await env.DB.prepare(
-    'SELECT id, is_active FROM subscriptions WHERE email = ?'
-  ).bind(email).first();
+      // Check if contact already exists in Resend Audience
+      const getContactRes = await fetch(`https://api.resend.com/audiences/${env.RESEND_AUDIENCE_ID}/contacts`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
-  if (existing && existing.is_active === 1) {
-    console.log('Email already subscribed:', email);
-    return jsonResponse({ 
-      message: 'Bu e-posta adresi zaten kayıtlı. Teşekkürler!',
-      alreadySubscribed: true 
-    }, 200);
-  }
+      let existingContact = null;
+      if (getContactRes.ok) {
+        const contactsData = await getContactRes.json();
+        existingContact = (contactsData.data || []).find(c => c.email === email);
+      }
 
-  if (existing && existing.is_active === 0) {
-    // Reactivate inactive subscription
-    await env.DB.prepare(
-      'UPDATE subscriptions SET is_active = 1, unsubscribe_token = ?, confirmed_at = ? WHERE email = ?'
-    ).bind(unsubscribeToken, now, email).run();
-    
-    console.log('Reactivated subscription for:', email);
-  } else {
-    // Insert new subscription
-    await env.DB.prepare(
-      'INSERT INTO subscriptions (email, preferences, unsubscribe_token, confirmed_at, is_active, created_at) VALUES (?, ?, ?, ?, 1, ?)'
-    ).bind(email, JSON.stringify({}), unsubscribeToken, now, now).run();
-    
-    console.log('Created new subscription for:', email);
-  }
+      if (existingContact) {
+        // Contact exists - check if unsubscribed
+        if (!existingContact.unsubscribed) {
+          console.log('Email already subscribed:', email);
+          return jsonResponse({ 
+            message: 'Bu e-posta adresi zaten kayıtlı. Teşekkürler!',
+            alreadySubscribed: true 
+          }, 200);
+        } else {
+          // Resubscribe the contact
+          const updateRes = await fetch(`https://api.resend.com/audiences/${env.RESEND_AUDIENCE_ID}/contacts/${existingContact.id}`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              unsubscribed: false
+            })
+          });
 
-  // Reset rate limit counter
-  if (env.RATE_LIMIT) {
-    const rateLimitKey = `ratelimit:${email}`;
-    await env.RATE_LIMIT.put(rateLimitKey, '0', { expirationTtl: 3600 });
-  }
-} catch (dbErr) {
-  console.error('DB error in subscribe:', dbErr);
-  return jsonResponse({ error: 'Database error while creating subscription' }, 500);
-}
+          if (!updateRes.ok) {
+            const errorText = await updateRes.text().catch(() => '<no-body>');
+            console.error('Failed to resubscribe contact:', updateRes.status, errorText);
+            return jsonResponse({ error: 'Failed to update subscription' }, 500);
+          }
 
-    // Send welcome email (non-blocking) - only if API key exists
-    if (env.RESEND_API_KEY) {
-      sendWelcomeEmail(env, email).catch(err => console.error('sendWelcomeEmail error:', err));
-    } else {
-      console.warn('RESEND_API_KEY not configured, skipping welcome email');
+          console.log('Reactivated subscription for:', email);
+        }
+      } else {
+        // Create new contact
+        const createRes = await fetch(`https://api.resend.com/audiences/${env.RESEND_AUDIENCE_ID}/contacts`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: email,
+            unsubscribed: false
+          })
+        });
+
+        if (!createRes.ok) {
+          const errorText = await createRes.text().catch(() => '<no-body>');
+          console.error('Failed to create contact:', createRes.status, errorText);
+          return jsonResponse({ error: 'Failed to create subscription' }, 500);
+        }
+
+        console.log('Created new subscription for:', email);
+      }
+
+      // Reset rate limit counter
+      if (env.RATE_LIMIT) {
+        const rateLimitKey = `ratelimit:${email}`;
+        await env.RATE_LIMIT.put(rateLimitKey, '0', { expirationTtl: 3600 });
+      }
+
+    } catch (apiErr) {
+      console.error('Resend API error in subscribe:', apiErr);
+      return jsonResponse({ error: 'Service error while creating subscription' }, 500);
     }
+
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail(env, email).catch(err => console.error('sendWelcomeEmail error:', err));
 
     return jsonResponse({ message: 'Subscribed successfully.' }, 200);
 
@@ -139,12 +164,6 @@ function jsonResponse(payload, status = 200) {
       'Access-Control-Allow-Origin': '*'
     }
   });
-}
-
-async function sendConfirmationEmail(env, email, token) {
-  // Deprecated: confirmation flow. Keep function as informational fallback.
-  console.log('sendConfirmationEmail called but confirmation flow is deprecated for this project');
-  return { ok: true };
 }
 
 async function sendWelcomeEmail(env, email) {

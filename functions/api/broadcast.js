@@ -1,5 +1,6 @@
-// Admin broadcast endpoint - sends an email to all active subscribers in D1
+// Admin broadcast endpoint - sends an email to all active subscribers using Resend Audience API
 // Protect this endpoint by setting ADMIN_SECRET in environment variables.
+// Required env vars: ADMIN_SECRET, RESEND_API_KEY, RESEND_AUDIENCE_ID
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -25,10 +26,31 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ error: 'Missing subject or content' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
+  if (!env.RESEND_API_KEY || !env.RESEND_AUDIENCE_ID) {
+    return new Response(JSON.stringify({ error: 'Resend API configuration missing' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+  }
+
   try {
-    // Fetch active subscribers from D1
-    const rows = await env.DB.prepare('SELECT email FROM subscriptions WHERE is_active = 1').all();
-    const emails = (rows && rows.results) ? rows.results.map(r => r.email) : [];
+    // Fetch all contacts from Resend Audience API
+    const contactsRes = await fetch(`https://api.resend.com/audiences/${env.RESEND_AUDIENCE_ID}/contacts`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!contactsRes.ok) {
+      const errorText = await contactsRes.text().catch(() => '<no-body>');
+      console.error('Failed to fetch contacts from Resend:', contactsRes.status, errorText);
+      return new Response(JSON.stringify({ error: 'Failed to fetch subscriber list' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    const contactsData = await contactsRes.json();
+    // Filter only subscribed contacts (unsubscribed: false)
+    const emails = (contactsData.data || [])
+      .filter(contact => !contact.unsubscribed)
+      .map(contact => contact.email);
 
     if (!emails || emails.length === 0) {
       return new Response(JSON.stringify({ message: 'No active subscribers' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
@@ -65,7 +87,7 @@ export async function onRequest(context) {
       console.log('broadcast batch sent', { status: res.status, batchCount: batch.length, body: textBody });
     }
 
-    return new Response(JSON.stringify({ message: 'Broadcast sent', batches: results }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ message: 'Broadcast sent', batches: results, totalSubscribers: emails.length }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 
   } catch (err) {
     console.error('Broadcast error', err);
