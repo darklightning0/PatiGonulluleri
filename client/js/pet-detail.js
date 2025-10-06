@@ -495,7 +495,7 @@ Hayvan: ${currentPet.name} (ID: ${currentPet.id})
     const caretakerEmail = currentPet.caretaker.mail || currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
     
     // Create mailto link
-    const mailtoLink = `mailto:${caretakerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoLink = `mailto:${caretakerEmail},iletisim@patigonulluleri.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
     // Open default email client
     window.location.href = mailtoLink;
