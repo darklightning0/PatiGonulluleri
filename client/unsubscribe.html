@@ -3,122 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abonelikten Çıkış - Pati Gönüllüleri</title>
+    <meta name="description" content="E-posta listemizden çıkmak için bu sayfayı kullanabilirsiniz.">
+    <title>Abonelikten Çık - Pati Gönüllüleri</title>
     
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/unsubscribe.css">
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        .unsubscribe-section {
-            min-height: calc(100vh - 200px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 120px 20px 80px;
-            background: linear-gradient(135deg, var(--cream-bg) 0%, var(--light-cream) 100%);
-        }
-
-        .unsubscribe-container {
-            max-width: 600px;
-            width: 100%;
-            background-color: var(--white);
-            border-radius: var(--border-radius-lg);
-            padding: 60px 40px;
-            box-shadow: var(--shadow-lg);
-            text-align: center;
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .unsubscribe-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--sage-green), var(--dark-sage));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 30px;
-            font-size: 36px;
-            color: var(--white);
-            box-shadow: var(--shadow-md);
-        }
-
-        .unsubscribe-container h1 {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--primary-brown);
-            margin-bottom: 20px;
-        }
-
-        .unsubscribe-container p {
-            color: var(--medium-gray);
-            line-height: 1.6;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-        }
-
-        .unsubscribe-message {
-            background-color: var(--light-cream);
-            border-left: 4px solid var(--sage-green);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            margin-bottom: 30px;
-            text-align: left;
-        }
-
-        .unsubscribe-message p {
-            margin: 0;
-            font-size: 0.95rem;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 30px;
-        }
-
-        .action-buttons .btn {
-            min-width: 180px;
-        }
-
-        @media (max-width: 480px) {
-            .unsubscribe-container {
-                padding: 40px 25px;
-            }
-
-            .unsubscribe-container h1 {
-                font-size: 1.5rem;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .action-buttons .btn {
-                width: 100%;
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- Header -->
@@ -158,37 +54,95 @@
         </div>
     </header>
 
-    <!-- Unsubscribe Section -->
-    <main>
+    <!-- Main Content -->
+    <main class="unsubscribe-main">
+        <!-- Unsubscribe Section -->
         <section class="unsubscribe-section">
-            <div class="unsubscribe-container">
-                <div class="unsubscribe-icon">
-                    <i class="fas fa-check"></i>
-                </div>
-                
-                <h1 data-tr="Abonelikten Çıkış Başarılı" data-en="Successfully Unsubscribed">
-                    Abonelikten Çıkış Başarılı
-                </h1>
-                
-                <p data-tr="E-posta listemizden başarıyla çıkarıldınız." data-en="You have been successfully removed from our email list.">
-                    E-posta listemizden başarıyla çıkarıldınız.
-                </p>
-
-                <div class="unsubscribe-message">
-                    <p data-tr="Artık bizden e-posta bildirimleri almayacaksınız. Bizi tercih ettiğiniz için teşekkür ederiz. Sokak hayvanlarına yardım etmek için hala birlikte çalışabiliriz!" data-en="You will no longer receive email notifications from us. Thank you for choosing us. We can still work together to help street animals!">
-                        Artık bizden e-posta bildirimleri almayacaksınız. Bizi tercih ettiğiniz için teşekkür ederiz. Sokak hayvanlarına yardım etmek için hala birlikte çalışabiliriz!
+            <div class="container">
+                <!-- Confirmation Form (Initial State) -->
+                <div id="unsubscribe-form-container" class="unsubscribe-container">
+                    <div class="unsubscribe-icon">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    
+                    <h1 class="unsubscribe-title" data-tr="Abonelikten Çıkmak İstiyor Musunuz?" data-en="Do You Want to Unsubscribe?">
+                        Abonelikten Çıkmak İstiyor Musunuz?
+                    </h1>
+                    
+                    <p class="unsubscribe-description" data-tr="Abonelikten çıkarsanız:" data-en="If you unsubscribe:">
+                        Abonelikten çıkarsanız:
                     </p>
+                    
+                    <ul class="unsubscribe-list">
+                        <li data-tr="Yeni sahiplendirilebilir hayvanlar hakkında bildirim almayacaksınız" data-en="You will not receive notifications about new adoptable animals">
+                            Yeni sahiplendirilebilir hayvanlar hakkında bildirim almayacaksınız
+                        </li>
+                        <li data-tr="Blog yazıları ve makaleler için e-posta almayacaksınız" data-en="You will not receive emails about blog posts and articles">
+                            Blog yazıları ve makaleler için e-posta almayacaksınız
+                        </li>
+                        <li data-tr="Özel etkinlikler ve duyurulardan haberdar olmayacaksınız" data-en="You will not be notified about special events and announcements">
+                            Özel etkinlikler ve duyurulardan haberdar olmayacaksınız
+                        </li>
+                        <li data-tr="İstediğiniz zaman tekrar abone olabilirsiniz" data-en="You can resubscribe at any time">
+                            İstediğiniz zaman tekrar abone olabilirsiniz
+                        </li>
+                    </ul>
+
+                    <form id="unsubscribe-form" class="unsubscribe-form">
+                        <div class="form-group">
+                            <label for="email" data-tr="E-posta Adresiniz" data-en="Your Email Address">
+                                E-posta Adresiniz
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                required 
+                                placeholder="ornek@email.com"
+                            >
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-unsubscribe" data-tr="Abonelikten Çık" data-en="Unsubscribe">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Abonelikten Çık
+                            </button>
+                            <a href="index.html" class="btn btn-secondary" data-tr="İptal" data-en="Cancel">
+                                <i class="fas fa-times"></i>
+                                İptal
+                            </a>
+                        </div>
+                    </form>
                 </div>
 
-                <div class="action-buttons">
-                    <a href="index.html" class="btn btn-primary" data-tr="Ana Sayfaya Dön" data-en="Back to Home">
-                        <i class="fas fa-home"></i>
-                        Ana Sayfaya Dön
-                    </a>
-                    <a href="adopt.html" class="btn btn-secondary" data-tr="Hayvanları Gör" data-en="View Animals">
-                        <i class="fas fa-paw"></i>
-                        Hayvanları Gör
-                    </a>
+                <!-- Success Message (Hidden Initially) -->
+                <div id="success-container" class="unsubscribe-container success-state hidden">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    
+                    <h1 class="success-title" data-tr="Başarıyla Abonelikten Çıktınız" data-en="Successfully Unsubscribed">
+                        Başarıyla Abonelikten Çıktınız
+                    </h1>
+                    
+                    <p class="success-description" data-tr="E-posta listemizden çıkarıldınız. Artık bizden bildirim almayacaksınız." data-en="You have been removed from our email list. You will no longer receive notifications from us.">
+                        E-posta listemizden çıkarıldınız. Artık bizden bildirim almayacaksınız.
+                    </p>
+                    
+                    <p class="success-note" data-tr="Fikrini değiştirirsen, istediğin zaman tekrar abone olabilirsin. Hayvanlara olan sevgin için teşekkürler! 🐾" data-en="If you change your mind, you can resubscribe at any time. Thank you for your love for animals! 🐾">
+                        Fikrini değiştirirsen, istediğin zaman tekrar abone olabilirsin. Hayvanlara olan sevgin için teşekkürler! 🐾
+                    </p>
+
+                    <div class="success-actions">
+                        <a href="index.html" class="btn btn-primary" data-tr="Ana Sayfaya Dön" data-en="Return to Homepage">
+                            <i class="fas fa-home"></i>
+                            Ana Sayfaya Dön
+                        </a>
+                        <a href="articles.html" class="btn btn-outline" data-tr="Makalelere Göz At" data-en="Browse Articles">
+                            <i class="fas fa-book-reader"></i>
+                            Makalelere Göz At
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -247,60 +201,7 @@
         </div>
     </footer>
 
-    <!-- JavaScript for mobile menu and language toggle -->
-    <script>
-        // Mobile menu toggle
-        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-        const nav = document.querySelector('.nav');
-
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenuBtn.classList.toggle('active');
-                nav.classList.toggle('active');
-            });
-        }
-
-        // Language toggle
-        const langBtns = document.querySelectorAll('.lang-btn');
-        const currentLang = localStorage.getItem('language') || 'tr';
-
-        // Set active language button
-        langBtns.forEach(btn => {
-            if (btn.dataset.lang === currentLang) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-
-        // Update text content based on language
-        function updateLanguage(lang) {
-            document.querySelectorAll('[data-tr][data-en]').forEach(element => {
-                element.textContent = element.dataset[lang];
-            });
-        }
-
-        updateLanguage(currentLang);
-
-        langBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const lang = btn.dataset.lang;
-                langBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                localStorage.setItem('language', lang);
-                updateLanguage(lang);
-            });
-        });
-
-        // Header scroll effect
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('.header');
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-    </script>
+    <!-- JavaScript -->
+    <script src="js/unsubscribe.js"></script>
 </body>
 </html>
