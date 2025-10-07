@@ -11,6 +11,17 @@ pages_build_output_dir = "client"
 binding = "RATE_LIMIT"
 id = "5b85cacbce7d442b8e6aa496986cced7"
 
+# R2 bucket binding
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "patigonulluleri-images"
+
+# R2 public domain configuration
+[env.production]
+r2_buckets = [
+  { binding = "IMAGES", bucket_name = "patigonulluleri-images" }
+]
+
 # Environment variables (non-sensitive)
 [vars]
 FRONTEND_URL = "https://patigonulluleri.com"
@@ -20,6 +31,7 @@ WELCOME_SUBJECT = "Pati Gönüllüleri - Aboneliğinize Hoşgeldiniz"
 WELCOME_HTML = "<p>Hoşgeldiniz! Pati Gönüllüleri e-posta listesine kaydoldunuz.</p>"
 BROADCAST_FROM = "Pati Gönüllüleri <noreply@patigonulluleri.com>"
 ADOPTION_FROM = "Pati Gönüllüleri <noreply@patigonulluleri.com>"
+R2_PUBLIC_DOMAIN = "images.patigonulluleri.com"
 
 # Secrets (set via: wrangler secret put SECRET_NAME)
 # - RESEND_API_KEY

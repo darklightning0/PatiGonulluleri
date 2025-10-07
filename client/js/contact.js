@@ -378,9 +378,6 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     if (fileInput && fileInput.files.length > 0) {
       const files = Array.from(fileInput.files);
       
-      // Show compression progress
-      showNotification(`📸 ${files.length} fotoğraf sıkıştırılıyor...`, 'info');
-      
       // Compress and convert each image
       const compressionPromises = files.map(file => compressAndConvertToBase64(file));
       
