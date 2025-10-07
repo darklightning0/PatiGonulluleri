@@ -40,8 +40,6 @@ function initAdoptionForm() {
   const form = document.getElementById("Adoption-form");
   if (!form) return;
 
-  const citySelect = document.getElementById("city");
-  const districtSelect = document.getElementById("district");
   const fileInput = document.getElementById("photos");
   let currentStep = 1;
   const totalSteps = 4;
