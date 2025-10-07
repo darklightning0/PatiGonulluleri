@@ -227,50 +227,56 @@ function initAdoptionForm() {
   // Note: city/district are now simple text inputs; no external API calls required.
 }
 
-/**
- * Compress and convert file to base64 string
- * @param {File} file - The file to compress and convert
- * @returns {Promise<string>} Base64 encoded string
- */
 async function compressAndConvertToBase64(file) {
     try {
-        // Compression options
+        let workingFile = file;
+
+        // 🧩 Detect and convert HEIC
+        if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+            console.log('🔄 Converting HEIC to JPEG...');
+            const blob = await heic2any({
+                blob: file,
+                toType: 'image/jpeg',
+                quality: 0.9
+            });
+            workingFile = new File([blob], file.name.replace(/\.heic$/i, '.jpg'), {
+                type: 'image/jpeg'
+            });
+        }
+
+        // 🧠 Compression settings
         const options = {
-            maxSizeMB: 0.8,              // Target max size: 800KB
-            maxWidthOrHeight: 1920,       // Max dimension: 1920px
-            useWebWorker: true,           // Use web worker for better performance
-            fileType: 'image/webp',       // Convert to JPEG for best compatibility
-            initialQuality: 0.85          // 85% quality - good balance
+            maxSizeMB: 0.8,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+            fileType: 'image/webp',
+            initialQuality: 0.85
         };
 
-        console.log(`🖼️ Original file: ${file.name}, Size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+        console.log(`🖼️ Original file: ${workingFile.name}, Size: ${(workingFile.size / 1024 / 1024).toFixed(2)}MB`);
 
-        // Compress the image
-        const compressedFile = await imageCompression(file, options);
+        // 🔧 Compress
+        const compressedFile = await imageCompression(workingFile, options);
 
-        console.log(`✅ Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB (${((1 - compressedFile.size / file.size) * 100).toFixed(1)}% reduction)`);
+        console.log(`✅ Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
 
-        // Convert compressed file to base64
+        // 🔄 Convert to base64
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                // Get base64 string without the data:image/xxx;base64, prefix
+            reader.onload = e => {
                 const base64 = e.target.result.split(',')[1];
                 resolve(base64);
             };
-            
-            reader.onerror = function(error) {
-                reject(error);
-            };
-            
+            reader.onerror = reject;
             reader.readAsDataURL(compressedFile);
         });
+
     } catch (error) {
         console.error('Compression error:', error);
         throw new Error('Fotoğraf sıkıştırılırken hata oluştu. Lütfen farklı bir fotoğraf deneyin.');
     }
 }
+
 
 function validateFileUpload(e) {
   const files = e.target.files;
