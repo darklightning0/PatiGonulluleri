@@ -46,6 +46,7 @@ function validateFormData(formData) {
     const animalType = formData.get("animalType");
     const size = formData.get("size");
     const description = formData.get("description");
+  const petName = formData.get("petName");
     const privacyAgreement = formData.get("privacyAgreement");
 
     if (!name || name.trim().length < 2) {
@@ -69,8 +70,11 @@ function validateFormData(formData) {
     if (!size) {
         errors.push("Boyut seçimi zorunludur.");
     }
-    if (!description || description.trim().length < 2) {
-        errors.push("Açıklama alanı en az 10 karakter olmalıdır.");
+  if (!petName || petName.trim().length < 2) {
+    errors.push("Hayvanın ismi en az 2 karakter olmalıdır.");
+  }
+  if (!description || description.trim().length < 10) {
+    errors.push("Açıklama alanı en az 10 karakter olmalıdır.");
     }
     if (privacyAgreement !== "on") {
         errors.push("KVKK metnini onaylamanız gerekmektedir.");
