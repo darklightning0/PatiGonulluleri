@@ -370,8 +370,6 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gönderiliyor...';
 
-  // file: client/js/contact.js
-
   try {
     const formDataToSend = new FormData(form);
     const csrfToken = form.dataset.csrfToken;
@@ -418,10 +416,8 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
 
     const result = await response.json();
 
-    // This is the key part: Check if the HTTP response status is an error
     if (!response.ok) {
-        // If the server sent a specific list of errors, format them.
-        // Otherwise, use the general message from the server.
+   
         const errorMessages = result.errors 
             ? result.errors.join('<br>') 
             : (result.message || 'Bilinmeyen bir sunucu hatası oluştu.');

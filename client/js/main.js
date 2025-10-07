@@ -420,11 +420,13 @@ async function loadFeaturedPets(petsContainer) {
             const petType = pet.type === 'dog' ? (lang === 'tr' ? 'Köpek' : 'Dog') : (lang === 'tr' ? 'Kedi' : 'Cat');
             const petSize = pet.size === 'large' ? (lang === 'tr' ? 'Büyük' : 'Large') : 
                            (pet.size === 'medium' ? (lang === 'tr' ? 'Orta' : 'Medium') : (lang === 'tr' ? 'Küçük' : 'Small'));
+            const petImage = (pet.images && pet.images.length > 0) ? pet.images[0] : (pet.image || '/images/placeholder-pet.jpg');
+
 
             return `
                 <div class="pet-card">
                     <div class="pet-image">
-                        <img src="${pet.image}" alt="${pet.name}" loading="lazy">
+                        <img src="${petImage}" alt="${pet.petName}" loading="lazy">
                         ${pet.urgent ? `<span class="pet-badge urgent">${lang === 'tr' ? 'Acil' : 'Urgent'}</span>` : ''}
                         <span class="pet-badge ${pet.type.toLowerCase()}">${petType}</span>
                     </div>
