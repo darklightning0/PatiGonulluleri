@@ -274,32 +274,54 @@ function initAdoptionForm() {
 }
 
 /**
- * Convert file to base64 string
- * @param {File} file - The file to convert
+ * Compress and convert file to base64 string
+ * @param {File} file - The file to compress and convert
  * @returns {Promise<string>} Base64 encoded string
  */
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            // Get base64 string without the data:image/xxx;base64, prefix
-            const base64 = e.target.result.split(',')[1];
-            resolve(base64);
+async function compressAndConvertToBase64(file) {
+    try {
+        // Compression options
+        const options = {
+            maxSizeMB: 0.8,              // Target max size: 800KB
+            maxWidthOrHeight: 1920,       // Max dimension: 1920px
+            useWebWorker: true,           // Use web worker for better performance
+            fileType: 'image/webp',       // Convert to JPEG for best compatibility
+            initialQuality: 0.85          // 85% quality - good balance
         };
-        
-        reader.onerror = function(error) {
-            reject(error);
-        };
-        
-        reader.readAsDataURL(file);
-    });
+
+        console.log(`🖼️ Original file: ${file.name}, Size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+
+        // Compress the image
+        const compressedFile = await imageCompression(file, options);
+
+        console.log(`✅ Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB (${((1 - compressedFile.size / file.size) * 100).toFixed(1)}% reduction)`);
+
+        // Convert compressed file to base64
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // Get base64 string without the data:image/xxx;base64, prefix
+                const base64 = e.target.result.split(',')[1];
+                resolve(base64);
+            };
+            
+            reader.onerror = function(error) {
+                reject(error);
+            };
+            
+            reader.readAsDataURL(compressedFile);
+        });
+    } catch (error) {
+        console.error('Compression error:', error);
+        throw new Error('Fotoğraf sıkıştırılırken hata oluştu. Lütfen farklı bir fotoğraf deneyin.');
+    }
 }
 
 function validateFileUpload(e) {
   const files = e.target.files;
   const maxFiles = 3;
-  const maxSize = 50 * 1024 * 1024;
+  const maxSize = 30 * 1024 * 1024; // 30MB total (after compression will be ~3-5MB)
   let totalSize = 0;
 
   if (files.length > maxFiles) {
@@ -315,10 +337,15 @@ function validateFileUpload(e) {
       e.target.value = '';
       return;
     }
+    
+    // Warn if individual file is very large (will take time to compress)
+    if (file.size > 15 * 1024 * 1024) {
+      showNotification(`⚠️ ${file.name} çok büyük (${(file.size / 1024 / 1024).toFixed(1)}MB). Sıkıştırma biraz zaman alabilir.`, 'warning');
+    }
   }
 
   if (totalSize > maxSize) {
-    showNotification('Toplam dosya boyutu 50MB\'ı geçemez.', 'error');
+    showNotification('Toplam dosya boyutu 30MB\'ı geçemez.', 'error');
     e.target.value = '';
   }
 }
@@ -394,10 +421,15 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     const fileInput = form.querySelector('#photos');
     if (fileInput && fileInput.files.length > 0) {
       const files = Array.from(fileInput.files);
-      const base64Promises = files.map(fileToBase64);
+      
+      // Show compression progress
+      showNotification(`📸 ${files.length} fotoğraf sıkıştırılıyor...`, 'info');
+      
+      // Compress and convert each image
+      const compressionPromises = files.map(file => compressAndConvertToBase64(file));
       
       try {
-        const base64Images = await Promise.all(base64Promises);
+        const base64Images = await Promise.all(compressionPromises);
         
         // Remove the original file input from FormData
         formDataToSend.delete('photos');
@@ -409,8 +441,11 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
         
         // Add number of photos for server validation
         formDataToSend.append('photoCount', files.length);
+        
+        console.log('✅ All images compressed and ready for upload');
+        
       } catch (error) {
-        console.error('Error converting images to base64:', error);
+        console.error('Error compressing images:', error);
         throw new Error('Fotoğraflar işlenirken bir hata oluştu. Lütfen tekrar deneyin.');
       }
     }
