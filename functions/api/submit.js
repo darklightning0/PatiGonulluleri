@@ -46,7 +46,7 @@ function validateFormData(formData) {
     const animalType = formData.get("animalType");
     const size = formData.get("size");
     const description = formData.get("description");
-  const petName = formData.get("petName");
+    const petName = formData.get("petName");
     const privacyAgreement = formData.get("privacyAgreement");
 
     if (!name || name.trim().length < 2) {

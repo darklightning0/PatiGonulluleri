@@ -431,7 +431,7 @@ async function loadFeaturedPets(petsContainer) {
                         <span class="pet-badge ${pet.type.toLowerCase()}">${petType}</span>
                     </div>
                     <div class="pet-info">
-                        <h3 class="pet-name">${pet.name}</h3>
+                        <h3 class="petName">${pet.name}</h3>
                         <p class="pet-description">${pet.description.substring(0, 100)}...</p>
                         <div class="pet-details">
                             <span class="pet-age">${ageText}</span>

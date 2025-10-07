@@ -9,8 +9,8 @@ let isPhoneVisible = false;
 import { CachedPetsService } from './firebase-data-service.js';
 
 const elements = {
-    petNameBreadcrumb: document.getElementById('pet-name-breadcrumb'),
-    petName: document.getElementById('pet-name'),
+    petNameBreadcrumb: document.getElementById('petName-breadcrumb'),
+    petName: document.getElementById('petName'),
     petBreed: document.getElementById('pet-breed'),
     petAge: document.getElementById('pet-age'),
     petLocation: document.getElementById('pet-location'),

@@ -257,25 +257,20 @@ async function compressAndConvertToBase64(file) {
 
         // 🔧 Compress
         const compressedFile = await imageCompression(workingFile, options);
-
+        
         console.log(`✅ Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
-
-        // 🔄 Convert to base64
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const base64 = e.target.result.split(',')[1];
-                resolve(base64);
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(compressedFile);
-        });
+        
+        return compressedFile;
 
     } catch (error) {
         console.error('Compression error:', error);
-        throw new Error('Fotoğraf sıkıştırılırken hata oluştu. Lütfen farklı bir fotoğraf deneyin.');
+        // Return original file if compression fails
+        return file;
     }
 }
+
+
+
 
 
 function validateFileUpload(e) {
