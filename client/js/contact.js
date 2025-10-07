@@ -96,18 +96,10 @@ function initAdoptionForm() {
 
   // Initialize stepper
   initStepper();
-
   // File upload validation
   fileInput.addEventListener('change', validateFileUpload);
 
   form.addEventListener("submit", (e) => handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, validateStep));
-
-  // City/District handlers
-  citySelect.addEventListener("change", () => {
-    const selected = citySelect.options[citySelect.selectedIndex];
-    const plateId = selected.dataset.plate;
-    plateId ? loadDistricts(plateId) : (districtSelect.innerHTML = `<option value="">Önce şehir seçiniz</option>`);
-  });
 
   // Initialize navigation buttons
   const navigationHTML = `
@@ -233,44 +225,8 @@ function initAdoptionForm() {
     });
   }
 
-  loadCities();
-
-  // Load cities
-  async function loadCities() {
-    try {
-      const res = await fetch("https://turkiyeapi.dev/api/v1/provinces");
-      const data = await res.json();
-      citySelect.innerHTML = `<option value="">Şehir seçiniz</option>`;
-      data.data.forEach(city => {
-        const opt = document.createElement("option");
-        opt.value = city.name;
-        opt.textContent = city.name;
-        opt.dataset.plate = city.id;
-        citySelect.appendChild(opt);
-      });
-    } catch (err) {
-      console.error("Şehirler yüklenemedi:", err);
-      citySelect.innerHTML = `<option value="">Şehir yüklenemedi</option>`;
-    }
-  }
-
-  // Load districts
-  async function loadDistricts(plateId) {
-    try {
-      const res = await fetch(`https://turkiyeapi.dev/api/v1/provinces/${plateId}`);
-      const data = await res.json();
-      districtSelect.innerHTML = `<option value="">İlçe seçiniz</option>`;
-      data.data.districts.forEach(dist => {
-        const opt = document.createElement("option");
-        opt.value = dist.name;
-        opt.textContent = dist.name;
-        districtSelect.appendChild(opt);
-      });
-    } catch (err) {
-      console.error("İlçeler yüklenemedi:", err);
-      districtSelect.innerHTML = `<option value="">İlçe yüklenemedi</option>`;
-    }
-  }
+  // City/district loading removed — using text inputs instead.
+  // Note: city/district are now simple text inputs; no external API calls required.
 }
 
 /**
@@ -483,10 +439,11 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     
     const photoInput = form.querySelector('#photos');
     if (photoInput) photoInput.value = '';
-    const districtSelect = form.querySelector('#district');
-    if (districtSelect) {
-        districtSelect.innerHTML = '<option value="">Önce şehir seçiniz</option>';
-    }
+  // Clear city/district text inputs (they were converted from selects)
+  const cityInput = form.querySelector('#city');
+  if (cityInput) cityInput.value = '';
+  const districtInput = form.querySelector('#district');
+  if (districtInput) districtInput.value = '';
     goToStep(1);
     form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
     
