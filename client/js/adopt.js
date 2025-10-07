@@ -287,7 +287,7 @@ normalizeValue(value) {
 
     const imageHTML = `
         <div class="pet-card-image">
-            <img src="${petImage}" alt="${pet.name}" loading="lazy" onerror="this.src='/images/placeholder-pet.jpg'">
+            <img src="${petImage}" alt="${pet.petName}" loading="lazy" onerror="this.src='/images/placeholder-pet.jpg'">
             ${urgentBadge}
             <div class="pet-type-badge">${translated.type}</div>
         </div>`;
@@ -304,7 +304,7 @@ normalizeValue(value) {
                 ${imageHTML}
                 <div class="pet-card-content">
                     <div class="pet-card-header">
-                        <h3 class="pet-card-name">${pet.name}</h3>
+                        <h3 class="pet-card-name">${pet.petName}</h3>
                         <div class="pet-card-breed">${translated.breed}</div>
                     </div>
                     <p class="pet-card-description">${translated.description}</p>
@@ -322,7 +322,7 @@ normalizeValue(value) {
                 ${imageHTML}
                 <div class="pet-card-content">
                     <div class="pet-card-main">
-                        <div class="pet-card-header"><h3 class="pet-card-name">${pet.name}</h3><div class="pet-card-breed">${translated.breed}</div></div>
+                        <div class="pet-card-header"><h3 class="pet-card-name">${pet.petName}</h3><div class="pet-card-breed">${translated.breed}</div></div>
                         <div class="pet-card-details">${detailsHTML}</div>
                         <div class="pet-card-tags">${healthTags}</div>
                     </div>

@@ -108,8 +108,8 @@ function updatePageContent() {
     const currentLang = getCurrentLanguage();
     
     // Safely update the pet details
-    elements.petNameBreadcrumb.textContent = currentPet.name || 'Unknown Name';
-    elements.petName.textContent = currentPet.name || 'Unknown Name';
+    elements.petNameBreadcrumb.textContent = currentPet.petName || 'Unknown Name';
+    elements.petName.textContent = currentPet.petName || 'Unknown Name';
     elements.petBreed.textContent = currentPet.breed || 'Unknown Breed';
     elements.petAge.textContent = `${currentPet.age || 'Unknown'} yaşında`;
     elements.petLocation.textContent = currentPet.location || 'Unknown Location';
