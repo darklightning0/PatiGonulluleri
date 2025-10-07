@@ -144,10 +144,50 @@ function updatePageContent() {
 
 
 function updateTranslatedFields(lang) {
+    // Normalizes incoming values (which may be Turkish or English) to canonical keys
+    const normalize = (value) => {
+        if (!value) return '';
+        const v = String(value).trim().toLowerCase();
+
+        const typeMap = {
+            'köpek': 'dog', 'dog': 'dog', 'köpek ': 'dog',
+            'kedi': 'cat', 'cat': 'cat',
+            'diğer': 'other', 'other': 'other'
+        };
+
+        const sizeMap = {
+            'küçük': 'small', 'small': 'small',
+            'orta': 'medium', 'medium': 'medium',
+            'büyük': 'large', 'large': 'large'
+        };
+
+        const genderMap = {
+            'erkek': 'male', 'male': 'male',
+            'dişi': 'female', 'dişi ': 'female', 'female': 'female',
+            'belirtilmemiş': 'unspecified', 'unspecified': 'unspecified'
+        };
+
+        if (typeMap[v]) return typeMap[v];
+        if (sizeMap[v]) return sizeMap[v];
+        if (genderMap[v]) return genderMap[v];
+
+        // Fallback: try to detect by common english words
+        if (v.includes('dog') || v.includes('köpek')) return 'dog';
+        if (v.includes('cat') || v.includes('kedi')) return 'cat';
+        if (v.includes('small') || v.includes('küçük')) return 'small';
+        if (v.includes('orta') || v.includes('medium')) return 'medium';
+        if (v.includes('large') || v.includes('büyük')) return 'large';
+        if (v.includes('erkek')) return 'male';
+        if (v.includes('dişi') || v.includes('female')) return 'female';
+
+        return v;
+    };
+
     const translations = {
         type: {
             dog: { tr: 'Köpek', en: 'Dog' },
-            cat: { tr: 'Kedi', en: 'Cat' }
+            cat: { tr: 'Kedi', en: 'Cat' },
+            other: { tr: 'Diğer', en: 'Other' }
         },
         size: {
             small: { tr: 'Küçük', en: 'Small' },
@@ -156,32 +196,45 @@ function updateTranslatedFields(lang) {
         },
         gender: {
             male: { tr: 'Erkek', en: 'Male' },
-            female: { tr: 'Dişi', en: 'Female' }
+            female: { tr: 'Dişi', en: 'Female' },
+            unspecified: { tr: 'Belirtilmemiş', en: 'Unspecified' }
         }
     };
-    
+
+    // Determine canonical keys from the pet's stored values
+    const canonicalType = normalize(currentPet.type);
+    const canonicalSize = normalize(currentPet.size);
+    const canonicalGender = normalize(currentPet.gender);
+
     const typeBadge = elements.petTypeBadge;
-    const typeText = translations.type[currentPet.type];
-    if (typeText) {
-        typeBadge.textContent = typeText[lang];
+    if (translations.type[canonicalType]) {
+        const typeText = translations.type[canonicalType];
+        typeBadge.textContent = typeText[lang] || typeText.tr;
         typeBadge.setAttribute('data-tr', typeText.tr);
         typeBadge.setAttribute('data-en', typeText.en);
+    } else {
+        // Fallback: show raw value
+        typeBadge.textContent = currentPet.type || '';
     }
-    
+
     const sizeElement = elements.petSize;
-    const sizeText = translations.size[currentPet.size];
-    if (sizeText) {
-        sizeElement.textContent = sizeText[lang];
+    if (translations.size[canonicalSize]) {
+        const sizeText = translations.size[canonicalSize];
+        sizeElement.textContent = sizeText[lang] || sizeText.tr;
         sizeElement.setAttribute('data-tr', sizeText.tr);
         sizeElement.setAttribute('data-en', sizeText.en);
+    } else {
+        sizeElement.textContent = currentPet.size || '';
     }
-    
+
     const genderElement = elements.petGender;
-    const genderText = translations.gender[currentPet.gender];
-    if (genderText) {
-        genderElement.textContent = genderText[lang];
+    if (translations.gender[canonicalGender]) {
+        const genderText = translations.gender[canonicalGender];
+        genderElement.textContent = genderText[lang] || genderText.tr;
         genderElement.setAttribute('data-tr', genderText.tr);
         genderElement.setAttribute('data-en', genderText.en);
+    } else {
+        genderElement.textContent = currentPet.gender || '';
     }
 }
 
@@ -243,11 +296,11 @@ function updateCaretakerInfo() {
 }
 
 function updatePageTitle() {
-    document.title = `${currentPet.name} - Sahiplendirme İlanı - Pati Gönüllüleri`;
+    document.title = `${currentPet.petName || currentPet.name} - Sahiplendirme İlanı - Pati Gönüllüleri`;
     
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-        metaDescription.content = `${currentPet.name} adlı ${currentPet.breed} ${currentPet.type === 'dog' ? 'köpeğimizi' : 'kedimizi'} sahiplenmek için detaylı bilgiler, fotoğraflar ve iletişim bilgileri.`;
+    metaDescription.content = `${currentPet.petName || currentPet.name} adlı ${currentPet.breed} ${currentPet.type === 'dog' ? 'köpeğimizi' : 'kedimizi'} sahiplenmek için detaylı bilgiler, fotoğraflar ve iletişim bilgileri.`;
     }
 }
 
@@ -282,14 +335,14 @@ function updateImageGallery() {
     const currentImageNum = elements.currentImageNum;
     
     mainImage.src = currentPet.images[0];
-    mainImage.alt = currentPet.name;
+    mainImage.alt = currentPet.petName || currentPet.name || '';
     
     totalImages.textContent = currentPet.images.length;
     currentImageNum.textContent = '1';
     
     thumbnailsContainer.innerHTML = currentPet.images.map((image, index) => `
         <div class="thumbnail ${index === 0 ? 'active' : ''}" data-image="${index}">
-            <img src="${currentPet.thumbnails ? currentPet.thumbnails[index] : image}" alt="${currentPet.name} ${index + 1}">
+            <img src="${currentPet.thumbnails ? currentPet.thumbnails[index] : image}" alt="${currentPet.petName || currentPet.name || ''} ${index + 1}">
         </div>
     `).join('');
     
@@ -303,25 +356,23 @@ function updateImageGallery() {
 
 function showImage(index) {
     if (!currentPet || !currentPet.images) return;
-    
+
     const images = currentPet.images;
     if (index < 0 || index >= images.length) return;
-    
+
     const mainImage = elements.mainImage;
     const thumbnails = document.querySelectorAll('.thumbnail');
     const currentImageNum = elements.currentImageNum;
-    
-    mainImage.style.opacity = '0';
-    setTimeout(() => {
-        mainImage.src = images[index];
-        mainImage.style.opacity = '1';
-    }, 150);
-    
+
+    mainImage.src = images[index];
+    mainImage.alt = currentPet.petName || currentPet.name || '';
+    mainImage.style.opacity = '1';
+
     thumbnails.forEach(thumb => thumb.classList.remove('active'));
     if (thumbnails[index]) {
         thumbnails[index].classList.add('active');
     }
-    
+
     currentImageNum.textContent = index + 1;
     currentImageIndex = index;
 }
@@ -397,7 +448,7 @@ function handleWhatsAppClick() {
         showNotification('WhatsApp için telefon numarası mevcut değil.', 'info');
         return;
     }
-    const message = encodeURIComponent(`Merhaba, ${currentPet.name} hakkında bilgi alabilir miyim?`);
+    const message = encodeURIComponent(`Merhaba, ${currentPet.petName || currentPet.name} hakkında bilgi alabilir miyim?`);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
     
@@ -473,11 +524,11 @@ function handleMessageSubmit(e) {
     }
     
     // Build email content
-    const subject = `${currentPet.name} Hakkında Bilgi Talebi - ${name}`;
+    const subject = `${currentPet.petName || currentPet.name} Hakkında Bilgi Talebi - ${name}`;
     const body = `
 Merhaba,
 
-${currentPet.name} hakkında bilgi almak istiyorum.
+${currentPet.petName || currentPet.name} hakkında bilgi almak istiyorum.
 
 --- İletişim Bilgileri ---
 Ad Soyad: ${name}
@@ -489,7 +540,7 @@ ${message}
 
 ---
 Bu mesaj Pati Gönüllüleri web sitesi üzerinden gönderilmiştir.
-Hayvan: ${currentPet.name} (ID: ${currentPet.id})
+Hayvan: ${currentPet.petName || currentPet.name} (ID: ${currentPet.id})
     `.trim();
     
     const caretakerEmail = currentPet.caretaker.mail || currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
@@ -551,11 +602,11 @@ function handleApplicationSubmit(e) {
     };
     
     // Build email content
-    const subject = `Sahiplendirme Başvurusu - ${currentPet.name} - ${applicationData.name}`;
+    const subject = `Sahiplendirme Başvurusu - ${currentPet.petName || currentPet.name} - ${applicationData.name}`;
     const body = `
 Merhaba,
 
-${currentPet.name} için sahiplendirme başvurusu yapmak istiyorum.
+${currentPet.petName || currentPet.name} için sahiplendirme başvurusu yapmak istiyorum.
 
 --- Başvuru Sahibi Bilgileri ---
 Ad Soyad: ${applicationData.name}
@@ -574,7 +625,7 @@ ${applicationData.notes || 'Ek not bulunmamaktadır.'}
 
 ---
 Bu başvuru Pati Gönüllüleri web sitesi üzerinden gönderilmiştir.
-Hayvan: ${currentPet.name}
+Hayvan: ${currentPet.petName || currentPet.name}
 ID: ${currentPet.id}
 Tarih: ${new Date().toLocaleDateString('tr-TR')}
     `.trim();
@@ -608,8 +659,8 @@ function handleShareClick() {
     if (!currentPet) return;
     
     const shareData = {
-        title: `${currentPet.name} - Sahiplendirme İlanı`,
-        text: `${currentPet.name} adlı ${currentPet.breed} sahiplenmeyi bekliyor!`,
+        title: `${currentPet.petName || currentPet.name} - Sahiplendirme İlanı`,
+        text: `${currentPet.petName || currentPet.name} adlı ${currentPet.breed} sahiplenmeyi bekliyor!`,
         url: window.location.href
     };
     
