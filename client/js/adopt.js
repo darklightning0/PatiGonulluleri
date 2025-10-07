@@ -188,20 +188,26 @@ const AdoptPageApp = {
         this.renderPets();
     },
     
-    applyFiltersAndSort() {
+applyFiltersAndSort() {
     const { animalType, age, size, gender, health } = this.state.currentFilters;
 
     let filtered = this.state.allPets.filter(pet => {
+        // Normalize values for comparison
+        const normalizedType = this.normalizeValue(pet.type);
+        const normalizedSize = this.normalizeValue(pet.size);
+        const normalizedGender = this.normalizeValue(pet.gender);
+        const normalizedAgeGroup = this.normalizeValue(pet.ageGroup);
+        
         // Handle health as both array (old) and object (new)
         const petHealthArray = Array.isArray(pet.health) 
             ? pet.health 
             : Object.keys(pet.health).filter(key => pet.health[key] === true);
         
         return (
-            (animalType.length === 0 || animalType.includes(pet.type)) &&
-            (age.length === 0 || age.includes(pet.ageGroup)) &&
-            (size.length === 0 || size.includes(pet.size)) &&
-            (gender.length === 0 || gender.includes(pet.gender)) &&
+            (animalType.length === 0 || animalType.some(type => this.normalizeValue(type) === normalizedType)) &&
+            (age.length === 0 || age.some(ageFilter => this.normalizeValue(ageFilter) === normalizedAgeGroup)) &&
+            (size.length === 0 || size.some(sizeFilter => this.normalizeValue(sizeFilter) === normalizedSize)) &&
+            (gender.length === 0 || gender.some(genderFilter => this.normalizeValue(genderFilter) === normalizedGender)) &&
             (health.length === 0 || health.every(h => petHealthArray.includes(h)))
         );
     });
@@ -209,6 +215,18 @@ const AdoptPageApp = {
     this.state.filteredPets = this.applySorting(filtered);
     this.renderPets();
     this.updateResultCount();
+},
+
+normalizeValue(value) {
+    if (!value) return '';
+    // Convert to lowercase and handle Turkish characters
+    return value.toString().toLowerCase()
+        .replace('ı', 'i')
+        .replace('ğ', 'g')
+        .replace('ü', 'u')
+        .replace('ş', 's')
+        .replace('ö', 'o')
+        .replace('ç', 'c');
 },
 
     applySorting(pets) {
@@ -248,69 +266,74 @@ const AdoptPageApp = {
         }, 250);
     },
 
-    createPetCard(pet, view) {
-        const lang = this.getCurrentLanguage();
-        const translated = this.translatePetData(pet, lang);
-        const urgentBadge = pet.urgent ? `<div class="pet-urgent-badge" data-tr="ACİL" data-en="URGENT"></div>` : '';
-        // Handle both array and object health format
-const petHealthArray = Array.isArray(pet.health) 
-    ? pet.health 
-    : Object.keys(pet.health).filter(key => pet.health[key] === true);
+   createPetCard(pet, view) {
+    const lang = this.getCurrentLanguage();
+    const translated = this.translatePetData(pet, lang);
+    const urgentBadge = pet.urgent ? `<div class="pet-urgent-badge" data-tr="ACİL" data-en="URGENT"></div>` : '';
+    
+    // Handle images array - use first image or fallback
+    const petImage = (pet.images && pet.images.length > 0) ? pet.images[0] : (pet.image || '/images/placeholder-pet.jpg');
+    
+    // Handle both array and object health format
+    const petHealthArray = Array.isArray(pet.health) 
+        ? pet.health 
+        : Object.keys(pet.health).filter(key => pet.health[key] === true);
 
-const healthTags = petHealthArray.map(h => 
-    `<span class="pet-tag">${this.translateHealth(h, lang)}</span>`
-).join('');
-        const date = new Date(pet.dateAdded).toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const healthTags = petHealthArray.map(h => 
+        `<span class="pet-tag">${this.translateHealth(h, lang)}</span>`
+    ).join('');
+    
+    const date = new Date(pet.dateAdded).toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-        const imageHTML = `
-            <div class="pet-card-image">
-                <img src="${pet.image}" alt="${pet.name}" loading="lazy">
-                ${urgentBadge}
-                <div class="pet-type-badge">${translated.type}</div>
+    const imageHTML = `
+        <div class="pet-card-image">
+            <img src="${petImage}" alt="${pet.name}" loading="lazy" onerror="this.src='/images/placeholder-pet.jpg'">
+            ${urgentBadge}
+            <div class="pet-type-badge">${translated.type}</div>
+        </div>`;
+    
+    const detailsHTML = `
+        <div class="pet-detail-item"><i class="fas fa-birthday-cake"></i><span data-tr="${pet.age || 0} yaşında" data-en="${pet.age || 0} years old"></span></div>
+        <div class="pet-detail-item"><i class="fas fa-ruler-vertical"></i><span>${translated.size}</span></div>
+        <div class="pet-detail-item"><i class="fas fa-venus-mars"></i><span>${translated.gender}</span></div>
+        <div class="pet-detail-item"><i class="fas fa-map-marker-alt"></i><span>${pet.location}</span></div>`;
+
+    if (view === 'grid') {
+        return `
+            <div class="adopt-pet-card" data-pet-id="${pet.id}">
+                ${imageHTML}
+                <div class="pet-card-content">
+                    <div class="pet-card-header">
+                        <h3 class="pet-card-name">${pet.name}</h3>
+                        <div class="pet-card-breed">${translated.breed}</div>
+                    </div>
+                    <p class="pet-card-description">${translated.description}</p>
+                    <div class="pet-card-details">${detailsHTML}</div>
+                    <div class="pet-card-tags">${healthTags}</div>
+                    <div class="pet-card-footer">
+                        <div class="pet-date">${date}</div>
+                        <a href="#" class="pet-card-btn" data-tr="İncele" data-en="View Details"></a>
+                    </div>
+                </div>
             </div>`;
-        
-        const detailsHTML = `
-            <div class="pet-detail-item"><i class="fas fa-birthday-cake"></i><span data-tr="${pet.age} yaşında" data-en="${pet.age} years old"></span></div>
-            <div class="pet-detail-item"><i class="fas fa-ruler-vertical"></i><span>${translated.size}</span></div>
-            <div class="pet-detail-item"><i class="fas fa-venus-mars"></i><span>${translated.gender}</span></div>
-            <div class="pet-detail-item"><i class="fas fa-map-marker-alt"></i><span>${pet.location}</span></div>`;
-
-        if (view === 'grid') {
-            return `
-                <div class="adopt-pet-card" data-pet-id="${pet.id}">
-                    ${imageHTML}
-                    <div class="pet-card-content">
-                        <div class="pet-card-header">
-                            <h3 class="pet-card-name">${pet.name}</h3>
-                            <div class="pet-card-breed">${translated.breed}</div>
-                        </div>
-                        <p class="pet-card-description">${translated.description}</p>
+    } else {
+        return `
+            <div class="adopt-pet-card" data-pet-id="${pet.id}">
+                ${imageHTML}
+                <div class="pet-card-content">
+                    <div class="pet-card-main">
+                        <div class="pet-card-header"><h3 class="pet-card-name">${pet.name}</h3><div class="pet-card-breed">${translated.breed}</div></div>
                         <div class="pet-card-details">${detailsHTML}</div>
                         <div class="pet-card-tags">${healthTags}</div>
-                        <div class="pet-card-footer">
-                            <div class="pet-date">${date}</div>
-                            <a href="#" class="pet-card-btn" data-tr="İncele" data-en="View Details"></a>
-                        </div>
                     </div>
-                </div>`;
-        } else {
-            return `
-                <div class="adopt-pet-card" data-pet-id="${pet.id}">
-                    ${imageHTML}
-                    <div class="pet-card-content">
-                        <div class="pet-card-main">
-                            <div class="pet-card-header"><h3 class="pet-card-name">${pet.name}</h3><div class="pet-card-breed">${translated.breed}</div></div>
-                            <div class="pet-card-details">${detailsHTML}</div>
-                            <div class="pet-card-tags">${healthTags}</div>
-                        </div>
-                        <div class="pet-card-side">
-                            <div class="pet-date">${date}</div>
-                            <a href="#" class="pet-card-btn" data-tr="İncele" data-en="View Details"></a>
-                        </div>
+                    <div class="pet-card-side">
+                        <div class="pet-date">${date}</div>
+                        <a href="#" class="pet-card-btn" data-tr="İncele" data-en="View Details"></a>
                     </div>
-                </div>`;
-        }
-    },
+                </div>
+            </div>`;
+    }
+},
 
     renderPagination() {
         const totalPages = Math.ceil(this.state.filteredPets.length / this.state.itemsPerPage);
@@ -362,10 +385,15 @@ const healthTags = petHealthArray.map(h =>
 
 updateFilterCounts() {
     const counts = this.state.allPets.reduce((acc, pet) => {
-        acc.animalType[pet.type] = (acc.animalType[pet.type] || 0) + 1;
-        acc.age[pet.ageGroup] = (acc.age[pet.ageGroup] || 0) + 1;
-        acc.size[pet.size] = (acc.size[pet.size] || 0) + 1;
-        acc.gender[pet.gender] = (acc.gender[pet.gender] || 0) + 1;
+        const normalizedType = this.normalizeValue(pet.type);
+        const normalizedSize = this.normalizeValue(pet.size);
+        const normalizedGender = this.normalizeValue(pet.gender);
+        const normalizedAgeGroup = this.normalizeValue(pet.ageGroup);
+        
+        acc.animalType[normalizedType] = (acc.animalType[normalizedType] || 0) + 1;
+        acc.age[normalizedAgeGroup] = (acc.age[normalizedAgeGroup] || 0) + 1;
+        acc.size[normalizedSize] = (acc.size[normalizedSize] || 0) + 1;
+        acc.gender[normalizedGender] = (acc.gender[normalizedGender] || 0) + 1;
         
         // Handle both array and object health format
         const petHealthArray = Array.isArray(pet.health) 
@@ -380,7 +408,10 @@ updateFilterCounts() {
         const { name, value } = cb;
         const countSpan = cb.parentElement.querySelector('.count');
         if (!countSpan) return;
-        countSpan.textContent = `(${(counts[name]?.[value]) || (value === 'all' ? this.state.allPets.length : 0)})`;
+        
+        const normalizedValue = this.normalizeValue(value);
+        const count = (counts[name]?.[normalizedValue]) || (value === 'all' ? this.state.allPets.length : 0);
+        countSpan.textContent = `(${count})`;
     });
 },
     
@@ -432,20 +463,46 @@ updateFilterCounts() {
         });
     },
 
-    translatePetData(pet, lang) {
-        const translations = {
-            type: { dog: { tr: 'Köpek', en: 'Dog' }, cat: { tr: 'Kedi', en: 'Cat' }, other: { tr: 'Diğer', en: 'Other' } },
-            size: { small: { tr: 'Küçük', en: 'Small' }, medium: { tr: 'Orta', en: 'Medium' }, large: { tr: 'Büyük', en: 'Large' } },
-            gender: { male: { tr: 'Erkek', en: 'Male' }, female: { tr: 'Dişi', en: 'Female' } }
-        };
-        return {
-            type: (translations.type[pet.type] || {})[lang] || pet.type,
-            size: (translations.size[pet.size] || {})[lang] || pet.size,
-            gender: (translations.gender[pet.gender] || {})[lang] || pet.gender,
-            breed: pet.breed,
-            description: pet.description.substring(0, 100) + '...',
-        };
-    },
+translatePetData(pet, lang) {
+    const translations = {
+        type: { 
+            'köpek': { tr: 'Köpek', en: 'Dog' },
+            'dog': { tr: 'Köpek', en: 'Dog' },
+            'kedi': { tr: 'Kedi', en: 'Cat' },
+            'cat': { tr: 'Kedi', en: 'Cat' },
+            'diğer': { tr: 'Diğer', en: 'Other' },
+            'other': { tr: 'Diğer', en: 'Other' }
+        },
+        size: { 
+            'küçük': { tr: 'Küçük', en: 'Small' },
+            'small': { tr: 'Küçük', en: 'Small' },
+            'orta': { tr: 'Orta', en: 'Medium' },
+            'medium': { tr: 'Orta', en: 'Medium' },
+            'büyük': { tr: 'Büyük', en: 'Large' },
+            'large': { tr: 'Büyük', en: 'Large' }
+        },
+        gender: { 
+            'erkek': { tr: 'Erkek', en: 'Male' },
+            'male': { tr: 'Erkek', en: 'Male' },
+            'dişi': { tr: 'Dişi', en: 'Female' },
+            'female': { tr: 'Dişi', en: 'Female' },
+            'belirtilmemiş': { tr: 'Belirtilmemiş', en: 'Unspecified' },
+            'unspecified': { tr: 'Belirtilmemiş', en: 'Unspecified' }
+        }
+    };
+    
+    const normalizedType = this.normalizeValue(pet.type);
+    const normalizedSize = this.normalizeValue(pet.size);
+    const normalizedGender = this.normalizeValue(pet.gender);
+    
+    return {
+        type: (translations.type[pet.type] || translations.type[normalizedType] || {})[lang] || pet.type,
+        size: (translations.size[pet.size] || translations.size[normalizedSize] || {})[lang] || pet.size,
+        gender: (translations.gender[pet.gender] || translations.gender[normalizedGender] || {})[lang] || pet.gender,
+        breed: pet.breed || (lang === 'tr' ? 'Belirtilmemiş' : 'Unspecified'),
+        description: (pet.description || '').substring(0, 100) + '...',
+    };
+},
 
     translateHealth(health, lang) {
         const translations = {
