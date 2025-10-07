@@ -372,38 +372,38 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
 
   try {
     const formDataToSend = new FormData(form);
-    const csrfToken = form.dataset.csrfToken;
-    formDataToSend.append('csrfToken', csrfToken);
+const csrfToken = form.dataset.csrfToken;
+formDataToSend.append('csrfToken', csrfToken);
 
-    // Handle file uploads and convert to base64
-    const fileInput = form.querySelector('#photos');
-    if (fileInput && fileInput.files.length > 0) {
-      const files = Array.from(fileInput.files);
-      
-      // Compress and convert each image
-      const compressionPromises = files.map(file => compressAndConvertToBase64(file));
-      
-      try {
-        const base64Images = await Promise.all(compressionPromises);
-        
-        // Remove the original file input from FormData
-        formDataToSend.delete('photos');
-        
-        // Add base64 encoded images
-        base64Images.forEach((base64, index) => {
-          formDataToSend.append(`photo${index + 1}`, base64);
-        });
-        
-        // Add number of photos for server validation
-        formDataToSend.append('photoCount', files.length);
-        
-        console.log('✅ All images compressed and ready for upload');
-        
-      } catch (error) {
-        console.error('Error compressing images:', error);
-        throw new Error('Fotoğraflar işlenirken bir hata oluştu. Lütfen tekrar deneyin.');
-      }
-    }
+// Handle file uploads and convert to base64
+const fileInput = form.querySelector('#photos');
+if (fileInput && fileInput.files.length > 0) {
+  const files = Array.from(fileInput.files);
+  
+  // Compress and convert each image
+  const compressionPromises = files.map(file => compressAndConvertToBase64(file));
+  
+  try {
+    const base64Images = await Promise.all(compressionPromises);
+    
+    // Remove the original file input from FormData
+    formDataToSend.delete('photos');
+    
+    // Add base64 encoded images
+    base64Images.forEach((base64, index) => {
+      formDataToSend.append(`photo${index + 1}`, base64);
+    });
+    
+    // Add number of photos for server validation
+    formDataToSend.append('photoCount', files.length);
+    
+    console.log('✅ All images compressed and ready for upload');
+    
+  } catch (error) {
+    console.error('Error compressing images:', error);
+    throw new Error('Fotoğraflar işlenirken bir hata oluştu. Lütfen tekrar deneyin.');
+  }
+}
 
     // Debug log to see what's being sent
     console.log('📋 Form data being sent to server:', Object.fromEntries(formDataToSend.entries()));
