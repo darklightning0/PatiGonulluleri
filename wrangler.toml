@@ -1,26 +1,19 @@
-# wrangler.toml - Cloudflare Pages Configuration
-
+# Top-level wrangler.toml - Cloudflare Pages Configuration
 name = "patigonulluleri"
 compatibility_date = "2024-01-01"
 
-# Pages configuration
+# Pages output directory
 pages_build_output_dir = "client"
 
-# KV namespace (for rate limiting)
+# KV namespace (if your Pages functions need it; optional)
 [[kv_namespaces]]
 binding = "RATE_LIMIT"
 id = "5b85cacbce7d442b8e6aa496986cced7"
 
-# R2 bucket binding
+# R2 bucket bindings
 [[r2_buckets]]
 binding = "IMAGES"
 bucket_name = "patigonulluleri-images"
-
-# R2 public domain configuration
-[env.production]
-r2_buckets = [
-  { binding = "IMAGES", bucket_name = "patigonulluleri-images" }
-]
 
 # Environment variables (non-sensitive)
 [vars]
@@ -33,8 +26,24 @@ BROADCAST_FROM = "Pati Gönüllüleri <noreply@patigonulluleri.com>"
 ADOPTION_FROM = "Pati Gönüllüleri <noreply@patigonulluleri.com>"
 R2_PUBLIC_DOMAIN = "images.patigonulluleri.com"
 
-# Secrets (set via: wrangler secret put SECRET_NAME)
-# - RESEND_API_KEY
-# - FIREBASE_API_KEY
-# - ADMIN_SECRET
+# Production-specific overrides
+[env.production]
+pages_build_output_dir = "client"
 
+[[env.production.kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "5b85cacbce7d442b8e6aa496986cced7"
+
+[[env.production.r2_buckets]]
+binding = "IMAGES"
+bucket_name = "patigonulluleri-images"
+
+[env.production.vars]
+FRONTEND_URL = "https://patigonulluleri.com"
+FIREBASE_PROJECT_ID = "patigonulluleri-1193e"
+WELCOME_FROM = "Pati Gönüllüleri <noreply@patigonulluleri.com>"
+WELCOME_SUBJECT = "Pati Gönüllüleri - Aboneliğinize Hoşgeldiniz"
+WELCOME_HTML = "<p>Hoşgeldiniz! Pati Gönüllüleri e-posta listesine kaydoldunuz.</p>"
+BROADCAST_FROM = "Pati Gönüllüleri <noreply@patigonulluleri.com>"
+ADOPTION_FROM = "Pati Gönüllüleri <noreply@patigonulluleri.com>"
+R2_PUBLIC_DOMAIN = "images.patigonulluleri.com"
