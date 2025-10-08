@@ -20,48 +20,48 @@ async function verify(key, signature, data) {
 }
 
 function validateFormData(formData) {
-  const errors = [];
-  const name = formData.get("name");
-  const email = formData.get("email");
-  const phone = formData.get("phone");
-  const city = formData.get("city");
-  const district = formData.get("district");
-  const animalType = formData.get("animalType");
-  const size = formData.get("size");
-  const description = formData.get("description");
-  const petName = formData.get("petName");
-  const privacyAgreement = formData.get("privacyAgreement");
+    const errors = [];
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const phone = formData.get("phone");
+    const city = formData.get("city");
+    const district = formData.get("district");
+    const petName = formData.get("petName");
+    const animalType = formData.get("animalType");
+    const size = formData.get("size");
+    const description = formData.get("description");
+    const privacyAgreement = formData.get("privacyAgreement");
 
-  if (!name || name.trim().length < 2) {
-    errors.push("Ad Soyad alanı zorunludur.");
-  }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.push("Geçerli bir e-posta adresi giriniz.");
-  }
-  if (!phone || !/^[\+]?[(]?[\d\s\-\(\)]{10,}$/.test(phone)) {
-    errors.push("Geçerli bir telefon numarası giriniz.");
-  }
-  if (!city) {
-    errors.push("Şehir seçimi zorunludur.");
-  }
-  if (!district) {
-    errors.push("İlçe seçimi zorunludur.");
-  }
-  if (!animalType) {
-    errors.push("Hayvan türü seçimi zorunludur.");
-  }
-  if (!size) {
-    errors.push("Boyut seçimi zorunludur.");
-  }
-  if (!petName || petName.trim().length < 2) {
-    errors.push("Hayvanın ismi en az 2 karakter olmalıdır.");
-  }
-  if (!description || description.trim().length < 10) {
-    errors.push("Açıklama alanı en az 10 karakter olmalıdır.");
-  }
-  if (privacyAgreement !== "on") {
-    errors.push("KVKK metnini onaylamanız gerekmektedir.");
-  }
+    if (!name || name.trim().length < 2) {
+        errors.push("Ad Soyad alanı zorunludur.");
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errors.push("Geçerli bir e-posta adresi giriniz.");
+    }
+    if (!phone || !/^[\+]?[(]?[\d\s\-\(\)]{10,}$/.test(phone)) {
+        errors.push("Geçerli bir telefon numarası giriniz.");
+    }
+    if (!city) {
+        errors.push("Şehir seçimi zorunludur.");
+    }
+    if (!district) {
+        errors.push("İlçe seçimi zorunludur.");
+    }
+    if (!animalType) {
+        errors.push("Hayvan türü seçimi zorunludur.");
+    }
+    if (!size) {
+        errors.push("Boyut seçimi zorunludur.");
+    }
+    if (!petName) {
+        errors.push("Hayvanınızın adı zorunludur.");
+    }
+    if (!description || description.trim().length < 2) {
+        errors.push("Açıklama alanı en az 10 karakter olmalıdır.");
+    }
+    if (privacyAgreement !== "on") {
+        errors.push("KVKK metnini onaylamanız gerekmektedir.");
+    }
 
   return {
     isValid: errors.length === 0,

@@ -227,6 +227,7 @@ function initAdoptionForm() {
   // Note: city/district are now simple text inputs; no external API calls required.
 }
 
+<<<<<<< HEAD
 async function compressAndConvertToBase64(file) {
     try {
         let workingFile = file;
@@ -271,9 +272,89 @@ async function compressAndConvertToBase64(file) {
             reader.readAsDataURL(compressedFile);
         });
 
+=======
+/**
+ * Convert HEIC/HEIF and other formats to WebP, then compress
+ * @param {File} file - The file to process
+ * @returns {Promise<string>} Base64 encoded WebP string
+ */
+async function compressAndConvertToBase64(file) {
+    try {
+        console.log(`🖼️ Processing: ${file.name}, Size: ${(file.size / 1024 / 1024).toFixed(2)}MB, Type: ${file.type}`);
+
+        let processedFile = file;
+        
+        // Step 1: Convert HEIC/HEIF to a web-compatible format first
+        if (file.type === 'image/heic' || file.type === 'image/heif' || 
+            file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+            
+            console.log('📸 HEIC/HEIF detected, converting to JPEG first...');
+            
+            try {
+                // Use heic2any library for conversion
+                const convertedBlob = await heic2any({
+                    blob: file,
+                    toType: 'image/jpeg',
+                    quality: 0.9
+                });
+                
+                // Handle array result (heic2any can return array)
+                const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+                processedFile = new File([blob], file.name.replace(/\.heic$/i, '.jpg'), { 
+                    type: 'image/jpeg' 
+                });
+                
+                console.log('✅ HEIC converted to JPEG');
+            } catch (heicError) {
+                console.error('❌ HEIC conversion failed:', heicError);
+                throw new Error('HEIC/HEIF formatı dönüştürülemedi. Lütfen farklı bir fotoğraf deneyin veya fotoğrafı JPEG olarak kaydedin.');
+            }
+        }
+
+        // Step 2: Compress and convert to WebP for optimal size
+        const options = {
+            maxSizeMB: 0.8,              // Target: 800KB max
+            maxWidthOrHeight: 1920,       // Max dimension
+            useWebWorker: true,           // Better performance
+            fileType: 'image/webp',       // WebP for best compression
+            initialQuality: 0.85,         // High quality
+            alwaysKeepResolution: false   // Allow downscaling if needed
+        };
+
+        console.log('🔄 Compressing to WebP...');
+        const compressedFile = await imageCompression(processedFile, options);
+
+        const compressionRatio = ((1 - compressedFile.size / file.size) * 100).toFixed(1);
+        console.log(`✅ Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB (${compressionRatio}% reduction)`);
+
+        // Step 3: Convert to base64
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const base64 = e.target.result.split(',')[1];
+                resolve(base64);
+            };
+            
+            reader.onerror = function(error) {
+                reject(new Error('Fotoğraf okunamadı. Lütfen tekrar deneyin.'));
+            };
+            
+            reader.readAsDataURL(compressedFile);
+        });
+        
+>>>>>>> 53dd97b (Pet Name - important)
     } catch (error) {
-        console.error('Compression error:', error);
-        throw new Error('Fotoğraf sıkıştırılırken hata oluştu. Lütfen farklı bir fotoğraf deneyin.');
+        console.error('❌ Processing error:', error);
+        
+        // Provide user-friendly error messages
+        if (error.message.includes('HEIC')) {
+            throw error; // Already has good message
+        } else if (error.message.includes('size')) {
+            throw new Error('Fotoğraf çok büyük. Lütfen daha küçük bir fotoğraf seçin.');
+        } else {
+            throw new Error('Fotoğraf işlenirken hata oluştu. Lütfen farklı bir fotoğraf deneyin.');
+        }
     }
 }
 
@@ -281,7 +362,7 @@ async function compressAndConvertToBase64(file) {
 function validateFileUpload(e) {
   const files = e.target.files;
   const maxFiles = 3;
-  const maxSize = 30 * 1024 * 1024; // 30MB total (after compression will be ~3-5MB)
+  const maxSize = 50 * 1024 * 1024; // 50MB total (to accommodate HEIC files)
   let totalSize = 0;
 
   if (files.length > maxFiles) {
@@ -292,20 +373,26 @@ function validateFileUpload(e) {
 
   for (let file of files) {
     totalSize += file.size;
-    if (!file.type.startsWith('image/')) {
+    
+    // Check if it's an image (including HEIC)
+    const isImage = file.type.startsWith('image/') || 
+                    file.name.toLowerCase().endsWith('.heic') || 
+                    file.name.toLowerCase().endsWith('.heif');
+    
+    if (!isImage) {
       showNotification('Lütfen sadece fotoğraf yükleyin.', 'error');
       e.target.value = '';
       return;
     }
     
-    // Warn if individual file is very large (will take time to compress)
-    if (file.size > 15 * 1024 * 1024) {
-      showNotification(`⚠️ ${file.name} çok büyük (${(file.size / 1024 / 1024).toFixed(1)}MB). Sıkıştırma biraz zaman alabilir.`, 'warning');
+    // Warn if individual file is very large
+    if (file.size > 20 * 1024 * 1024) {
+      showNotification(`⚠️ ${file.name} çok büyük (${(file.size / 1024 / 1024).toFixed(1)}MB). İşlem biraz zaman alabilir.`, 'warning');
     }
   }
 
   if (totalSize > maxSize) {
-    showNotification('Toplam dosya boyutu 30MB\'ı geçemez.', 'error');
+    showNotification('Toplam dosya boyutu 50MB\'ı geçemez.', 'error');
     e.target.value = '';
   }
 }
