@@ -91,6 +91,7 @@ export async function onRequestPost(context) {
   
   const GOOGLE_SCRIPT_URL = env.GOOGLE_SCRIPT_URL;
   console.log("GOOGLE_SCRIPT_URL:", GOOGLE_SCRIPT_URL);
+  console.log("GOOGLE_SCRIPT_URL:");
   const SECRET_KEY = env.TOKEN_KEY;
 
   // Check environment variables
