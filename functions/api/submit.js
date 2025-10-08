@@ -278,30 +278,76 @@ export async function onRequestPost(context) {
     console.log(`Total fields to send: ${fieldCount}`);
     console.log(`Sending to URL: ${GOOGLE_SCRIPT_URL}`);
     
-    // Convert FormData to URL-encoded format for Google Script
-    const formEntries = {};
-    for (let [key, value] of cleanFormData.entries()) {
-      // Handle files separately
+    // Safe conversion of FormData to a simple object
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit per file
+    const MAX_TOTAL_SIZE = 20 * 1024 * 1024; // 20MB total limit
+    let formDataTotalSize = 0;
+
+    // Function to safely process form values
+    async function processFormValue(value) {
       if (value instanceof File || value instanceof Blob) {
+        if (value.size > MAX_FILE_SIZE) {
+          throw new Error(`File ${value.name} exceeds size limit of 5MB`);
+        }
+        
         // Convert File/Blob to base64
-        const arrayBuffer = await value.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-        formEntries[key] = {
+        const buffer = await value.arrayBuffer();
+        formDataTotalSize += buffer.byteLength;
+        
+        if (formDataTotalSize > MAX_TOTAL_SIZE) {
+          throw new Error('Total file size exceeds 20MB limit');
+        }
+        
+        // Convert to base64 in chunks to avoid memory issues
+        const chunks = [];
+        const uint8Array = new Uint8Array(buffer);
+        const chunkSize = 1024 * 512; // 512KB chunks
+        
+        for (let i = 0; i < uint8Array.length; i += chunkSize) {
+          const chunk = uint8Array.slice(i, i + chunkSize);
+          chunks.push(String.fromCharCode.apply(null, chunk));
+        }
+        
+        return {
           name: value.name,
           type: value.type,
-          content: base64
+          size: value.size,
+          content: btoa(chunks.join(''))
         };
-      } else {
-        formEntries[key] = value;
+      }
+      
+      // For non-file values, ensure they're simple strings
+      return String(value);
+    }
+
+    // Process form data
+    console.log('Processing form data...');
+    const formEntries = {};
+    
+    for (let [key, value] of cleanFormData.entries()) {
+      try {
+        console.log(`Processing field: ${key} (${typeof value})`);
+        formEntries[key] = await processFormValue(value);
+      } catch (error) {
+        console.error(`Error processing field ${key}:`, error);
+        throw new Error(`Failed to process form field ${key}: ${error.message}`);
       }
     }
+
+    console.log('Form data processed:', {
+      fields: Object.keys(formEntries),
+      totalSize: `${Math.round(formDataTotalSize / 1024)}KB`
+    });
 
     // Make the request to Google Script
     const googleResponse = await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify(formEntries),
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        data: formEntries
+      }),
       headers: {
-        'Content-Type': 'application/json'  // Send as JSON which Google Apps Script can handle better
+        'Content-Type': 'application/json'
       },
       redirect: 'follow'
     });
