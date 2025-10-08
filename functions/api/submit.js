@@ -92,12 +92,46 @@ export async function onRequestPost(context) {
     });
   }
 
-  if (!GOOGLE_SCRIPT_URL || !GOOGLE_SCRIPT_URL.startsWith('https://script.google.com/macros/s/')) {
-    console.error("GOOGLE_SCRIPT_URL is not set or invalid:", GOOGLE_SCRIPT_URL?.substring(0, 30) + '...');
+  // Validate Google Script URL
+  if (!GOOGLE_SCRIPT_URL) {
+    console.error("GOOGLE_SCRIPT_URL is not set");
     return new Response(
       JSON.stringify({ 
         result: 'error', 
-        message: 'Server configuration error: Invalid or missing GOOGLE_SCRIPT_URL.' 
+        message: 'Server configuration error: GOOGLE_SCRIPT_URL is not set.' 
+      }), 
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
+
+  try {
+    const scriptUrl = new URL(GOOGLE_SCRIPT_URL);
+    if (!scriptUrl.hostname.endsWith('script.google.com') || !scriptUrl.pathname.includes('/macros/s/')) {
+      console.error("Invalid Google Script URL format:", 
+        `Host: ${scriptUrl.hostname}, ` +
+        `Path: ${scriptUrl.pathname.substring(0, 20)}...`
+      );
+      return new Response(
+        JSON.stringify({ 
+          result: 'error', 
+          message: 'Server configuration error: Invalid Google Script URL format.' 
+        }), 
+        { 
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    console.log("✅ Google Script URL validated");
+  } catch (urlError) {
+    console.error("Invalid Google Script URL:", urlError);
+    return new Response(
+      JSON.stringify({ 
+        result: 'error', 
+        message: 'Server configuration error: GOOGLE_SCRIPT_URL is not a valid URL.' 
       }), 
       { 
         status: 500,
@@ -244,14 +278,32 @@ export async function onRequestPost(context) {
     console.log(`Total fields to send: ${fieldCount}`);
     console.log(`Sending to URL: ${GOOGLE_SCRIPT_URL}`);
     
+    // Convert FormData to URL-encoded format for Google Script
+    const formEntries = {};
+    for (let [key, value] of cleanFormData.entries()) {
+      // Handle files separately
+      if (value instanceof File || value instanceof Blob) {
+        // Convert File/Blob to base64
+        const arrayBuffer = await value.arrayBuffer();
+        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        formEntries[key] = {
+          name: value.name,
+          type: value.type,
+          content: base64
+        };
+      } else {
+        formEntries[key] = value;
+      }
+    }
+
     // Make the request to Google Script
     const googleResponse = await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
-      body: cleanFormData,
-      redirect: 'follow',  // Follow redirects
+      body: JSON.stringify(formEntries),
       headers: {
-        'Content-Type': 'multipart/form-data'  // Required for Google Apps Script to process the form data
-      }
+        'Content-Type': 'application/json'  // Send as JSON which Google Apps Script can handle better
+      },
+      redirect: 'follow'
     });
     
     console.log(`Google Script Response Status: ${googleResponse.status}`);
@@ -262,40 +314,62 @@ export async function onRequestPost(context) {
     console.log(`Response text length: ${responseText.length}`);
     console.log(`First 200 chars: ${responseText.substring(0, 200)}`);
     
-    // Try to parse as JSON
+    // Handle response
     let responseData;
+    
+    // Handle different response status codes
+    if (googleResponse.status === 400) {
+      throw new Error('Google Script rejected the request format. Check if all required fields are present.');
+    } else if (googleResponse.status === 401 || googleResponse.status === 403) {
+      throw new Error('Google Script authentication failed. Check deployment permissions.');
+    } else if (googleResponse.status === 404) {
+      throw new Error('Google Script URL not found. Verify the deployment URL.');
+    } else if (googleResponse.status >= 500) {
+      throw new Error('Google Script server error. Check script logs for details.');
+    }
+
     try {
-      responseData = JSON.parse(responseText);
-      console.log("✅ Successfully parsed JSON response");
-    } catch (parseError) {
-      console.error("Failed to parse as JSON:", parseError);
-      
-      // Check if it's an HTML error page
-      if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
-        console.error("Received HTML instead of JSON - likely an error page");
+      const responseText = await googleResponse.text();
+      console.log('Google Script Response:', responseText.substring(0, 200));
+
+      try {
+        responseData = JSON.parse(responseText);
+        console.log("✅ Successfully parsed JSON response");
+      } catch (parseError) {
+        console.error("Response is not JSON:", responseText.substring(0, 200));
         
-        // Check for common error messages in HTML
-        if (responseText.includes('does not have permission')) {
-          throw new Error("Google Script permission error - check deployment settings");
-        }
-        if (responseText.includes('Script function not found')) {
-          throw new Error("Google Script doPost function not found");
-        }
-      }
-      
-      // If status is OK, treat as success
-      if (googleResponse.status === 200 || googleResponse.status === 302) {
-        console.log("Treating as success despite non-JSON response");
-        return new Response(
-          JSON.stringify({ result: 'success', message: 'Form submitted successfully' }), 
-          { 
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
+        // Check if it's an HTML error page
+        if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
+          if (responseText.includes('does not have permission')) {
+            throw new Error("Google Script permission error - check deployment settings");
           }
-        );
-      } else {
-        throw new Error(`Google Script returned status ${googleResponse.status}`);
+          if (responseText.includes('Script function not found')) {
+            throw new Error("Google Script doPost function not found");
+          }
+          throw new Error("Received HTML error page from Google Script");
+        }
+        
+        // If status is OK but not JSON, treat as success
+        if (googleResponse.status === 200 || googleResponse.status === 302) {
+          console.log("Non-JSON success response");
+          return new Response(
+            JSON.stringify({ 
+              result: 'success', 
+              message: 'Form submitted successfully',
+              response: responseText.substring(0, 100)
+            }), 
+            { 
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
+        }
+        
+        throw new Error(`Invalid response format from Google Script: ${responseText.substring(0, 100)}`);
       }
+    } catch (error) {
+      console.error('Response processing error:', error);
+      throw error;
     }
     
     return new Response(JSON.stringify(responseData), {
