@@ -1,24 +1,12 @@
 /**
- * Cloudflare Function - /functions/api/submit.js
- *
- * Securely proxies form data to Google Apps Script
- * and includes CSRF protection.
+ * DEBUG VERSION - Cloudflare Worker /functions/api/submit.js
+ * Added extensive logging to debug the issue
  */
 
-/**
- * Verifies the HMAC signature of the token.
- * @param {CryptoKey} key - The secret key for signing.
- * @param {string} signature - The base64-encoded signature from the cookie.
- * @param {string} data - The data to verify (the token from the form).
- * @returns {Promise<boolean>} - True if the signature is valid.
- */
 async function verify(key, signature, data) {
   try {
-    // Decode the base64 signature
     const sig = atob(signature);
-    // Convert the string to a byte array
     const sigBytes = Uint8Array.from(sig, (c) => c.charCodeAt(0));
-    // Verify the signature
     return await crypto.subtle.verify(
       "HMAC",
       key,
@@ -31,11 +19,6 @@ async function verify(key, signature, data) {
   }
 }
 
-/**
- * Validates the form data against a set of rules.
- * @param {FormData} formData - The form data to validate.
- * @returns {{isValid: boolean, errors: string[]}} - An object containing the validation result.
- */
 function validateFormData(formData) {
     const errors = [];
     const name = formData.get("name");
@@ -70,11 +53,11 @@ function validateFormData(formData) {
     if (!size) {
         errors.push("Boyut seçimi zorunludur.");
     }
-  if (!petName || petName.trim().length < 2) {
-    errors.push("Hayvanın ismi en az 2 karakter olmalıdır.");
-  }
-  if (!description || description.trim().length < 10) {
-    errors.push("Açıklama alanı en az 10 karakter olmalıdır.");
+    if (!petName || petName.trim().length < 2) {
+        errors.push("Hayvanın ismi en az 2 karakter olmalıdır.");
+    }
+    if (!description || description.trim().length < 10) {
+        errors.push("Açıklama alanı en az 10 karakter olmalıdır.");
     }
     if (privacyAgreement !== "on") {
         errors.push("KVKK metnini onaylamanız gerekmektedir.");
@@ -87,15 +70,22 @@ function validateFormData(formData) {
 }
 
 export async function onRequestPost(context) {
-  console.log("Received a form submission request.");
+  console.log("=== CLOUDFLARE WORKER START ===");
   const { request, env } = context;
   
   const GOOGLE_SCRIPT_URL = env.GOOGLE_SCRIPT_URL;
   const SECRET_KEY = env.TOKEN_KEY;
 
-  // Check environment variables
+  // Debug: Log environment variables (without exposing sensitive data)
+  console.log("Environment check:", {
+    hasGoogleUrl: !!GOOGLE_SCRIPT_URL,
+    googleUrlLength: GOOGLE_SCRIPT_URL ? GOOGLE_SCRIPT_URL.length : 0,
+    googleUrlStart: GOOGLE_SCRIPT_URL ? GOOGLE_SCRIPT_URL.substring(0, 30) + "..." : "MISSING",
+    hasSecretKey: !!SECRET_KEY
+  });
+
   if (!SECRET_KEY) {
-    console.error("CSRF validation failed: TOKEN_KEY secret is not set.");
+    console.error("TOKEN_KEY is not set");
     return new Response(JSON.stringify({ result: 'error', message: 'Server configuration error: TOKEN_KEY missing.' }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
@@ -103,7 +93,7 @@ export async function onRequestPost(context) {
   }
 
   if (!GOOGLE_SCRIPT_URL) {
-    console.error("GOOGLE_SCRIPT_URL is not set.");
+    console.error("GOOGLE_SCRIPT_URL is not set");
     return new Response(
       JSON.stringify({ result: 'error', message: 'Server configuration error: GOOGLE_SCRIPT_URL missing.' }), 
       { 
@@ -116,41 +106,39 @@ export async function onRequestPost(context) {
   let formData;
   let bodyToken;
 
-  // --- CSRF VALIDATION START ---
+  // CSRF Validation
   try {
-    // Clone request to read form data without consuming the body
     formData = await request.clone().formData();
     bodyToken = formData.get("csrfToken");
     const cookie = request.headers.get("Cookie");
     
+    console.log("CSRF Check:", {
+      hasBodyToken: !!bodyToken,
+      hasCookie: !!cookie
+    });
+    
     if (!bodyToken) {
-      console.error("❌ No CSRF token in form body");
       throw new Error("CSRF token not found in form body.");
     }
     
     const cookieToken = cookie?.match(/__csrf_token=([^;]+)/)?.[1];
 
     if (!cookieToken) {
-      console.error("❌ No CSRF token in cookies");
       throw new Error("CSRF token not found in cookies.");
     }
 
     const [token, signature] = cookieToken.split(".");
 
     if (!token || !signature) {
-      console.error("❌ Cookie token is malformed");
       throw new Error("CSRF cookie is malformed.");
     }
 
-    // Check if tokens match
     const tokensMatch = bodyToken === token;
     
     if (!tokensMatch) {
-      console.error("❌ Token mismatch - Body:", bodyToken, "Cookie:", token);
       throw new Error("CSRF token mismatch.");
     }
 
-    // Verify signature
     const key = await crypto.subtle.importKey(
       "raw",
       new TextEncoder().encode(SECRET_KEY),
@@ -162,10 +150,10 @@ export async function onRequestPost(context) {
     const signatureValid = await verify(key, signature, bodyToken);
 
     if (!signatureValid) {
-      console.error("❌ Invalid signature");
       throw new Error("Invalid CSRF token signature.");
     }
     
+    console.log("✅ CSRF validation passed");
     
   } catch (error) {
     console.error("CSRF Validation Failed:", error.message);
@@ -180,29 +168,29 @@ export async function onRequestPost(context) {
       }
     );
   }
-  // --- CSRF VALIDATION END ---
-  // --- SERVER-SIDE VALIDATION START ---
-try {
-    console.log("🔍 Starting server-side validation...");
+
+  // Server-side validation
+  try {
+    console.log("Starting server-side validation...");
     const validationResult = validateFormData(formData);
 
     if (!validationResult.isValid) {
-        console.error("❌ Server-side validation failed:", validationResult.errors);
+        console.error("Validation failed:", validationResult.errors);
         return new Response(
             JSON.stringify({
                 result: 'error',
-                message: 'Form verileri geçersiz. Lütfen alanları kontrol edip tekrar deneyin.',
+                message: 'Form verileri geçersiz.',
                 errors: validationResult.errors,
             }),
             {
-                status: 400, // Bad Request
+                status: 400,
                 headers: { 'Content-Type': 'application/json' }
             }
         );
     }
-    console.log("✅ Server-side validation passed.");
-} catch (error) {
-    console.error("Validation error:", error.message);
+    console.log("✅ Validation passed");
+  } catch (error) {
+    console.error("Validation error:", error);
     return new Response(
         JSON.stringify({
             result: 'error',
@@ -213,36 +201,67 @@ try {
             headers: { 'Content-Type': 'application/json' }
         }
     );
-}
-// --- SERVER-SIDE VALIDATION END ---
-  // --- FORWARD TO GOOGLE SCRIPT ---
+  }
+
+  // Forward to Google Script
   try {
+    console.log("📤 Preparing to forward to Google Script");
     
-    // Remove CSRF token from form data before forwarding
+    // Create clean FormData
     const cleanFormData = new FormData();
+    let fieldCount = 0;
     for (let [key, value] of formData.entries()) {
       if (key !== 'csrfToken') {
         cleanFormData.append(key, value);
+        fieldCount++;
+        // Log first 50 chars of each field
+        const preview = typeof value === 'string' ? value.substring(0, 50) : '[FILE]';
+        console.log(`Field: ${key} = ${preview}...`);
       }
     }
     
+    console.log(`Total fields to send: ${fieldCount}`);
+    console.log(`Sending to URL: ${GOOGLE_SCRIPT_URL}`);
     
+    // Make the request to Google Script
     const googleResponse = await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       body: cleanFormData,
+      redirect: 'follow'  // Follow redirects
     });
     
-    // Read the response body as text first
+    console.log(`Google Script Response Status: ${googleResponse.status}`);
+    console.log(`Response Headers:`, Object.fromEntries(googleResponse.headers.entries()));
+    
+    // Read response
     const responseText = await googleResponse.text();
+    console.log(`Response text length: ${responseText.length}`);
+    console.log(`First 200 chars: ${responseText.substring(0, 200)}`);
     
     // Try to parse as JSON
     let responseData;
     try {
       responseData = JSON.parse(responseText);
+      console.log("✅ Successfully parsed JSON response");
     } catch (parseError) {
-      console.error("Failed to parse Google Script response as JSON:", parseError);
-      // If Google Script returns HTML or non-JSON, treat as success if status is 200/302
+      console.error("Failed to parse as JSON:", parseError);
+      
+      // Check if it's an HTML error page
+      if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
+        console.error("Received HTML instead of JSON - likely an error page");
+        
+        // Check for common error messages in HTML
+        if (responseText.includes('does not have permission')) {
+          throw new Error("Google Script permission error - check deployment settings");
+        }
+        if (responseText.includes('Script function not found')) {
+          throw new Error("Google Script doPost function not found");
+        }
+      }
+      
+      // If status is OK, treat as success
       if (googleResponse.status === 200 || googleResponse.status === 302) {
+        console.log("Treating as success despite non-JSON response");
         return new Response(
           JSON.stringify({ result: 'success', message: 'Form submitted successfully' }), 
           { 
@@ -251,11 +270,10 @@ try {
           }
         );
       } else {
-        throw new Error("Google Script returned non-JSON error response");
+        throw new Error(`Google Script returned status ${googleResponse.status}`);
       }
     }
     
-    // Return the parsed response
     return new Response(JSON.stringify(responseData), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
@@ -265,25 +283,10 @@ try {
     console.error('❌ Error forwarding to Google Script:', error);
     console.error('Error details:', error.stack);
     
-    // Since the data might have been saved despite the error, 
-    // check if it's a response parsing issue
-    if (error.message.includes('JSON')) {
-      return new Response(
-        JSON.stringify({ 
-          result: 'success', 
-          message: 'Form submitted (with warnings)' 
-        }), 
-        { 
-          status: 200,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
-    
     return new Response(
       JSON.stringify({ 
         result: 'error', 
-        message: 'An error occurred while processing your request. Please try again.' 
+        message: `Failed to submit form: ${error.message}` 
       }), 
       { 
         status: 500,
