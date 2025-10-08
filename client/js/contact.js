@@ -439,15 +439,36 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     console.log(formDataEntries);
 
     // ==========================================
-    // SEND TO SERVER
+    // CONVERT FORMDATA TO JSON OBJECT
+    // ==========================================
+    const jsonData = {};
+    for (let [key, value] of formDataToSend.entries()) {
+      // Handle array fields (health[])
+      if (key.endsWith('[]')) {
+        const cleanKey = key.replace('[]', '');
+        if (!jsonData[cleanKey]) {
+          jsonData[cleanKey] = [];
+        }
+        jsonData[cleanKey].push(value);
+      } else {
+        jsonData[key] = value;
+      }
+    }
+    
+    console.log('📦 Sending as JSON with', Object.keys(jsonData).length, 'fields');
+
+    // ==========================================
+    // SEND TO SERVER AS JSON
     // ==========================================
     console.log('🚀 Sending request to', ADOPTION_FORM_ENDPOINT);
     
     const response = await fetch(ADOPTION_FORM_ENDPOINT, {
       method: 'POST',
-      body: formDataToSend,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(jsonData),
       credentials: 'include'
-      // DON'T set Content-Type - let browser set it with boundary
     });
 
     console.log('📥 Server response:', response.status, response.statusText);
