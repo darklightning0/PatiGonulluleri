@@ -92,10 +92,13 @@ export async function onRequestPost(context) {
     });
   }
 
-  if (!GOOGLE_SCRIPT_URL) {
-    console.error("GOOGLE_SCRIPT_URL is not set");
+  if (!GOOGLE_SCRIPT_URL || !GOOGLE_SCRIPT_URL.startsWith('https://script.google.com/macros/s/')) {
+    console.error("GOOGLE_SCRIPT_URL is not set or invalid:", GOOGLE_SCRIPT_URL?.substring(0, 30) + '...');
     return new Response(
-      JSON.stringify({ result: 'error', message: 'Server configuration error: GOOGLE_SCRIPT_URL missing.' }), 
+      JSON.stringify({ 
+        result: 'error', 
+        message: 'Server configuration error: Invalid or missing GOOGLE_SCRIPT_URL.' 
+      }), 
       { 
         status: 500,
         headers: { 'Content-Type': 'application/json' }
@@ -207,18 +210,36 @@ export async function onRequestPost(context) {
   try {
     console.log("📤 Preparing to forward to Google Script");
     
-    // Create clean FormData
+    // Create clean FormData and log contents
     const cleanFormData = new FormData();
     let fieldCount = 0;
+    let totalSize = 0;
+    
+    console.log("Original form data entries:");
     for (let [key, value] of formData.entries()) {
       if (key !== 'csrfToken') {
         cleanFormData.append(key, value);
         fieldCount++;
-        // Log first 50 chars of each field
-        const preview = typeof value === 'string' ? value.substring(0, 50) : '[FILE]';
-        console.log(`Field: ${key} = ${preview}...`);
+        
+        // Calculate size and log field info
+        let fieldSize = 0;
+        if (value instanceof File || value instanceof Blob) {
+          fieldSize = value.size;
+          console.log(`Field: ${key} = [File/Blob] Type: ${value.type}, Size: ${value.size} bytes`);
+        } else {
+          fieldSize = new TextEncoder().encode(String(value)).length;
+          const preview = String(value).substring(0, 50);
+          console.log(`Field: ${key} = "${preview}${preview.length < String(value).length ? '...' : ''}", Size: ${fieldSize} bytes`);
+        }
+        totalSize += fieldSize;
       }
     }
+    
+    console.log(`Form Summary:
+      Total Fields: ${fieldCount}
+      Total Size: ${totalSize} bytes
+      Content-Type: ${request.headers.get('Content-Type')}
+    `);
     
     console.log(`Total fields to send: ${fieldCount}`);
     console.log(`Sending to URL: ${GOOGLE_SCRIPT_URL}`);
@@ -227,7 +248,10 @@ export async function onRequestPost(context) {
     const googleResponse = await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       body: cleanFormData,
-      redirect: 'follow'  // Follow redirects
+      redirect: 'follow',  // Follow redirects
+      headers: {
+        'Content-Type': 'multipart/form-data'  // Required for Google Apps Script to process the form data
+      }
     });
     
     console.log(`Google Script Response Status: ${googleResponse.status}`);
