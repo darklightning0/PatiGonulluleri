@@ -1,6 +1,6 @@
 /**
- * CORRECTED VERSION - Cloudflare Worker /functions/api/submit.js
- * Forwards the original request body to Google Apps Script to ensure compatibility.
+ * CORRECTED VERSION 2 - Cloudflare Worker /functions/api/submit.js
+ * Fixes the typo in the digest algorithm (SHA-256).
  */
 
 // Helper function to verify the CSRF token signature
@@ -24,7 +24,7 @@ async function verify(key, signature, data) {
 function validateFormData(formData) {
     const errors = [];
     const requiredFields = ["name", "email", "phone", "city", "district", "animalType", "size", "petName", "description", "privacyAgreement"];
-    
+
     for (const field of requiredFields) {
         if (!formData.get(field)) {
             errors.push(`Missing required field: ${field}`);
@@ -65,8 +65,6 @@ export async function onRequestPost(context) {
 
     try {
         // --- CSRF and Form Validation ---
-        // We must clone the request to read its body for validation,
-        // leaving the original request body intact to be forwarded later.
         const clonedRequest = request.clone();
         const formData = await clonedRequest.formData();
 
@@ -89,7 +87,8 @@ export async function onRequestPost(context) {
 
         const key = await crypto.subtle.importKey(
             "raw", new TextEncoder().encode(SECRET_KEY),
-            { name: "HMAC", hash: "SHA-265" },
+            // *** THE FIX IS HERE: Changed "SHA-265" to "SHA-256" ***
+            { name: "HMAC", hash: "SHA-256" },
             false, ["verify"]
         );
 
@@ -114,17 +113,12 @@ export async function onRequestPost(context) {
 
 
         // --- Forward the ORIGINAL request to Google Script ---
-        // This is the critical change. We forward the original, untouched request body
-        // and its 'Content-Type' header, which includes the multipart boundary.
-        
         console.log("📤 Forwarding original request to Google Script...");
 
         const googleResponse = await fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
-            body: request.body, // Use the original request's body stream
+            body: request.body,
             headers: {
-                // Pass the original Content-Type header, which is essential
-                // for the Google Apps Script to parse the multipart data correctly.
                 'Content-Type': request.headers.get('Content-Type'),
             },
             redirect: 'follow'
@@ -132,11 +126,9 @@ export async function onRequestPost(context) {
 
         console.log(`Google Script Response Status: ${googleResponse.status}`);
         
-        // Return the response from Google Script directly to the client
         const responseBody = await googleResponse.text();
-         console.log(`Response from Google: ${responseBody}`);
+        console.log(`Response from Google: ${responseBody}`);
 
-        // It's important to return a Response object
         return new Response(responseBody, {
             status: googleResponse.status,
             headers: { 'Content-Type': 'application/json' }
