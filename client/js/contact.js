@@ -321,15 +321,12 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     console.error('❌ CSRF token not ready');
     showNotification('Güvenlik anahtarı hazır değil. Lütfen bekleyin veya sayfayı yenileyin.', 'error');
     
-    // Try to fetch token again
-    const tokenPromise = fetch('/api/token', {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: { 'Accept': 'application/json' }
-    });
-    
     try {
-      const response = await tokenPromise;
+      const response = await fetch('/api/token', {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json' }
+      });
       const data = await response.json();
       if (data.csrfToken) {
         form.dataset.csrfToken = data.csrfToken;
@@ -350,19 +347,15 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     }
   }
 
-  // Create FormData from the form
-  const formData = new FormData(form);
-
-  // Add the CSRF token from the data attribute
+  // Get CSRF token
   const csrfToken = form.dataset.csrfToken;
-  if (csrfToken) {
-    formData.append('csrfToken', csrfToken);
-  } else {
+  if (!csrfToken) {
     showNotification('Güvenlik hatası. Lütfen sayfayı yenileyin.', 'error');
     return;
   }
 
-  if (!formData.get('privacyAgreement')) {
+  // Check privacy agreement
+  if (!form.querySelector('#privacy-agreement').checked) {
     showNotification('Lütfen KVKK metnini onaylayın.', 'error');
     return;
   }
@@ -371,30 +364,54 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gönderiliyor...';
 
   try {
-    const formDataToSend = new FormData(form);
-    const csrfToken = form.dataset.csrfToken;
+    // ==========================================
+    // CREATE CLEAN FORMDATA (NO FILE OBJECTS)
+    // ==========================================
+    const formDataToSend = new FormData();
+    
+    // Add CSRF token first
     formDataToSend.append('csrfToken', csrfToken);
-
-    // Handle file uploads and convert to base64
+    
+    // Add all text fields manually (skip file inputs)
+    const textFields = [
+      'name', 'email', 'phone', 'availableHours', 'city', 'district',
+      'petName', 'animalType', 'breed', 'age', 'size', 'gender',
+      'extraHealth', 'description', 'privacyAgreement'
+    ];
+    
+    textFields.forEach(fieldName => {
+      const field = form.querySelector(`[name="${fieldName}"]`);
+      if (field) {
+        formDataToSend.append(fieldName, field.value || '');
+      }
+    });
+    
+    // Handle health checkboxes
+    const healthCheckboxes = form.querySelectorAll('[name="health[]"]:checked');
+    healthCheckboxes.forEach(checkbox => {
+      formDataToSend.append('health[]', checkbox.value);
+    });
+    
+    // ==========================================
+    // HANDLE IMAGE COMPRESSION AND BASE64
+    // ==========================================
     const fileInput = form.querySelector('#photos');
     if (fileInput && fileInput.files.length > 0) {
       const files = Array.from(fileInput.files);
       
-      // Compress and convert each image
-      const compressionPromises = files.map(file => compressAndConvertToBase64(file));
+      console.log(`📸 Processing ${files.length} images...`);
       
       try {
+        // Compress and convert each image
+        const compressionPromises = files.map(file => compressAndConvertToBase64(file));
         const base64Images = await Promise.all(compressionPromises);
         
-        // Remove the original file input from FormData
-        formDataToSend.delete('photos');
-        
-        // Add base64 encoded images
+        // Add base64 encoded images (NO file objects)
         base64Images.forEach((base64, index) => {
           formDataToSend.append(`photo${index + 1}`, base64);
         });
         
-        // Add number of photos for server validation
+        // Add photo count
         formDataToSend.append('photoCount', files.length);
         
         console.log('✅ All images compressed and ready for upload');
@@ -403,30 +420,62 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
         console.error('Error compressing images:', error);
         throw new Error('Fotoğraflar işlenirken bir hata oluştu. Lütfen tekrar deneyin.');
       }
+    } else {
+      console.log('⚠️ No images to upload');
     }
 
-    // Debug log to see what's being sent
-    console.log('📋 Form data being sent to server:', Object.fromEntries(formDataToSend.entries()));
+    // ==========================================
+    // LOG WHAT WE'RE SENDING (for debugging)
+    // ==========================================
+    console.log('📋 Form data being sent to server:');
+    const formDataEntries = {};
+    for (let [key, value] of formDataToSend.entries()) {
+      if (key.startsWith('photo') && key !== 'photoCount') {
+        formDataEntries[key] = `[base64 image, ${value.length} chars]`;
+      } else {
+        formDataEntries[key] = value;
+      }
+    }
+    console.log(formDataEntries);
 
+    // ==========================================
+    // SEND TO SERVER
+    // ==========================================
+    console.log('🚀 Sending request to', ADOPTION_FORM_ENDPOINT);
+    
     const response = await fetch(ADOPTION_FORM_ENDPOINT, {
-        method: 'POST',
-        body: formDataToSend,
-        credentials: 'include'
+      method: 'POST',
+      body: formDataToSend,
+      credentials: 'include'
+      // DON'T set Content-Type - let browser set it with boundary
     });
 
-    const result = await response.json();
+    console.log('📥 Server response:', response.status, response.statusText);
 
-    if (!response.ok) {
-   
-        const errorMessages = result.errors 
-            ? result.errors.join('<br>') 
-            : (result.message || 'Bilinmeyen bir sunucu hatası oluştu.');
-        
-        // Throw a new error to be caught by the 'catch' block below
-        throw new Error(errorMessages);
+    // Parse response
+    let result;
+    try {
+      result = await response.json();
+      console.log('📄 Response data:', result);
+    } catch (parseError) {
+      console.error('❌ Failed to parse response as JSON:', parseError);
+      throw new Error('Sunucu yanıtı işlenemedi.');
     }
 
-    // This code will only run if the response was successful (status 200-299)
+    // Check if request was successful
+    if (!response.ok) {
+      const errorMessages = result.errors 
+        ? result.errors.join('<br>') 
+        : (result.message || 'Bilinmeyen bir sunucu hatası oluştu.');
+      
+      throw new Error(errorMessages);
+    }
+
+    // ==========================================
+    // SUCCESS! 
+    // ==========================================
+    console.log('✅ Form submitted successfully!');
+    
     showNotification('İlanınız başarıyla gönderildi! En kısa sürede yayınlanacaktır.', 'success');
 
     // Reset form
@@ -434,37 +483,46 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
     delete form.dataset.csrfToken;
     csrfTokenReady = false;
     
+    // Clear file input
     const photoInput = form.querySelector('#photos');
     if (photoInput) photoInput.value = '';
-  // Clear city/district text inputs (they were converted from selects)
-  const cityInput = form.querySelector('#city');
-  if (cityInput) cityInput.value = '';
-  const districtInput = form.querySelector('#district');
-  if (districtInput) districtInput.value = '';
+    
+    // Clear city/district inputs
+    const cityInput = form.querySelector('#city');
+    if (cityInput) cityInput.value = '';
+    const districtInput = form.querySelector('#district');
+    if (districtInput) districtInput.value = '';
+    
+    // Go back to first step
     goToStep(1);
+    
+    // Clear error styling
     form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
     
-    // Fetch a new token for the next submission
+    // Fetch a new CSRF token
     fetch('/api/token', {
-        method: 'GET',
-        credentials: 'same-origin',
-        headers: { 'Accept': 'application/json' }
-    }).then(res => res.json()).then(data => {
-        if (data.csrfToken) {
-            form.dataset.csrfToken = data.csrfToken;
-            csrfTokenReady = true;
-            console.log('✅ New CSRF token ready for next submission');
-        }
-    }).catch(err => console.error('Failed to fetch new token:', err));
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.csrfToken) {
+        form.dataset.csrfToken = data.csrfToken;
+        csrfTokenReady = true;
+        console.log('✅ New CSRF token ready for next submission');
+      }
+    })
+    .catch(err => console.error('Failed to fetch new token:', err));
     
-} catch (error) {
-    console.error('Form submission error:', error);
-    // The notification will now display the detailed error message
-    showNotification(`İlan gönderilemedi:${error.message}`, 'error');
-} finally {
+  } catch (error) {
+    console.error('❌ Form submission error:', error);
+    showNotification(`İlan gönderilemedi: ${error.message}`, 'error');
+    
+  } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = '<i class="fas fa-paw"></i> İlan Gönder';
-}
+  }
 }
 
 // ===================
