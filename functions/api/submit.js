@@ -107,34 +107,15 @@ export async function onRequestPost(context) {
     );
   }
 
-  let jsonData;
+  let formData;
   let bodyToken;
-
-  // ==================
-  // Parse JSON body
-  // ==================
-  try {
-    jsonData = await request.json();
-    console.log("📦 Received JSON with", Object.keys(jsonData).length, "fields");
-  } catch (error) {
-    console.error("❌ Failed to parse JSON body:", error);
-    return new Response(
-      JSON.stringify({ 
-        result: 'error', 
-        message: 'Invalid request format.'
-      }), 
-      { 
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
-  }
 
   // ==================
   // CSRF Validation
   // ==================
   try {
-    bodyToken = jsonData.csrfToken;
+    formData = await request.formData();
+    bodyToken = formData.get("csrfToken");
     const cookie = request.headers.get("Cookie");
     
     console.log("🔒 CSRF Check:", {
@@ -143,7 +124,7 @@ export async function onRequestPost(context) {
     });
     
     if (!bodyToken) {
-      throw new Error("CSRF token not found in request body.");
+      throw new Error("CSRF token not found in form body.");
     }
     
     const cookieToken = cookie?.match(/__csrf_token=([^;]+)/)?.[1];
@@ -199,7 +180,7 @@ export async function onRequestPost(context) {
   // ==================
   try {
     console.log("🔍 Starting server-side validation...");
-    const validationResult = validateFormData(jsonData);
+    const validationResult = validateFormData(formData);
 
     if (!validationResult.isValid) {
       console.error("❌ Validation failed:", validationResult.errors);
