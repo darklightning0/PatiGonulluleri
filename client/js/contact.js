@@ -447,7 +447,6 @@ async function handleAdoptionFormSubmit(e, currentStep, totalSteps, goToStep, va
       method: 'POST',
       body: formDataToSend,
       credentials: 'include'
-      // DON'T set Content-Type - let browser set it with boundary
     });
 
     console.log('📥 Server response:', response.status, response.statusText);
