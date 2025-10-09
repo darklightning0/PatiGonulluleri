@@ -490,27 +490,28 @@ createPetCard(pet, view) {
 updateFilterCounts() {
     const filterMapping = {
         type: {
-            'köpek': 'dog', 'dog': 'dog',
+            'köpek': 'dog', 'dog': 'dog', 'kopek': 'dog',
             'kedi': 'cat', 'cat': 'cat',
-            'diğer': 'other', 'other': 'other'
+            'diğer': 'other', 'other': 'other', 'diger': 'other'
         },
         ageGroup: {
-            'genç': 'young', 'young': 'young',
-            'yetişkin': 'adult', 'adult': 'adult',
-            'yaşlı': 'senior', 'senior': 'senior'
+            'genç': 'young', 'young': 'young', 'genc': 'young',
+            'yetişkin': 'adult', 'adult': 'adult', 'yetiskin': 'adult',
+            'yaşlı': 'senior', 'senior': 'senior', 'yasli': 'senior'
         },
         size: {
-            'küçük': 'small', 'small': 'small',
+            'küçük': 'small', 'small': 'small', 'kucuk': 'small',
             'orta': 'medium', 'medium': 'medium',
-            'büyük': 'large', 'large': 'large'
+            'büyük': 'large', 'large': 'large', 'buyuk': 'large'
         },
         gender: {
             'erkek': 'male', 'male': 'male',
             'dişi': 'female', 'female': 'female', 'disi': 'female',
-            'belirtilmemiş': 'unspecified', 'unspecified': 'unspecified'
+            'belirtilmemiş': 'unspecified', 'unspecified': 'unspecified', 'belirtilmemis': 'unspecified'
         }
     };
 
+    // Use arrow function to preserve 'this' context
     const counts = this.state.allPets.reduce((acc, pet) => {
         const normalizedType = this.normalizeValue(pet.type);
         const normalizedSize = this.normalizeValue(pet.size);
