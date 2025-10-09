@@ -274,7 +274,7 @@ function updateVerifiedTag(){
 
     const verifiedBadge = document.querySelector('.trust-badge.verified');
 
-    if (!petData.verified) {
+    if (!currentPet.verified) {
     verifiedBadge.style.display = 'none';
     } else {
     verifiedBadge.style.display = 'inline-flex'; // or 'block' depending on your layout
