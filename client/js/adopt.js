@@ -219,25 +219,90 @@ const AdoptPageApp = {
 applyFiltersAndSort() {
     const { animalType, age, size, gender, health } = this.state.currentFilters;
 
+    // Create bidirectional mapping for filters
+    const filterMapping = {
+        type: {
+            'köpek': 'dog',
+            'dog': 'dog',
+            'kedi': 'cat',
+            'cat': 'cat',
+            'diğer': 'other',
+            'other': 'other'
+        },
+        ageGroup: {
+            'genç': 'young',
+            'young': 'young',
+            'yetişkin': 'adult',
+            'adult': 'adult',
+            'yaşlı': 'senior',
+            'senior': 'senior'
+        },
+        size: {
+            'küçük': 'small',
+            'small': 'small',
+            'orta': 'medium',
+            'medium': 'medium',
+            'büyük': 'large',
+            'large': 'large'
+        },
+        gender: {
+            'erkek': 'male',
+            'male': 'male',
+            'dişi': 'female',
+            'female': 'female',
+            'belirtilmemiş': 'unspecified',
+            'unspecified': 'unspecified'
+        }
+    };
+
     let filtered = this.state.allPets.filter(pet => {
-        // Normalize values for comparison
-        const normalizedType = this.normalizeValue(pet.type);
-        const normalizedSize = this.normalizeValue(pet.size);
-        const normalizedGender = this.normalizeValue(pet.gender);
-        const normalizedAgeGroup = this.normalizeValue(pet.ageGroup);
+        // Normalize pet data to English keys for comparison
+        const petTypeNormalized = this.normalizeValue(pet.type);
+        const petSizeNormalized = this.normalizeValue(pet.size);
+        const petGenderNormalized = this.normalizeValue(pet.gender);
+        const petAgeGroupNormalized = this.normalizeValue(pet.ageGroup);
         
         // Handle health as both array (old) and object (new)
         const petHealthArray = Array.isArray(pet.health) 
             ? pet.health 
-            : Object.keys(pet.health).filter(key => pet.health[key] === true);
+            : Object.keys(pet.health || {}).filter(key => pet.health[key] === true);
         
-        return (
-            (animalType.length === 0 || animalType.some(type => this.normalizeValue(type) === normalizedType)) &&
-            (age.length === 0 || age.some(ageFilter => this.normalizeValue(ageFilter) === normalizedAgeGroup)) &&
-            (size.length === 0 || size.some(sizeFilter => this.normalizeValue(sizeFilter) === normalizedSize)) &&
-            (gender.length === 0 || gender.some(genderFilter => this.normalizeValue(genderFilter) === normalizedGender)) &&
-            (health.length === 0 || health.every(h => petHealthArray.includes(h)))
-        );
+        // Check type filter
+        const typeMatch = animalType.length === 0 || animalType.some(filterValue => {
+            const normalizedFilter = this.normalizeValue(filterValue);
+            const mappedFilter = filterMapping.type[normalizedFilter] || normalizedFilter;
+            const mappedPetType = filterMapping.type[petTypeNormalized] || petTypeNormalized;
+            return mappedFilter === mappedPetType;
+        });
+        
+        // Check age filter
+        const ageMatch = age.length === 0 || age.some(filterValue => {
+            const normalizedFilter = this.normalizeValue(filterValue);
+            const mappedFilter = filterMapping.ageGroup[normalizedFilter] || normalizedFilter;
+            const mappedPetAge = filterMapping.ageGroup[petAgeGroupNormalized] || petAgeGroupNormalized;
+            return mappedFilter === mappedPetAge;
+        });
+        
+        // Check size filter
+        const sizeMatch = size.length === 0 || size.some(filterValue => {
+            const normalizedFilter = this.normalizeValue(filterValue);
+            const mappedFilter = filterMapping.size[normalizedFilter] || normalizedFilter;
+            const mappedPetSize = filterMapping.size[petSizeNormalized] || petSizeNormalized;
+            return mappedFilter === mappedPetSize;
+        });
+        
+        // Check gender filter
+        const genderMatch = gender.length === 0 || gender.some(filterValue => {
+            const normalizedFilter = this.normalizeValue(filterValue);
+            const mappedFilter = filterMapping.gender[normalizedFilter] || normalizedFilter;
+            const mappedPetGender = filterMapping.gender[petGenderNormalized] || petGenderNormalized;
+            return mappedFilter === mappedPetGender;
+        });
+        
+        // Check health filter
+        const healthMatch = health.length === 0 || health.every(h => petHealthArray.includes(h));
+        
+        return typeMatch && ageMatch && sizeMatch && genderMatch && healthMatch;
     });
 
     this.state.filteredPets = this.applySorting(filtered);
@@ -247,21 +312,28 @@ applyFiltersAndSort() {
 
 normalizeValue(value) {
     if (!value) return '';
-    // Convert to lowercase, trim spaces, and handle Turkish characters
-    return value.toString().trim().toLowerCase()
-        .replace(/ı/g, 'i')
-        .replace(/ğ/g, 'g')
-        .replace(/ü/g, 'u')
-        .replace(/ş/g, 's')
-        .replace(/ö/g, 'o')
-        .replace(/ç/g, 'c')
-        .replace(/İ/g, 'i')
-        .replace(/Ğ/g, 'g')
-        .replace(/Ü/g, 'u')
-        .replace(/Ş/g, 's')
-        .replace(/Ö/g, 'o')
-        .replace(/Ç/g, 'c')
-        .replace(/\s+/g, '-'); // Convert spaces to dashes for consistency
+    
+    // Convert to string, trim, and lowercase
+    let normalized = value.toString().trim().toLowerCase();
+    
+    // Replace Turkish characters with English equivalents
+    const turkishMap = {
+        'ı': 'i', 'İ': 'i',
+        'ğ': 'g', 'Ğ': 'g',
+        'ü': 'u', 'Ü': 'u',
+        'ş': 's', 'Ş': 's',
+        'ö': 'o', 'Ö': 'o',
+        'ç': 'c', 'Ç': 'c'
+    };
+    
+    Object.keys(turkishMap).forEach(char => {
+        normalized = normalized.replace(new RegExp(char, 'g'), turkishMap[char]);
+    });
+    
+    // Remove extra spaces and replace spaces with hyphens
+    normalized = normalized.replace(/\s+/g, '-');
+    
+    return normalized;
 },
 
     applySorting(pets) {
@@ -442,21 +514,50 @@ createPetCard(pet, view) {
     },
 
 updateFilterCounts() {
+    const filterMapping = {
+        type: {
+            'köpek': 'dog', 'dog': 'dog',
+            'kedi': 'cat', 'cat': 'cat',
+            'diğer': 'other', 'other': 'other'
+        },
+        ageGroup: {
+            'genç': 'young', 'young': 'young',
+            'yetişkin': 'adult', 'adult': 'adult',
+            'yaşlı': 'senior', 'senior': 'senior'
+        },
+        size: {
+            'küçük': 'small', 'small': 'small',
+            'orta': 'medium', 'medium': 'medium',
+            'büyük': 'large', 'large': 'large'
+        },
+        gender: {
+            'erkek': 'male', 'male': 'male',
+            'dişi': 'female', 'female': 'female',
+            'belirtilmemiş': 'unspecified', 'unspecified': 'unspecified'
+        }
+    };
+
     const counts = this.state.allPets.reduce((acc, pet) => {
         const normalizedType = this.normalizeValue(pet.type);
         const normalizedSize = this.normalizeValue(pet.size);
         const normalizedGender = this.normalizeValue(pet.gender);
         const normalizedAgeGroup = this.normalizeValue(pet.ageGroup);
         
-        acc.animalType[normalizedType] = (acc.animalType[normalizedType] || 0) + 1;
-        acc.age[normalizedAgeGroup] = (acc.age[normalizedAgeGroup] || 0) + 1;
-        acc.size[normalizedSize] = (acc.size[normalizedSize] || 0) + 1;
-        acc.gender[normalizedGender] = (acc.gender[normalizedGender] || 0) + 1;
+        // Map to canonical English keys
+        const canonicalType = filterMapping.type[normalizedType] || normalizedType;
+        const canonicalSize = filterMapping.size[normalizedSize] || normalizedSize;
+        const canonicalGender = filterMapping.gender[normalizedGender] || normalizedGender;
+        const canonicalAge = filterMapping.ageGroup[normalizedAgeGroup] || normalizedAgeGroup;
+        
+        acc.animalType[canonicalType] = (acc.animalType[canonicalType] || 0) + 1;
+        acc.age[canonicalAge] = (acc.age[canonicalAge] || 0) + 1;
+        acc.size[canonicalSize] = (acc.size[canonicalSize] || 0) + 1;
+        acc.gender[canonicalGender] = (acc.gender[canonicalGender] || 0) + 1;
         
         // Handle both array and object health format
         const petHealthArray = Array.isArray(pet.health) 
             ? pet.health 
-            : Object.keys(pet.health).filter(key => pet.health[key] === true);
+            : Object.keys(pet.health || {}).filter(key => pet.health[key] === true);
         
         petHealthArray.forEach(h => acc.health[h] = (acc.health[h] || 0) + 1);
         return acc;
@@ -465,10 +566,19 @@ updateFilterCounts() {
     this.elements.filterCheckboxes.forEach(cb => {
         const { name, value } = cb;
         const countSpan = cb.parentElement.querySelector('.count');
-        if (!countSpan) return;
+        if (!countSpan || value === 'all') {
+            if (countSpan && value === 'all') {
+                countSpan.textContent = `(${this.state.allPets.length})`;
+            }
+            return;
+        }
         
         const normalizedValue = this.normalizeValue(value);
-        const count = (counts[name]?.[normalizedValue]) || (value === 'all' ? this.state.allPets.length : 0);
+        const mappedValue = filterMapping[name] ? 
+            (filterMapping[name][normalizedValue] || normalizedValue) : 
+            normalizedValue;
+        
+        const count = counts[name]?.[mappedValue] || 0;
         countSpan.textContent = `(${count})`;
     });
 },

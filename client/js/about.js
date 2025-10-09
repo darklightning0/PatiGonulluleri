@@ -14,19 +14,17 @@ let statsAnimated = false;
 // ===================
 
 document.addEventListener('DOMContentLoaded', () => {
-    initAboutPage();
-});
-
-function initAboutPage() {
-    console.log('🐾 Initializing About Us Page');
+    // Ensure DOM is fully loaded
+    if (document.readyState === 'loading') {
+        // Still loading, wait for DOMContentLoaded
+        return;
+    }
     
-    // Initialize components
-    initFAQ();
-    initScrollAnimations();
-    initStatisticsAnimation();
-    initTimelineAnimation();
-
-    setTimeout(() => {
+    // Initialize immediately
+    initAboutPage();
+    
+    // Run additional initialization after DOM is fully painted
+    requestAnimationFrame(() => {
         initSmoothScrolling();
         initKeyboardNavigation();
         optimizeAnimations();
@@ -40,9 +38,19 @@ function initAboutPage() {
         window.addEventListener('languageChanged', updateLanguageContent);
         
         console.log('🎉 About Us Page Fully Loaded');
-    }, 100);
+    });
+});
+
+function initAboutPage() {
+    console.log('ðŸ¾ Initializing About Us Page');
     
-    console.log('✅ About Us Page Initialized');
+    // Initialize components
+    initFAQ();
+    initScrollAnimations();
+    initStatisticsAnimation();
+    initTimelineAnimation();
+    
+    console.log('âœ… About Us Page Initialized');
 }
 
 // ===================
