@@ -443,7 +443,7 @@ function handleCallClick() {
 function handleWhatsAppClick() {
     if (!currentPet) return;
     const rawPhone = currentPet.caretaker.phone || currentPet.caretaker.phoneNumber || '';
-       const phoneNumber = String(rawPhone).replace(/\D/g, '');
+    const phoneNumber = String(rawPhone).replace(/\D/g, '');
     if (!phoneNumber) {
         showNotification('WhatsApp için telefon numarası mevcut değil.', 'info');
         return;
@@ -451,7 +451,6 @@ function handleWhatsAppClick() {
     const message = encodeURIComponent(`Merhaba, ${currentPet.petName || currentPet.petName} hakkında bilgi alabilir miyim?`);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
-    
     console.log('WhatsApp contact initiated for pet:', currentPet.id);
 }
 
