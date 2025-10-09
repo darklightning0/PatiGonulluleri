@@ -227,6 +227,32 @@ const AdoptPageApp = {
         this.elements.petsContainer.className = `pets-container ${view}-view`;
         this.renderPets();
     },
+
+    normalizeValue(value) {
+    if (!value) return '';
+    
+    // Convert to string, trim, and lowercase
+    let normalized = value.toString().trim().toLowerCase();
+    
+    // Replace Turkish characters with English equivalents
+    const turkishMap = {
+        'ı': 'i', 'İ': 'i',
+        'ğ': 'g', 'Ğ': 'g',
+        'ü': 'u', 'Ü': 'u',
+        'ş': 's', 'Ş': 's',
+        'ö': 'o', 'Ö': 'o',
+        'ç': 'c', 'Ç': 'c'
+    };
+    
+    Object.keys(turkishMap).forEach(char => {
+        normalized = normalized.replace(new RegExp(char, 'g'), turkishMap[char]);
+    });
+    
+    // Remove extra spaces and replace spaces with hyphens
+    normalized = normalized.replace(/\s+/g, '-');
+    
+    return normalized;
+},
     
 applyFiltersAndSort() {
     const { animalType, age, size, gender, health } = this.state.currentFilters;
