@@ -568,52 +568,54 @@ function handleGeneralFormSubmit(e) {
     return;
   }
 
-  const contactData = {
-    name: formData.get('name'),
-    email: formData.get('email'),
-    subject: formData.get('subject'),
-    message: formData.get('message'),
-    timestamp: new Date().toISOString(),
-    type: 'general_contact'
-  };
+  const name = formData.get('name');
+  const email = formData.get('email');
+  const subject = formData.get('subject');
+  const message = formData.get('message');
 
-  submitForm(form, contactData, 'Mesajınız gönderildi! En kısa sürede size dönüş yapacağız.');
+  // Build email content
+  const emailSubject = subject || 'Genel İletişim - Pati Gönüllüleri';
+  const emailBody = `
+Merhaba,
+
+Pati Gönüllüleri web sitesi üzerinden yeni bir iletişim mesajı aldınız.
+
+--- İletişim Bilgileri ---
+Ad Soyad: ${name}
+E-posta: ${email}
+
+--- Konu ---
+${subject || 'Belirtilmedi'}
+
+--- Mesaj ---
+${message}
+
+---
+Bu mesaj Pati Gönüllüleri web sitesi üzerinden gönderilmiştir.
+Tarih: ${new Date().toLocaleDateString('tr-TR')} ${new Date().toLocaleTimeString('tr-TR')}
+  `.trim();
+
+  // Create mailto link
+  const mailtoLink = `mailto:iletisim@patigonulluleri.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+
+  // Open default email client
+  window.location.href = mailtoLink;
+
+  // Reset form and show notification
+  form.reset();
+  clearAllFieldErrors(form);
+  
+  showNotification(getCurrentLanguage() === 'tr' ?
+    'E-posta uygulamanız açılıyor...' :
+    'Opening your email application...', 'success');
+  
+  // Scroll to top
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
 }
 
-function submitForm(form, data, successMessage) {
-  isSubmitting = true;
-
-  const submitBtn = form.querySelector('.submit-btn');
-  const originalHTML = submitBtn.innerHTML;
-
-  submitBtn.classList.add('loading');
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Gönderiliyor...</span>';
-
-  setTimeout(() => {
-    try {
-      console.log('Form submitted:', data);
-      showNotification(successMessage, 'success');
-      form.reset();
-      clearAllFieldErrors(form);
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-      trackFormSubmission(data.type, data);
-    } catch (error) {
-      console.error('Form submission error:', error);
-      showNotification(getCurrentLanguage() === 'tr' ?
-        'Bir hata oluştu. Lütfen tekrar deneyin.' :
-        'An error occurred. Please try again.', 'error');
-    } finally {
-      submitBtn.classList.remove('loading');
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalHTML;
-      isSubmitting = false;
-    }
-  }, 2000);
-}
 
 // ===================
 // VALIDATION

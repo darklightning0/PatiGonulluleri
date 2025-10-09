@@ -185,22 +185,23 @@ function animateNumber(element, start, end, duration) {
     const startTime = performance.now();
     const range = end - start;
     
+    // Store the target value as a data attribute for later use
+    element.setAttribute('data-current-value', end);
+    
     function updateNumber(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
         
-        // Easing function for smooth animation
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         const currentNumber = Math.round(start + (range * easeOutQuart));
         
-        // Format number with separators
         element.textContent = formatNumber(currentNumber);
         
         if (progress < 1) {
             requestAnimationFrame(updateNumber);
         } else {
-            // Final value with formatting
             element.textContent = formatNumber(end);
+            element.setAttribute('data-current-value', end);
         }
     }
     
@@ -251,16 +252,13 @@ function getCurrentLanguage() {
 }
 
 function updateLanguageContent() {
-    // This function can be called when language is switched
-    // Update any dynamic content that needs language-specific formatting
-    
     const currentLang = getCurrentLanguage();
     
-    // Update number formatting based on language
     const statNumbers = document.querySelectorAll('.stat-number');
     statNumbers.forEach(statNumber => {
-        const currentValue = parseInt(statNumber.textContent.replace(/[^\d]/g, ''));
-        if (!isNaN(currentValue)) {
+        // Use the stored current value instead of parsing text
+        const currentValue = parseInt(statNumber.getAttribute('data-current-value') || statNumber.dataset.target);
+        if (!isNaN(currentValue) && currentValue > 0) {
             const locale = currentLang === 'tr' ? 'tr-TR' : 'en-US';
             statNumber.textContent = currentValue.toLocaleString(locale);
         }
@@ -387,13 +385,11 @@ function handleErrors() {
 function initPageVisibilityHandling() {
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-            // Pause animations when page is not visible
             console.log('Page hidden - pausing animations');
         } else {
-            // Resume animations when page becomes visible
             console.log('Page visible - resuming animations');
             
-            // Re-trigger statistics animation if user returns to page
+            // Only animate if NOT already animated
             const impactSection = document.querySelector('.impact-section');
             if (impactSection && isElementInViewport(impactSection) && !statsAnimated) {
                 animateStatistics();
