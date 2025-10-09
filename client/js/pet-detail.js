@@ -168,6 +168,7 @@ function updatePageContent() {
     }
     
     // Call other update functions
+    updateVerifiedTag();
     updateHealthTags();
     updateCaretakerInfo();
     updateImageGallery();
@@ -267,6 +268,18 @@ function updateTranslatedFields(lang) {
     } else {
         genderElement.textContent = currentPet.gender || '';
     }
+}
+
+function updateVerifiedTag(){
+
+    const verifiedBadge = document.querySelector('.trust-badge.verified');
+
+    if (!petData.verified) {
+    verifiedBadge.style.display = 'none';
+    } else {
+    verifiedBadge.style.display = 'inline-flex'; // or 'block' depending on your layout
+    }
+
 }
 
 function updateHealthTags() {
