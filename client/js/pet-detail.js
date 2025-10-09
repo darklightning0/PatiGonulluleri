@@ -748,6 +748,7 @@ function createSimilarPetCard(pet) {
     const currentLang = getCurrentLanguage();
     const translatedData = translatePetData(pet, currentLang);
     const urgentBadge = pet.urgent ? `<div class="pet-urgent-badge" data-tr="ACİL" data-en="URGENT">ACİL</div>` : '';
+    const petImage = (pet.images && pet.images.length > 0) ? pet.images[0] : (pet.image || '/images/placeholder-pet.jpg');
     const healthTags = (() => {
     const healthTranslations = {
         'vaccinated': { tr: 'Aşılı', en: 'Vaccinated' },
@@ -779,7 +780,7 @@ function createSimilarPetCard(pet) {
     return `
         <div class="adopt-pet-card" data-pet-id="${pet.id}">
             <div class="pet-card-image">
-                <img src="${pet.image}" alt="${pet.petName}" loading="lazy">
+                <img src="${petImage}" alt="${pet.petName}" loading="lazy">
                 ${urgentBadge}
                 <div class="pet-type-badge" data-tr="${translatedData.type.tr}" data-en="${translatedData.type.en}">
                     ${translatedData.type[currentLang]}
