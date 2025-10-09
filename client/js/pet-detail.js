@@ -296,11 +296,11 @@ function updateCaretakerInfo() {
 }
 
 function updatePageTitle() {
-    document.title = `${currentPet.petName || currentPet.name} - Sahiplendirme İlanı - Pati Gönüllüleri`;
+    document.title = `${currentPet.petName || currentPet.petName} - Sahiplendirme İlanı - Pati Gönüllüleri`;
     
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-    metaDescription.content = `${currentPet.petName || currentPet.name} adlı ${currentPet.breed} ${currentPet.type === 'dog' ? 'köpeğimizi' : 'kedimizi'} sahiplenmek için detaylı bilgiler, fotoğraflar ve iletişim bilgileri.`;
+    metaDescription.content = `${currentPet.petName || currentPet.petName} adlı ${currentPet.breed} ${currentPet.type === 'dog' ? 'köpeğimizi' : 'kedimizi'} sahiplenmek için detaylı bilgiler, fotoğraflar ve iletişim bilgileri.`;
     }
 }
 
@@ -335,14 +335,14 @@ function updateImageGallery() {
     const currentImageNum = elements.currentImageNum;
     
     mainImage.src = currentPet.images[0];
-    mainImage.alt = currentPet.petName || currentPet.name || '';
+    mainImage.alt = currentPet.petName || currentPet.petName || '';
     
     totalImages.textContent = currentPet.images.length;
     currentImageNum.textContent = '1';
     
     thumbnailsContainer.innerHTML = currentPet.images.map((image, index) => `
         <div class="thumbnail ${index === 0 ? 'active' : ''}" data-image="${index}">
-            <img src="${currentPet.thumbnails ? currentPet.thumbnails[index] : image}" alt="${currentPet.petName || currentPet.name || ''} ${index + 1}">
+            <img src="${currentPet.thumbnails ? currentPet.thumbnails[index] : image}" alt="${currentPet.petName || currentPet.petNname || ''} ${index + 1}">
         </div>
     `).join('');
     
@@ -365,7 +365,7 @@ function showImage(index) {
     const currentImageNum = elements.currentImageNum;
 
     mainImage.src = images[index];
-    mainImage.alt = currentPet.petName || currentPet.name || '';
+    mainImage.alt = currentPet.petName || currentPet.petName || '';
     mainImage.style.opacity = '1';
 
     thumbnails.forEach(thumb => thumb.classList.remove('active'));
@@ -448,7 +448,7 @@ function handleWhatsAppClick() {
         showNotification('WhatsApp için telefon numarası mevcut değil.', 'info');
         return;
     }
-    const message = encodeURIComponent(`Merhaba, ${currentPet.petName || currentPet.name} hakkında bilgi alabilir miyim?`);
+    const message = encodeURIComponent(`Merhaba, ${currentPet.petName || currentPet.petName} hakkında bilgi alabilir miyim?`);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
     
@@ -462,7 +462,7 @@ function handleMessageClick() {
         
         const messageText = document.getElementById('message-text');
         if (messageText) {
-            messageText.value = `Merhaba, ${currentPet.name} hakkında daha fazla bilgi alabilir miyim?`;
+            messageText.value = `Merhaba, ${currentPet.petName} hakkında daha fazla bilgi alabilir miyim?`;
         }
     }
 }
@@ -524,11 +524,11 @@ function handleMessageSubmit(e) {
     }
     
     // Build email content
-    const subject = `${currentPet.petName || currentPet.name} Hakkında Bilgi Talebi - ${name}`;
+    const subject = `${currentPet.petName || currentPet.petName} Hakkında Bilgi Talebi - ${name}`;
     const body = `
 Merhaba,
 
-${currentPet.petName || currentPet.name} hakkında bilgi almak istiyorum.
+${currentPet.petName} hakkında bilgi almak istiyorum.
 
 --- İletişim Bilgileri ---
 Ad Soyad: ${name}
@@ -540,13 +540,13 @@ ${message}
 
 ---
 Bu mesaj Pati Gönüllüleri web sitesi üzerinden gönderilmiştir.
-Hayvan: ${currentPet.petName || currentPet.name} (ID: ${currentPet.id})
+Hayvan: ${currentPet.petName} (ID: ${currentPet.id})
     `.trim();
     
     const caretakerEmail = currentPet.caretaker.mail || currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
     
     // Create mailto link
-    const mailtoLink = `mailto:${caretakerEmail},iletisim@patigonulluleri.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoLink = `mailto:${caretakerEmail};iletisim@patigonulluleri.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
     // Open default email client
     window.location.href = mailtoLink;
@@ -602,11 +602,11 @@ function handleApplicationSubmit(e) {
     };
     
     // Build email content
-    const subject = `Sahiplendirme Başvurusu - ${currentPet.petName || currentPet.name} - ${applicationData.name}`;
+    const subject = `Sahiplendirme Başvurusu - ${currentPet.petName} - ${applicationData.name}`;
     const body = `
 Merhaba,
 
-${currentPet.petName || currentPet.name} için sahiplendirme başvurusu yapmak istiyorum.
+${currentPet.petName} için sahiplendirme başvurusu yapmak istiyorum.
 
 --- Başvuru Sahibi Bilgileri ---
 Ad Soyad: ${applicationData.name}
@@ -625,7 +625,7 @@ ${applicationData.notes || 'Ek not bulunmamaktadır.'}
 
 ---
 Bu başvuru Pati Gönüllüleri web sitesi üzerinden gönderilmiştir.
-Hayvan: ${currentPet.petName || currentPet.name}
+Hayvan: ${currentPet.petName}
 ID: ${currentPet.id}
 Tarih: ${new Date().toLocaleDateString('tr-TR')}
     `.trim();
@@ -659,8 +659,8 @@ function handleShareClick() {
     if (!currentPet) return;
     
     const shareData = {
-        title: `${currentPet.petName || currentPet.name} - Sahiplendirme İlanı`,
-        text: `${currentPet.petName || currentPet.name} adlı ${currentPet.breed} sahiplenmeyi bekliyor!`,
+        title: `${currentPet.petName} - Sahiplendirme İlanı`,
+        text: `${currentPet.petName} adlı ${currentPet.breed} sahiplenmeyi bekliyor!`,
         url: window.location.href
     };
     
@@ -778,7 +778,7 @@ function createSimilarPetCard(pet) {
     return `
         <div class="adopt-pet-card" data-pet-id="${pet.id}">
             <div class="pet-card-image">
-                <img src="${pet.image}" alt="${pet.name}" loading="lazy">
+                <img src="${pet.image}" alt="${pet.petName}" loading="lazy">
                 ${urgentBadge}
                 <div class="pet-type-badge" data-tr="${translatedData.type.tr}" data-en="${translatedData.type.en}">
                     ${translatedData.type[currentLang]}
@@ -786,7 +786,7 @@ function createSimilarPetCard(pet) {
             </div>
             <div class="pet-card-content">
                 <div class="pet-card-header">
-                    <h3 class="pet-card-name">${pet.name}</h3>
+                    <h3 class="pet-card-name">${pet.petName}</h3>
                     <div class="pet-card-breed">${translatedData.breed}</div>
                 </div>
                 <div class="pet-card-details">
