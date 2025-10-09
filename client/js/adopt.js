@@ -234,36 +234,24 @@ applyFiltersAndSort() {
     // Create bidirectional mapping for filters
     const filterMapping = {
         type: {
-            'köpek': 'dog',
-            'dog': 'dog',
-            'kedi': 'cat',
-            'cat': 'cat',
-            'diğer': 'other',
-            'other': 'other'
+            'köpek': 'dog', 'dog': 'dog', 'kopek': 'dog',
+            'kedi': 'cat', 'cat': 'cat',
+            'diğer': 'other', 'other': 'other', 'diger': 'other'
         },
         ageGroup: {
-            'genç': 'young',
-            'young': 'young',
-            'yetişkin': 'adult',
-            'adult': 'adult',
-            'yaşlı': 'senior',
-            'senior': 'senior'
+            'genç': 'young', 'young': 'young', 'genc': 'young',
+            'yetişkin': 'adult', 'adult': 'adult', 'yetiskin': 'adult',
+            'yaşlı': 'senior', 'senior': 'senior', 'yasli': 'senior'
         },
         size: {
-            'küçük': 'small',
-            'small': 'small',
-            'orta': 'medium',
-            'medium': 'medium',
-            'büyük': 'large',
-            'large': 'large'
+            'küçük': 'small', 'small': 'small', 'kucuk': 'small',
+            'orta': 'medium', 'medium': 'medium',
+            'büyük': 'large', 'large': 'large', 'buyuk': 'large'
         },
         gender: {
-            'erkek': 'male',
-            'male': 'male',
-            'dişi': 'female',
-            'female': 'female',
-            'belirtilmemiş': 'unspecified',
-            'unspecified': 'unspecified'
+            'erkek': 'male', 'male': 'male',
+            'dişi': 'female', 'female': 'female', 'disi': 'female',
+            'belirtilmemiş': 'unspecified', 'unspecified': 'unspecified', 'belirtilmemis': 'unspecified'
         }
     };
 
@@ -320,32 +308,6 @@ applyFiltersAndSort() {
     this.state.filteredPets = this.applySorting(filtered);
     this.renderPets();
     this.updateResultCount();
-},
-
-normalizeValue(value) {
-    if (!value) return '';
-    
-    // Convert to string, trim, and lowercase
-    let normalized = value.toString().trim().toLowerCase();
-    
-    // Replace Turkish characters with English equivalents
-    const turkishMap = {
-        'ı': 'i', 'İ': 'i',
-        'ğ': 'g', 'Ğ': 'g',
-        'ü': 'u', 'Ü': 'u',
-        'ş': 's', 'Ş': 's',
-        'ö': 'o', 'Ö': 'o',
-        'ç': 'c', 'Ç': 'c'
-    };
-    
-    Object.keys(turkishMap).forEach(char => {
-        normalized = normalized.replace(new RegExp(char, 'g'), turkishMap[char]);
-    });
-    
-    // Remove extra spaces and replace spaces with hyphens
-    normalized = normalized.replace(/\s+/g, '-');
-    
-    return normalized;
 },
 
     applySorting(pets) {
