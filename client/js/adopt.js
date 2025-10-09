@@ -544,7 +544,7 @@ updateFilterCounts() {
         },
         gender: {
             'erkek': 'male', 'male': 'male',
-            'dişi': 'female', 'female': 'female',
+            'dişi': 'female', 'female': 'female', 'disi': 'female',
             'belirtilmemiş': 'unspecified', 'unspecified': 'unspecified'
         }
     };
