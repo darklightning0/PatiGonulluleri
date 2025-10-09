@@ -521,9 +521,9 @@ updateFilterCounts() {
             'diğer': 'other', 'other': 'other'
         },
         ageGroup: {
-            'genç': 'young', 'young': 'young',
-            'yetişkin': 'adult', 'adult': 'adult',
-            'yaşlı': 'senior', 'senior': 'senior'
+            'genç': 'genç', 'young': 'genç',
+            'yetişkin': 'yetişkin', 'adult': 'yetişkin',
+            'yaşlı': 'yaşlı', 'senior': 'yaşlı'
         },
         size: {
             'küçük': 'small', 'small': 'small',
