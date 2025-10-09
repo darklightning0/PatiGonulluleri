@@ -443,7 +443,7 @@ function handleCallClick() {
 function handleWhatsAppClick() {
     if (!currentPet) return;
     const rawPhone = currentPet.caretaker.phone || currentPet.caretaker.phoneNumber || '';
-    const phoneNumber = rawPhone.replace(/\D/g, '');
+       const phoneNumber = String(rawPhone).replace(/\D/g, '');
     if (!phoneNumber) {
         showNotification('WhatsApp için telefon numarası mevcut değil.', 'info');
         return;
@@ -546,7 +546,7 @@ Hayvan: ${currentPet.petName} (ID: ${currentPet.id})
     const caretakerEmail = currentPet.caretaker.mail || currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
     
     // Create mailto link
-    const mailtoLink = `mailto:${caretakerEmail};iletisim@patigonulluleri.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoLink = `mailto:${caretakerEmail}?cc=iletisim@patigonulluleri.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
     // Open default email client
     window.location.href = mailtoLink;
