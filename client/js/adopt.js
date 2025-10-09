@@ -172,23 +172,35 @@ const AdoptPageApp = {
     },
 
     handleFilterChange(e) {
-        const { name: filterType, value: filterValue, checked } = e.target;
-        
-        if (filterValue === 'all') {
-            if (checked) {
-                this.state.currentFilters[filterType] = [];
-                document.querySelectorAll(`input[name="${filterType}"]:not([value="all"])`).forEach(cb => cb.checked = false);
-            }
-        } else {
-            this.state.currentFilters[filterType] = checked
-                ? [...this.state.currentFilters[filterType], filterValue]
-                : this.state.currentFilters[filterType].filter(val => val !== filterValue);
-            document.querySelector(`input[name="${filterType}"][value="all"]`).checked = this.state.currentFilters[filterType].length === 0;
+    const { name: filterType, value: filterValue, checked } = e.target;
+    
+    if (filterValue === 'all') {
+        if (checked) {
+            this.state.currentFilters[filterType] = [];
+            document.querySelectorAll(`input[name="${filterType}"]:not([value="all"])`).forEach(cb => cb.checked = false);
         }
+    } else {
+        // Uncheck the "all" option when selecting a specific filter
+        const allCheckbox = document.querySelector(`input[name="${filterType}"][value="all"]`);
+        if (allCheckbox) {
+            allCheckbox.checked = false;
+        }
+        
+        if (checked) {
+            this.state.currentFilters[filterType] = [...this.state.currentFilters[filterType], filterValue];
+        } else {
+            this.state.currentFilters[filterType] = this.state.currentFilters[filterType].filter(val => val !== filterValue);
+            
+            // If no filters are selected, check "all" again
+            if (this.state.currentFilters[filterType].length === 0 && allCheckbox) {
+                allCheckbox.checked = true;
+            }
+        }
+    }
 
-        this.resetPagination();
-        this.applyFiltersAndSort();
-    },
+    this.resetPagination();
+    this.applyFiltersAndSort();
+},
 
     clearAllFilters() {
         Object.keys(this.state.currentFilters).forEach(key => this.state.currentFilters[key] = []);
@@ -521,9 +533,9 @@ updateFilterCounts() {
             'diğer': 'other', 'other': 'other'
         },
         ageGroup: {
-            'genç': 'genç', 'young': 'genç',
-            'yetişkin': 'yetişkin', 'adult': 'yetişkin',
-            'yaşlı': 'yaşlı', 'senior': 'yaşlı'
+            'genç': 'young', 'young': 'young',
+            'yetişkin': 'adult', 'adult': 'adult',
+            'yaşlı': 'senior', 'senior': 'senior'
         },
         size: {
             'küçük': 'small', 'small': 'small',
