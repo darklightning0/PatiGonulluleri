@@ -417,9 +417,9 @@ async function loadFeaturedPets(petsContainer) {
         petsContainer.innerHTML = featuredPets.map(pet => {
             const lang = currentLanguage;
             const ageText = `${pet.age} ${lang === 'tr' ? 'yaşında' : 'year' + (pet.age > 1 ? 's' : '')}`;
-            const petType = pet.type === 'dog' ? (lang === 'tr' ? 'Köpek' : 'Dog') : (lang === 'tr' ? 'Kedi' : 'Cat');
-            const petSize = pet.size === 'large' ? (lang === 'tr' ? 'Büyük' : 'Large') : 
-                           (pet.size === 'medium' ? (lang === 'tr' ? 'Orta' : 'Medium') : (lang === 'tr' ? 'Küçük' : 'Small'));
+            const petType = pet.type === 'köpek' ? (lang === 'tr' ? 'Köpek' : 'Dog') : (lang === 'tr' ? 'Kedi' : 'Cat');
+            const petSize = pet.size === 'büyük' ? (lang === 'tr' ? 'Büyük' : 'Large') : 
+                           (pet.size === 'orta' ? (lang === 'tr' ? 'Orta' : 'Medium') : (lang === 'tr' ? 'Küçük' : 'Small'));
             const petImage = (pet.images && pet.images.length > 0) ? pet.images[0] : (pet.image || '/images/placeholder-pet.jpg');
 
 

@@ -479,6 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initPageVisibilityHandling();
         initLazyLoading();
         trackUserInteractions();
+        animateStatistics();
         
         // Listen for language changes
         window.addEventListener('languageChanged', updateLanguageContent);
