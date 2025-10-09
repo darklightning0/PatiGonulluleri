@@ -25,6 +25,22 @@ function initAboutPage() {
     initScrollAnimations();
     initStatisticsAnimation();
     initTimelineAnimation();
+
+    setTimeout(() => {
+        initSmoothScrolling();
+        initKeyboardNavigation();
+        optimizeAnimations();
+        initIntersectionObserverPolyfill();
+        handleErrors();
+        initPageVisibilityHandling();
+        initLazyLoading();
+        trackUserInteractions();
+        
+        // Listen for language changes
+        window.addEventListener('languageChanged', updateLanguageContent);
+        
+        console.log('🎉 About Us Page Fully Loaded');
+    }, 100);
     
     console.log('✅ About Us Page Initialized');
 }
@@ -36,19 +52,16 @@ function initAboutPage() {
 function initFAQ() {
     const faqItems = document.querySelectorAll('.faq-item');
     
-    faqItems.forEach(item => {
-        const question = item.querySelector('.faq-question');
-        
+    // Store references
+    const faqData = Array.from(faqItems).map(item => ({
+        item,
+        question: item.querySelector('.faq-question'),
+        answer: item.querySelector('.faq-answer')
+    }));
+    
+    faqData.forEach(({item, question, answer}) => {
         question.addEventListener('click', () => {
-            toggleFAQ(item);
-        });
-        
-        // Add keyboard support
-        question.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleFAQ(item);
-            }
+            toggleFAQ(item, answer, question, faqData);
         });
         
         // Make focusable
@@ -58,34 +71,25 @@ function initFAQ() {
     });
 }
 
-function toggleFAQ(faqItem) {
+function toggleFAQ(faqItem, answer, question, allFaqData) {
     const isActive = faqItem.classList.contains('active');
-    const answer = faqItem.querySelector('.faq-answer');
-    const question = faqItem.querySelector('.faq-question');
     
     if (isActive) {
-        // Close FAQ
         faqItem.classList.remove('active');
         answer.style.maxHeight = '0';
         question.setAttribute('aria-expanded', 'false');
     } else {
-        // Close other FAQ items first (accordion behavior)
-        closeAllFAQs();
+        // Close all others
+        allFaqData.forEach(({item: otherItem, answer: otherAnswer, question: otherQuestion}) => {
+            otherItem.classList.remove('active');
+            otherAnswer.style.maxHeight = '0';
+            otherQuestion.setAttribute('aria-expanded', 'false');
+        });
         
-        // Open this FAQ
+        // Open this one
         faqItem.classList.add('active');
         answer.style.maxHeight = answer.scrollHeight + 'px';
         question.setAttribute('aria-expanded', 'true');
-    }
-    
-    // Smooth scroll to FAQ item if it's being opened
-    if (!isActive) {
-        setTimeout(() => {
-            faqItem.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-        }, 100);
     }
 }
 
@@ -468,24 +472,7 @@ function trackUserInteractions() {
 // COMPLETE INITIALIZATION
 // ===================
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Run additional initialization after a short delay to ensure DOM is fully loaded
-    setTimeout(() => {
-        initSmoothScrolling();
-        initKeyboardNavigation();
-        optimizeAnimations();
-        initIntersectionObserverPolyfill();
-        handleErrors();
-        initPageVisibilityHandling();
-        initLazyLoading();
-        trackUserInteractions();
-        
-        // Listen for language changes
-        window.addEventListener('languageChanged', updateLanguageContent);
-        
-        console.log('🎉 About Us Page Fully Loaded');
-    }, 100);
-});
+
 
 // ===================
 // RESIZE HANDLING

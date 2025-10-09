@@ -46,9 +46,40 @@ const elements = {
     adoptionApplicationForm: document.getElementById('adoption-application-form'),
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Wait for Firebase to be ready
+    if (!window.db) {
+        await new Promise(resolve => {
+            const checkFirebase = setInterval(() => {
+                if (window.db) {
+                    clearInterval(checkFirebase);
+                    resolve();
+                }
+            }, 100);
+            
+            // Timeout after 5 seconds
+            setTimeout(() => {
+                clearInterval(checkFirebase);
+                console.error('Firebase initialization timeout');
+                resolve();
+            }, 5000);
+        });
+    }
+    
     initPetDetailPage();
 });
+
+function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
+}
 
 async function initPetDetailPage() {
     console.log('🐾 Initializing Pet Detail Page with Firebase');
@@ -114,7 +145,7 @@ function updatePageContent() {
     elements.petAge.textContent = `${currentPet.age || 'Unknown'} yaşında`;
     elements.petLocation.textContent = currentPet.location || 'Unknown Location';
     
-    // Add description
+    // Add description - use textContent for safety
     elements.petDescription.textContent = currentPet.description || 'Açıklama bulunamadı.';
     
     // Update translated fields
@@ -248,25 +279,29 @@ function updateHealthTags() {
     
     const allHealthOptions = ['vaccinated', 'sterilized', 'microchipped'];
     
-    healthContainer.innerHTML = allHealthOptions.map(health => {
-        // Handle both old array format and new map format
-        let hasHealth = false;
-        if (Array.isArray(currentPet.health)) {
-            hasHealth = currentPet.health.includes(health);
-        } else if (typeof currentPet.health === 'object') {
-            hasHealth = currentPet.health[health] === true;
-        }
-        
-        const healthText = healthTranslations[health];
-        const statusClass = hasHealth ? 'verified' : 'not-verified';
-        const iconClass = hasHealth ? 'fas fa-check-circle' : 'fas fa-times-circle';
-        
-        return `
-            <span class="health-tag ${statusClass}" data-tr="${healthText.tr}" data-en="${healthText.en}">
-                <i class="${iconClass}"></i> ${healthText.tr}
-            </span>
-        `;
-    }).join('');
+    healthContainer.innerHTML = allHealthOptions
+        .filter(health => {
+            // Only show verified health tags
+            if (Array.isArray(currentPet.health)) {
+                return currentPet.health.includes(health);
+            } else if (typeof currentPet.health === 'object') {
+                return currentPet.health[health] === true;
+            }
+            return false;
+        })
+        .map(health => {
+            const healthText = healthTranslations[health];
+            return `
+                <span class="health-tag verified" data-tr="${healthText.tr}" data-en="${healthText.en}">
+                    <i class="fas fa-check-circle"></i> ${healthText.tr}
+                </span>
+            `;
+        }).join('');
+    
+    // Show message if no health info
+    if (healthContainer.innerHTML === '') {
+        healthContainer.innerHTML = '<span class="no-health-info">Sağlık bilgisi belirtilmemiş</span>';
+    }
 }
 
 function updateCaretakerInfo() {
@@ -340,11 +375,15 @@ function updateImageGallery() {
     totalImages.textContent = currentPet.images.length;
     currentImageNum.textContent = '1';
     
-    thumbnailsContainer.innerHTML = currentPet.images.map((image, index) => `
-        <div class="thumbnail ${index === 0 ? 'active' : ''}" data-image="${index}">
-            <img src="${currentPet.thumbnails ? currentPet.thumbnails[index] : image}" alt="${currentPet.petName || currentPet.petNname || ''} ${index + 1}">
-        </div>
-    `).join('');
+thumbnailsContainer.innerHTML = currentPet.images.map((image, index) => {
+        const escapedImage = escapeHtml(currentPet.thumbnails ? currentPet.thumbnails[index] : image);
+        const escapedAlt = escapeHtml(currentPet.petName || currentPet.petNname || '');
+        return `
+            <div class="thumbnail ${index === 0 ? 'active' : ''}" data-image="${index}">
+                <img src="${escapedImage}" alt="${escapedAlt} ${index + 1}">
+            </div>
+        `;
+    }).join('');
     
     const thumbnails = thumbnailsContainer.querySelectorAll('.thumbnail');
     thumbnails.forEach((thumbnail, index) => {
@@ -547,7 +586,7 @@ Hayvan: ${currentPet.petName} (ID: ${currentPet.id})
     const caretakerEmail = currentPet.caretaker.mail || currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
     
     // Create mailto link
-    const mailtoLink = `mailto:${caretakerEmail}?cc=iletisim@patigonulluleri.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoLink = `mailto:${caretakerEmail}?cc=iletisim@patigonulluleri.com&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
     // Open default email client
     window.location.href = mailtoLink;
@@ -635,7 +674,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
     const caretakerEmail = currentPet.caretaker.mail || currentPet.caretaker.email || 'iletisim@patigonulluleri.com';
     
     // Create mailto link
-    const mailtoLink = `mailto:${caretakerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoLink = `mailto:${caretakerEmail}?cc=iletisim@patigonulluleri.com&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
     // Open default email client
     window.location.href = mailtoLink;
@@ -749,27 +788,36 @@ function createSimilarPetCard(pet) {
     const translatedData = translatePetData(pet, currentLang);
     const urgentBadge = pet.urgent ? `<div class="pet-urgent-badge" data-tr="ACİL" data-en="URGENT">ACİL</div>` : '';
     const petImage = (pet.images && pet.images.length > 0) ? pet.images[0] : (pet.image || '/images/placeholder-pet.jpg');
+    
+    // Escape all user-controlled content
+    const escapedImage = escapeHtml(petImage);
+    const escapedPetName = escapeHtml(pet.petName);
+    const escapedBreed = escapeHtml(translatedData.breed);
+    const escapedAge = escapeHtml(String(pet.age));
+    const escapedLocation = escapeHtml(pet.location);
+    const escapedId = escapeHtml(pet.id);
+    
     const healthTags = (() => {
-    const healthTranslations = {
-        'vaccinated': { tr: 'Aşılı', en: 'Vaccinated' },
-        'sterilized': { tr: 'Kısırlaştırılmış', en: 'Sterilized' },
-        'microchipped': { tr: 'Çipli', en: 'Microchipped' }
-    };
-    
-    const healthArray = [];
-    if (Array.isArray(pet.health)) {
-        healthArray.push(...pet.health);
-    } else if (typeof pet.health === 'object') {
-        Object.keys(pet.health).forEach(key => {
-            if (pet.health[key] === true) healthArray.push(key);
-        });
-    }
-    
-    return healthArray.map(health => {
-        const healthText = healthTranslations[health] ? healthTranslations[health][currentLang] : health;
-        return `<span class="pet-tag">${healthText}</span>`;
-    }).join('');
-})();
+        const healthTranslations = {
+            'vaccinated': { tr: 'Aşılı', en: 'Vaccinated' },
+            'sterilized': { tr: 'Kısırlaştırılmış', en: 'Sterilized' },
+            'microchipped': { tr: 'Çipli', en: 'Microchipped' }
+        };
+        
+        const healthArray = [];
+        if (Array.isArray(pet.health)) {
+            healthArray.push(...pet.health);
+        } else if (typeof pet.health === 'object') {
+            Object.keys(pet.health).forEach(key => {
+                if (pet.health[key] === true) healthArray.push(key);
+            });
+        }
+        
+        return healthArray.map(health => {
+            const healthText = healthTranslations[health] ? healthTranslations[health][currentLang] : health;
+            return `<span class="pet-tag">${escapeHtml(healthText)}</span>`;
+        }).join('');
+    })();
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -778,35 +826,35 @@ function createSimilarPetCard(pet) {
     };
 
     return `
-        <div class="adopt-pet-card" data-pet-id="${pet.id}">
+        <div class="adopt-pet-card" data-pet-id="${escapedId}">
             <div class="pet-card-image">
-                <img src="${petImage}" alt="${pet.petName}" loading="lazy">
+                <img src="${escapedImage}" alt="${escapedPetName}" loading="lazy">
                 ${urgentBadge}
-                <div class="pet-type-badge" data-tr="${translatedData.type.tr}" data-en="${translatedData.type.en}">
-                    ${translatedData.type[currentLang]}
+                <div class="pet-type-badge" data-tr="${escapeHtml(translatedData.type.tr)}" data-en="${escapeHtml(translatedData.type.en)}">
+                    ${escapeHtml(translatedData.type[currentLang])}
                 </div>
             </div>
             <div class="pet-card-content">
                 <div class="pet-card-header">
-                    <h3 class="pet-card-name">${pet.petName}</h3>
-                    <div class="pet-card-breed">${translatedData.breed}</div>
+                    <h3 class="pet-card-name">${escapedPetName}</h3>
+                    <div class="pet-card-breed">${escapedBreed}</div>
                 </div>
                 <div class="pet-card-details">
                     <div class="pet-detail-item">
                         <i class="fas fa-birthday-cake"></i>
-                        <span>${pet.age} <span data-tr="yaşında" data-en="years old">yaşında</span></span>
+                        <span>${escapedAge} <span data-tr="yaşında" data-en="years old">yaşında</span></span>
                     </div>
                     <div class="pet-detail-item">
                         <i class="fas fa-ruler-vertical"></i>
-                        <span data-tr="${translatedData.size.tr}" data-en="${translatedData.size.en}">${translatedData.size[currentLang]}</span>
+                        <span data-tr="${escapeHtml(translatedData.size.tr)}" data-en="${escapeHtml(translatedData.size.en)}">${escapeHtml(translatedData.size[currentLang])}</span>
                     </div>
                     <div class="pet-detail-item">
                         <i class="fas fa-venus-mars"></i>
-                        <span data-tr="${translatedData.gender.tr}" data-en="${translatedData.gender.en}">${translatedData.gender[currentLang]}</span>
+                        <span data-tr="${escapeHtml(translatedData.gender.tr)}" data-en="${escapeHtml(translatedData.gender.en)}">${escapeHtml(translatedData.gender[currentLang])}</span>
                     </div>
                     <div class="pet-detail-item">
                         <i class="fas fa-map-marker-alt"></i>
-                        <span>${pet.location}</span>
+                        <span>${escapedLocation}</span>
                     </div>
                 </div>
                 <div class="pet-card-tags">
@@ -814,7 +862,7 @@ function createSimilarPetCard(pet) {
                 </div>
                 <div class="pet-card-footer">
                     <div class="pet-date">${formatDate(pet.dateAdded)}</div>
-                    <a href="pet-detail.html?id=${pet.id}" class="pet-card-btn" data-tr="İncele" data-en="View Details">İncele</a>
+                    <a href="pet-detail.html?id=${escapedId}" class="pet-card-btn" data-tr="İncele" data-en="View Details">İncele</a>
                 </div>
             </div>
         </div>

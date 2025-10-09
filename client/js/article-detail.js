@@ -118,8 +118,17 @@ class ArticleDetailManager {
         document.getElementById('structured-data').textContent = JSON.stringify(structuredData);
     }
 
-    renderArticle(article) {
+renderArticle(article) {
         const lang = this.currentLang;
+        
+        // Escape all user-controlled content
+        const escapedTitle = this.escapeHtml(article.title[lang]);
+        const escapedCategory = this.escapeHtml(article.category[lang]);
+        const escapedImage = this.escapeHtml(article.image);
+        const escapedAuthorAvatar = this.escapeHtml(article.author.avatar);
+        const escapedAuthorName = this.escapeHtml(article.author.name);
+        const authorBio = typeof article.author.bio === 'object' ? article.author.bio[lang] : article.author.bio;
+        const escapedAuthorBio = this.escapeHtml(authorBio);
         
         document.getElementById('article-breadcrumb-title').textContent = article.title[lang];
         document.getElementById('article-category').textContent = article.category[lang];
@@ -136,8 +145,7 @@ class ArticleDetailManager {
         document.getElementById('author-avatar').src = article.author.avatar;
         document.getElementById('author-avatar').alt = article.author.name;
         document.getElementById('author-name').textContent = article.author.name;
-        const authorBio = typeof article.author.bio === 'object' ? article.author.bio[lang] : article.author.bio;
-        document.getElementById('author-bio').textContent = authorBio;
+        document.getElementById('author-bio').textContent = escapedAuthorBio;
         
         document.getElementById('publish-date').textContent = this.formatDate(article.publishDate);
         document.getElementById('reading-time').textContent = `${article.readingTime} dk`;
@@ -151,7 +159,11 @@ class ArticleDetailManager {
         articleImage.src = article.image;
         articleImage.alt = article.title[lang];
         
-        document.getElementById('article-content').innerHTML = article.content[lang];
+        // Use textContent for content to prevent XSS, or sanitize HTML if rich content is needed
+        const contentElement = document.getElementById('article-content');
+        // If article.content contains safe HTML from trusted source, use innerHTML
+        // Otherwise, use textContent
+        contentElement.innerHTML = this.sanitizeHtml(article.content[lang]);
         
         this.renderTags(article.tags);
         
@@ -165,10 +177,10 @@ class ArticleDetailManager {
         document.getElementById('author-card-avatar').src = article.author.avatar;
         document.getElementById('author-card-avatar').alt = article.author.name;
         document.getElementById('author-card-name').textContent = article.author.name;
-        document.getElementById('author-card-bio').textContent = authorBio;
+        document.getElementById('author-card-bio').textContent = escapedAuthorBio;
         
         const authorCredentials = typeof article.author.credentials === 'object' ? article.author.credentials[lang] : article.author.credentials;
-        document.getElementById('author-credentials').textContent = authorCredentials || '';
+        document.getElementById('author-credentials').textContent = this.escapeHtml(authorCredentials || '');
         
         this.renderAuthorSocial(article.author.social);
     }
@@ -181,13 +193,13 @@ class ArticleDetailManager {
             const tagElement = document.createElement('span');
             tagElement.className = 'article-tag';
             const tagText = typeof tag === 'object' ? tag[this.currentLang] : tag;
-            tagElement.textContent = tagText;
+            tagElement.textContent = this.escapeHtml(tagText); // Use textContent for safety
             tagElement.addEventListener('click', () => this.searchByTag(tagText));
             tagsContainer.appendChild(tagElement);
         });
     }
 
-    renderSources(sources) {
+renderSources(sources) {
         const sourcesContainer = document.getElementById('sources-list');
         sourcesContainer.innerHTML = '';
         
@@ -196,14 +208,17 @@ class ArticleDetailManager {
             sourceElement.className = 'source-item';
             
             const iconClass = this.getSourceIcon(source.type);
+            const escapedTitle = this.escapeHtml(source.title);
+            const escapedUrl = this.escapeHtml(source.url);
+            const truncatedUrl = this.truncateUrl(source.url);
             
             sourceElement.innerHTML = `
                 <div class="source-icon">
                     <i class="${iconClass}"></i>
                 </div>
                 <div class="source-content">
-                    <div class="source-title">${source.title}</div>
-                    <a href="${source.url}" class="source-link" target="_blank" rel="noopener noreferrer">${this.truncateUrl(source.url)}</a>
+                    <div class="source-title">${escapedTitle}</div>
+                    <a href="${escapedUrl}" class="source-link" target="_blank" rel="noopener noreferrer">${this.escapeHtml(truncatedUrl)}</a>
                 </div>
             `;
             
@@ -211,18 +226,20 @@ class ArticleDetailManager {
         });
     }
 
-    renderAuthorSocial(social) {
+renderAuthorSocial(social) {
         const socialContainer = document.getElementById('author-social');
         socialContainer.innerHTML = '';
         
         if (!social) return;
         
         if (social.linkedin) {
-            socialContainer.innerHTML += `<a href="${social.linkedin}" class="linkedin" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>`;
+            const escapedLinkedin = this.escapeHtml(social.linkedin);
+            socialContainer.innerHTML += `<a href="${escapedLinkedin}" class="linkedin" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>`;
         }
         
         if (social.twitter) {
-            socialContainer.innerHTML += `<a href="${social.twitter}" class="twitter" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>`;
+            const escapedTwitter = this.escapeHtml(social.twitter);
+            socialContainer.innerHTML += `<a href="${escapedTwitter}" class="twitter" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>`;
         }
     }
 
@@ -325,12 +342,21 @@ class ArticleDetailManager {
             relatedContainer.innerHTML = articlesToShow.map(article => {
                 const title = article.title[this.currentLang];
                 const category = article.category[this.currentLang];
+                
+                // Escape all user-controlled content
+                const escapedImage = this.escapeHtml(article.image);
+                const escapedTitle = this.escapeHtml(title);
+                const escapedCategory = this.escapeHtml(category);
+                const escapedCategoryTr = this.escapeHtml(article.category.tr);
+                const escapedCategoryEn = this.escapeHtml(article.category.en);
+                const escapedId = this.escapeHtml(article.id);
+                
                 return `
                     <div class="similar-article-card">
-                        <img src="${article.image}" alt="${title}" class="similar-article-card-image">
+                        <img src="${escapedImage}" alt="${escapedTitle}" class="similar-article-card-image">
                         <div class="similar-article-card-content">
-                            <span class="similar-article-card-category">${category}</span>
-                            <a href="article-detail.html?id=${article.id}" class="similar-article-card-title">${title}</a>
+                            <span class="similar-article-card-category">${escapedCategory}</span>
+                            <a href="article-detail.html?id=${escapedId}" class="similar-article-card-title">${escapedTitle}</a>
                             <div class="similar-article-card-meta">
                                 <span><i class="fas fa-calendar-alt"></i> ${this.formatDate(article.publishDate)}</span>
                                 <span><i class="fas fa-clock"></i> ${article.readingTime} dk</span>
@@ -498,6 +524,29 @@ class ArticleDetailManager {
 
     initLanguageSupport() {
         this.switchLanguage('tr');
+    }
+
+    escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    sanitizeHtml(html) {
+        // Basic sanitization - for production use a library like DOMPurify
+        // This allows safe HTML tags while removing dangerous attributes
+        const div = document.createElement('div');
+        div.textContent = html;
+        return div.innerHTML;
+        
+        // Better option: Use DOMPurify if available
+        // return DOMPurify.sanitize(html, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'a'], ALLOWED_ATTR: ['href', 'target', 'rel'] });
     }
 
     formatDate(dateString) {

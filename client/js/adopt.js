@@ -4,6 +4,34 @@
  */
 import { CachedPetsService } from './firebase-data-service.js';
 
+// Move outside function as constant
+const PET_TRANSLATIONS = {
+    type: { 
+        'köpek': { tr: 'Köpek', en: 'Dog' },
+        'dog': { tr: 'Köpek', en: 'Dog' },
+        'kedi': { tr: 'Kedi', en: 'Cat' },
+        'cat': { tr: 'Kedi', en: 'Cat' },
+        'diğer': { tr: 'Diğer', en: 'Other' },
+        'other': { tr: 'Diğer', en: 'Other' }
+    },
+    size: { 
+        'küçük': { tr: 'Küçük', en: 'Small' },
+        'small': { tr: 'Küçük', en: 'Small' },
+        'orta': { tr: 'Orta', en: 'Medium' },
+        'medium': { tr: 'Orta', en: 'Medium' },
+        'büyük': { tr: 'Büyük', en: 'Large' },
+        'large': { tr: 'Büyük', en: 'Large' }
+    },
+    gender: { 
+        'erkek': { tr: 'Erkek', en: 'Male' },
+        'male': { tr: 'Erkek', en: 'Male' },
+        'dişi': { tr: 'Dişi', en: 'Female' },
+        'female': { tr: 'Dişi', en: 'Female' },
+        'belirtilmemiş': { tr: 'Belirtilmemiş', en: 'Unspecified' },
+        'unspecified': { tr: 'Belirtilmemiş', en: 'Unspecified' }
+    }
+};
+
 const AdoptPageApp = {
     state: {
         allPets: [],
@@ -219,14 +247,21 @@ applyFiltersAndSort() {
 
 normalizeValue(value) {
     if (!value) return '';
-    // Convert to lowercase and handle Turkish characters
-    return value.toString().toLowerCase()
-        .replace('ı', 'i')
-        .replace('ğ', 'g')
-        .replace('ü', 'u')
-        .replace('ş', 's')
-        .replace('ö', 'o')
-        .replace('ç', 'c');
+    // Convert to lowercase, trim spaces, and handle Turkish characters
+    return value.toString().trim().toLowerCase()
+        .replace(/ı/g, 'i')
+        .replace(/ğ/g, 'g')
+        .replace(/ü/g, 'u')
+        .replace(/ş/g, 's')
+        .replace(/ö/g, 'o')
+        .replace(/ç/g, 'c')
+        .replace(/İ/g, 'i')
+        .replace(/Ğ/g, 'g')
+        .replace(/Ü/g, 'u')
+        .replace(/Ş/g, 's')
+        .replace(/Ö/g, 'o')
+        .replace(/Ç/g, 'c')
+        .replace(/\s+/g, '-'); // Convert spaces to dashes for consistency
 },
 
     applySorting(pets) {
@@ -266,7 +301,18 @@ normalizeValue(value) {
         }, 250);
     },
 
-   createPetCard(pet, view) {
+    escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+},
+
+createPetCard(pet, view) {
     const lang = this.getCurrentLanguage();
     const translated = this.translatePetData(pet, lang);
     const urgentBadge = pet.urgent ? `<div class="pet-urgent-badge" data-tr="ACİL" data-en="URGENT"></div>` : '';
@@ -280,34 +326,46 @@ normalizeValue(value) {
         : Object.keys(pet.health).filter(key => pet.health[key] === true);
 
     const healthTags = petHealthArray.map(h => 
-        `<span class="pet-tag">${this.translateHealth(h, lang)}</span>`
+        `<span class="pet-tag">${this.escapeHtml(this.translateHealth(h, lang))}</span>`
     ).join('');
     
     const date = new Date(pet.dateAdded).toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
+    // Escape all user-controlled content
+    const escapedPetName = this.escapeHtml(pet.petName);
+    const escapedBreed = this.escapeHtml(translated.breed);
+    const escapedDescription = this.escapeHtml(translated.description);
+    const escapedLocation = this.escapeHtml(pet.location);
+    const escapedAge = this.escapeHtml(String(pet.age || 0));
+    const escapedSize = this.escapeHtml(translated.size);
+    const escapedGender = this.escapeHtml(translated.gender);
+    const escapedType = this.escapeHtml(translated.type);
+    const escapedImage = this.escapeHtml(petImage);
+    const escapedId = this.escapeHtml(pet.id);
+
     const imageHTML = `
         <div class="pet-card-image">
-            <img src="${petImage}" alt="${pet.petName}" loading="lazy" onerror="this.src='/images/placeholder-pet.jpg'">
+            <img src="${escapedImage}" alt="${escapedPetName}" loading="lazy" onerror="this.src='/images/placeholder-pet.jpg'">
             ${urgentBadge}
-            <div class="pet-type-badge">${translated.type}</div>
+            <div class="pet-type-badge">${escapedType}</div>
         </div>`;
     
     const detailsHTML = `
-        <div class="pet-detail-item"><i class="fas fa-birthday-cake"></i><span data-tr="${pet.age || 0} yaşında" data-en="${pet.age || 0} years old"></span></div>
-        <div class="pet-detail-item"><i class="fas fa-ruler-vertical"></i><span>${translated.size}</span></div>
-        <div class="pet-detail-item"><i class="fas fa-venus-mars"></i><span>${translated.gender}</span></div>
-        <div class="pet-detail-item"><i class="fas fa-map-marker-alt"></i><span>${pet.location}</span></div>`;
+        <div class="pet-detail-item"><i class="fas fa-birthday-cake"></i><span data-tr="${escapedAge} yaşında" data-en="${escapedAge} years old"></span></div>
+        <div class="pet-detail-item"><i class="fas fa-ruler-vertical"></i><span>${escapedSize}</span></div>
+        <div class="pet-detail-item"><i class="fas fa-venus-mars"></i><span>${escapedGender}</span></div>
+        <div class="pet-detail-item"><i class="fas fa-map-marker-alt"></i><span>${escapedLocation}</span></div>`;
 
     if (view === 'grid') {
         return `
-            <div class="adopt-pet-card" data-pet-id="${pet.id}">
+            <div class="adopt-pet-card" data-pet-id="${escapedId}">
                 ${imageHTML}
                 <div class="pet-card-content">
                     <div class="pet-card-header">
-                        <h3 class="pet-card-name">${pet.petName}</h3>
-                        <div class="pet-card-breed">${translated.breed}</div>
+                        <h3 class="pet-card-name">${escapedPetName}</h3>
+                        <div class="pet-card-breed">${escapedBreed}</div>
                     </div>
-                    <p class="pet-card-description">${translated.description}</p>
+                    <p class="pet-card-description">${escapedDescription}</p>
                     <div class="pet-card-details">${detailsHTML}</div>
                     <div class="pet-card-tags">${healthTags}</div>
                     <div class="pet-card-footer">
@@ -318,11 +376,11 @@ normalizeValue(value) {
             </div>`;
     } else {
         return `
-            <div class="adopt-pet-card" data-pet-id="${pet.id}">
+            <div class="adopt-pet-card" data-pet-id="${escapedId}">
                 ${imageHTML}
                 <div class="pet-card-content">
                     <div class="pet-card-main">
-                        <div class="pet-card-header"><h3 class="pet-card-name">${pet.petName}</h3><div class="pet-card-breed">${translated.breed}</div></div>
+                        <div class="pet-card-header"><h3 class="pet-card-name">${escapedPetName}</h3><div class="pet-card-breed">${escapedBreed}</div></div>
                         <div class="pet-card-details">${detailsHTML}</div>
                         <div class="pet-card-tags">${healthTags}</div>
                     </div>
@@ -463,42 +521,16 @@ updateFilterCounts() {
         });
     },
 
+
 translatePetData(pet, lang) {
-    const translations = {
-        type: { 
-            'köpek': { tr: 'Köpek', en: 'Dog' },
-            'dog': { tr: 'Köpek', en: 'Dog' },
-            'kedi': { tr: 'Kedi', en: 'Cat' },
-            'cat': { tr: 'Kedi', en: 'Cat' },
-            'diğer': { tr: 'Diğer', en: 'Other' },
-            'other': { tr: 'Diğer', en: 'Other' }
-        },
-        size: { 
-            'küçük': { tr: 'Küçük', en: 'Small' },
-            'small': { tr: 'Küçük', en: 'Small' },
-            'orta': { tr: 'Orta', en: 'Medium' },
-            'medium': { tr: 'Orta', en: 'Medium' },
-            'büyük': { tr: 'Büyük', en: 'Large' },
-            'large': { tr: 'Büyük', en: 'Large' }
-        },
-        gender: { 
-            'erkek': { tr: 'Erkek', en: 'Male' },
-            'male': { tr: 'Erkek', en: 'Male' },
-            'dişi': { tr: 'Dişi', en: 'Female' },
-            'female': { tr: 'Dişi', en: 'Female' },
-            'belirtilmemiş': { tr: 'Belirtilmemiş', en: 'Unspecified' },
-            'unspecified': { tr: 'Belirtilmemiş', en: 'Unspecified' }
-        }
-    };
-    
     const normalizedType = this.normalizeValue(pet.type);
     const normalizedSize = this.normalizeValue(pet.size);
     const normalizedGender = this.normalizeValue(pet.gender);
     
     return {
-        type: (translations.type[pet.type] || translations.type[normalizedType] || {})[lang] || pet.type,
-        size: (translations.size[pet.size] || translations.size[normalizedSize] || {})[lang] || pet.size,
-        gender: (translations.gender[pet.gender] || translations.gender[normalizedGender] || {})[lang] || pet.gender,
+        type: (PET_TRANSLATIONS.type[pet.type] || PET_TRANSLATIONS.type[normalizedType] || {})[lang] || pet.type,
+        size: (PET_TRANSLATIONS.size[pet.size] || PET_TRANSLATIONS.size[normalizedSize] || {})[lang] || pet.size,
+        gender: (PET_TRANSLATIONS.gender[pet.gender] || PET_TRANSLATIONS.gender[normalizedGender] || {})[lang] || pet.gender,
         breed: pet.breed || (lang === 'tr' ? 'Belirtilmemiş' : 'Unspecified'),
         description: (pet.description || '').substring(0, 100) + '...',
     };

@@ -19,6 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initArticlesPage();
 });
 
+function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
 async function initArticlesPage() {
     console.log('📚 Initializing Articles Page with Firebase');
     
@@ -338,22 +350,32 @@ function loadArticles() {
                     const categoryEn = article.category?.en || '';
                     const publishDate = formatDate(article.publishDate, currentLang);
                     const readingTime = article.readingTime || 5;
+                    
+                    // Escape all user-controlled content
+                    const escapedImage = escapeHtml(article.image || '');
+                    const escapedTitle = escapeHtml(title);
+                    const escapedSummary = escapeHtml(summary);
+                    const escapedCategory = escapeHtml(category);
+                    const escapedCategoryTr = escapeHtml(categoryTr);
+                    const escapedCategoryEn = escapeHtml(categoryEn);
+                    const escapedId = escapeHtml(article.id);
+                    
                     const tags = (article.tags || []).map(tag => {
                         const tagText = typeof tag === 'object' ? tag[currentLang] : tag;
-                        return `<span class="article-tag">${tagText}</span>`;
+                        return `<span class="article-tag">${escapeHtml(tagText)}</span>`;
                     }).join('');
 
                     return `
-                        <div class="article-card" data-article-id="${article.id}" style="cursor: pointer;">
+                        <div class="article-card" data-article-id="${escapedId}" style="cursor: pointer;">
                             <div class="article-image">
-                                <img src="${article.image || ''}" alt="${title}" loading="lazy">
-                                <div class="category-badge" data-tr="${categoryTr}" data-en="${categoryEn}">
-                                    ${category}
+                                <img src="${escapedImage}" alt="${escapedTitle}" loading="lazy">
+                                <div class="category-badge" data-tr="${escapedCategoryTr}" data-en="${escapedCategoryEn}">
+                                    ${escapedCategory}
                                 </div>
                             </div>
                             <div class="article-content">
-                                <h3 class="article-title">${title}</h3>
-                                <p class="article-summary">${summary}</p>
+                                <h3 class="article-title">${escapedTitle}</h3>
+                                <p class="article-summary">${escapedSummary}</p>
                                 <div class="article-meta">
                                     <div class="article-date">
                                         <i class="fas fa-calendar"></i>
@@ -394,17 +416,30 @@ function loadArticles() {
 function createFeaturedArticleCard(article) {
     try {
         const currentLang = getCurrentLanguage();
+        
+        // Escape all user-controlled content
+        const escapedImage = escapeHtml(article.image || '');
+        const escapedTitle = escapeHtml((article.title && article.title[currentLang]) ? article.title[currentLang] : '');
+        const escapedSummary = escapeHtml((article.summary && article.summary[currentLang]) ? article.summary[currentLang] : '');
+        const escapedCategory = escapeHtml((article.category && article.category[currentLang]) ? article.category[currentLang] : '');
+        const escapedCategoryTr = escapeHtml((article.category && article.category.tr) ? article.category.tr : '');
+        const escapedCategoryEn = escapeHtml((article.category && article.category.en) ? article.category.en : '');
+        const escapedId = escapeHtml(article.id);
+        const escapedAuthorAvatar = escapeHtml((article.author && article.author.avatar) ? article.author.avatar : '');
+        const escapedAuthorName = escapeHtml((article.author && article.author.name) ? article.author.name : '');
+        const escapedAuthorBio = escapeHtml((article.author && article.author.bio && article.author.bio[currentLang]) ? article.author.bio[currentLang] : '');
+        
         return `
-            <a href="article-detail.html?id=${article.id}" class="featured-article-card" data-article-id="${article.id}" style="text-decoration:none;color:inherit;">
+            <a href="article-detail.html?id=${escapedId}" class="featured-article-card" data-article-id="${escapedId}" style="text-decoration:none;color:inherit;">
                 <div class="article-image">
-                    <img src="${article.image || ''}" alt="${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}" loading="lazy">
-                    <div class="category-badge" data-tr="${(article.category && article.category.tr) ? article.category.tr : ''}" data-en="${(article.category && article.category.en) ? article.category.en : ''}">
-                        ${(article.category && article.category[currentLang]) ? article.category[currentLang] : ''}
+                    <img src="${escapedImage}" alt="${escapedTitle}" loading="lazy">
+                    <div class="category-badge" data-tr="${escapedCategoryTr}" data-en="${escapedCategoryEn}">
+                        ${escapedCategory}
                     </div>
                 </div>
                 <div class="article-content">
-                    <h3 class="article-title">${(article.title && article.title[currentLang]) ? article.title[currentLang] : ''}</h3>
-                    <p class="article-summary">${(article.summary && article.summary[currentLang]) ? article.summary[currentLang] : ''}</p>
+                    <h3 class="article-title">${escapedTitle}</h3>
+                    <p class="article-summary">${escapedSummary}</p>
                     <div class="article-meta">
                         <div class="article-date">
                             <i class="fas fa-calendar"></i>
@@ -416,10 +451,10 @@ function createFeaturedArticleCard(article) {
                         </div>
                     </div>
                     <div class="article-author">
-                        <img src="${(article.author && article.author.avatar) ? article.author.avatar : ''}" alt="${(article.author && article.author.name) ? article.author.name : ''}" class="author-avatar" loading="lazy">
+                        <img src="${escapedAuthorAvatar}" alt="${escapedAuthorName}" class="author-avatar" loading="lazy">
                         <div class="author-info">
-                            <h4>${(article.author && article.author.name) ? article.author.name : ''}</h4>
-                            <p class="author-bio">${(article.author && article.author.bio && article.author.bio[currentLang]) ? article.author.bio[currentLang] : ''}</p>
+                            <h4>${escapedAuthorName}</h4>
+                            <p class="author-bio">${escapedAuthorBio}</p>
                         </div>
                     </div>
                 </div>
