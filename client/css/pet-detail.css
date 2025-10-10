@@ -3,9 +3,10 @@
    =================== */
 
 .pet-detail-main {
-    padding-top: 110px; /* Increased from 80px to prevent header overlap */
+    padding-top: 110px;
     min-height: 100vh;
     background-color: var(--cream-bg);
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 /* ===================
@@ -16,7 +17,7 @@
     background-color: var(--white);
     padding: 20px 0;
     border-bottom: 1px solid rgba(179, 187, 175, 0.2);
-    margin-bottom: 0; /* Ensure no extra margin */
+    margin-bottom: 0;
 }
 
 .breadcrumb {
@@ -46,7 +47,7 @@
 }
 
 /* ===================
-   DETAIL CONTENT
+   DETAIL CONTENT LAYOUT
    =================== */
 
 .pet-detail-content {
@@ -55,26 +56,32 @@
 
 .detail-grid {
     display: grid;
-    /* Updated based on instructions */
-    grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
-    gap: 20px;
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); /* Adjusted for a slightly wider sidebar */
+    gap: 40px;
     margin-bottom: 40px;
     align-items: start;
 }
 
-/* ===================
-   LEFT COLUMN - IMAGES AND PET INFO
-   =================== */
-
+/* Left Column */
 .images-and-info {
     display: flex;
     flex-direction: column;
-    /* Updated based on instructions */
     gap: 20px;
 }
 
+/* Right Column (Sidebar) */
+.contact-section {
+    position: sticky;
+    top: 100px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 320px;
+}
+
 /* ===================
-   IMAGES SECTION
+   IMAGES SECTION (LEFT COLUMN)
    =================== */
 
 .images-section {
@@ -84,14 +91,12 @@
 .main-image-container {
     position: relative;
     width: 100%;
-    /* Updated based on instructions */
     height: 400px;
     border-radius: var(--border-radius-lg);
     overflow: hidden;
     background-color: var(--light-gray);
     box-shadow: var(--shadow-lg);
-    /* Updated based on instructions */
-    margin-bottom: 10px;
+    margin-bottom: 15px; /* Consistent spacing */
 }
 
 .main-image {
@@ -153,8 +158,7 @@
 
 .thumbnails-container {
     display: grid;
-    /* Updated based on instructions */
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* More flexible */
     gap: 10px;
 }
 
@@ -189,7 +193,7 @@
 }
 
 /* ===================
-   PET INFO SECTION
+   PET INFO SECTION (LEFT COLUMN)
    =================== */
 
 .pet-info-section {
@@ -198,7 +202,7 @@
     padding: 30px;
     box-shadow: var(--shadow-md);
     border: 1px solid rgba(179, 187, 175, 0.2);
-    width: 100%; /* Ensure full width */
+    width: 100%;
 }
 
 .pet-header {
@@ -283,14 +287,11 @@
     transform: translateY(-2px);
 }
 
-/* ===================
-   QUICK INFO GRID
-   =================== */
-
+/* Quick Info Grid */
 .quick-info-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Flexible grid */
+    gap: 20px;
     margin-bottom: 30px;
 }
 
@@ -345,11 +346,9 @@
     word-wrap: break-word;
 }
 
-/* ===================
-   HEALTH SECTION
-   =================== */
-
-.health-section {
+/* Health & Description Sections */
+.health-section,
+.description-section {
     margin-bottom: 30px;
 }
 
@@ -371,7 +370,6 @@
     background: linear-gradient(135deg, var(--accent-orange), var(--light-orange));
     border-radius: 2px;
 }
-
 
 .health-tags {
     display: flex;
@@ -406,14 +404,6 @@
     font-size: 12px;
 }
 
-/* ===================
-   DESCRIPTION SECTION
-   =================== */
-
-.description-section {
-    margin-bottom: 30px;
-}
-
 .description-content {
     line-height: 1.7;
     color: var(--deep-plum);
@@ -427,21 +417,9 @@
     margin-bottom: 0;
 }
 
-
 /* ===================
-   CONTACT SECTION
+   CONTACT SECTION (RIGHT SIDEBAR)
    =================== */
-
-.contact-section {
-    position: sticky;
-    /* Updated based on instructions */
-    top: 100px;
-    align-self: start;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    min-width: 320px; /* Ensure minimum width */
-}
 
 .contact-card, .application-card {
     background-color: var(--white);
@@ -492,10 +470,6 @@
     font-size: 10px;
 }
 
-/* ===================
-   CARETAKER INFO
-   =================== */
-
 .caretaker-info {
     display: flex;
     gap: 16px;
@@ -522,7 +496,7 @@
 
 .caretaker-details {
     flex: 1;
-    min-width: 0; /* Allow text to wrap */
+    min-width: 0;
 }
 
 .caretaker-name {
@@ -537,10 +511,6 @@
     color: var(--medium-gray);
     margin-bottom: 8px;
 }
-
-/* ===================
-   CONTACT METHODS
-   =================== */
 
 .contact-methods {
     display: flex;
@@ -600,11 +570,6 @@
     font-weight: 500;
 }
 
-.contact-btn small {
-    font-size: 12px;
-    opacity: 0.8;
-}
-
 .contact-btn#whatsapp-btn {
     border-color: #25d366;
     color: #25d366;
@@ -615,14 +580,10 @@
     color: var(--white);
 }
 
-/* ===================
-   PHONE NUMBER DISPLAY
-   =================== */
-
 .call-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 8px; /* Adds a small space between the button and the note */
+    gap: 8px;
 }
 
 .availability-note {
@@ -642,11 +603,6 @@
 .availability-note i {
     color: var(--accent-orange);
     font-size: 12px;
-}
-
-.availability-hours {
-    font-weight: 600;
-    color: var(--primary-brown);
 }
 
 .phone-number {
@@ -698,10 +654,6 @@
     font-style: italic;
 }
 
-/* ===================
-   SAFETY NOTICE
-   =================== */
-
 .safety-notice {
     background-color: #fff3cd;
     border: 1px solid #ffeaa7;
@@ -749,7 +701,7 @@
 }
 
 /* ===================
-   APPLICATION FORM
+   APPLICATION FORM (RIGHT SIDEBAR)
    =================== */
 
 .application-card {
@@ -775,12 +727,6 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-}
-
-.form-row {
-    display: flex;
-    flex-direction: column; /* Stack vertically for better mobile support */
-    gap: 12px;
 }
 
 .form-group {
@@ -904,7 +850,6 @@
    =================== */
 
 .similar-pets-section {
-    /* Updated based on instructions */
     padding: 40px 0;
     background-color: var(--white);
     border-top: 1px solid rgba(179, 187, 175, 0.2);
@@ -918,50 +863,33 @@
 
 .similar-pets-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 30%));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
-    align-items: stretch; /* FIX: Ensure all cards have equal height */
+    align-items: stretch; /* Ensure all cards have equal height */
 }
 
+/* Fixes for cards within the grid to ensure consistent height */
 .adopt-pet-card {
     display: flex;
     flex-direction: column;
-    height: 100%; /* force card to fill grid cell */
+    height: 100%;
 }
 
 .pet-card-content {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    /* No forced min-height needed */
 }
 
-/* FIX: Limit health tags wrapping to prevent extra height growth */
 .pet-card-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     margin-bottom: 16px;
-    /* Prevent excessive wrapping */
-    max-height: 40px; /* or 2 lines, adjust as needed */
+    max-height: 40px;
     overflow: hidden;
 }
 
-/* FIX: Remove extra margin from .pet-card-description in similar cards (if present) */
-.similar-pet-card .pet-card-description {
-    display: none !important;
-}
-
-/* Optional: Ensure images display consistently */
-.pet-card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-}
-
-/* FIX: Prevent extra space at bottom of card if content is short */
 .pet-card-footer {
     margin-top: auto;
 }
@@ -1063,8 +991,9 @@
     gap: 16px;
 }
 
+
 /* ===================
-   UTILITY CLASSES
+   UTILITY & ANIMATION CLASSES
    =================== */
 
 .hidden {
@@ -1075,158 +1004,6 @@
     opacity: 0.6;
     pointer-events: none;
 }
-
-/* ===================
-   RESPONSIVE DESIGN
-   =================== */
-
-@media (max-width: 1024px) {
-    .detail-grid {
-        /* Updated based on instructions */
-        grid-template-columns: 1fr;
-    }
-    
-    .contact-section {
-        /* Updated based on instructions */
-        position: static;
-    }
-    
-    .main-image-container {
-        height: 400px;
-    }
-    
-    .quick-info-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .similar-pets-grid {
-        /* Updated based on instructions */
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    .pet-detail-main {
-        padding-top: 80px; /* Reduce for mobile */
-    }
-    
-    .breadcrumb-section {
-        padding: 15px 0;
-    }
-    
-    .pet-detail-content {
-        padding: 20px 0;
-    }
-    
-    .detail-grid {
-        gap: 20px;
-    }
-    
-    .pet-info-section,
-    .contact-card,
-    .application-card {
-        padding: 20px;
-    }
-    
-    .pet-title {
-        font-size: 2rem;
-    }
-    
-    .pet-header {
-        flex-direction: column;
-        gap: 16px;
-        align-items: flex-start;
-    }
-    
-    .pet-actions {
-        align-self: flex-end;
-    }
-    
-    .quick-info-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .main-image-container {
-        height: 300px;
-    }
-    
-    .thumbnails-container {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .thumbnail {
-        height: 80px;
-    }
-    
-    .form-row {
-        flex-direction: column;
-    }
-    
-    .similar-pets-grid {
-        gap: 20px;
-    }
-    
-    .contact-section {
-        min-width: auto;
-    }
-}
-
-@media (max-width: 480px) {
-    .pet-detail-content {
-        padding: 15px 0;
-    }
-    
-    .detail-grid {
-        gap: 15px;
-    }
-    
-    .pet-info-section,
-    .contact-card,
-    .application-card {
-        padding: 16px;
-    }
-    
-    .pet-title {
-        font-size: 1.8rem;
-    }
-    
-    .main-image-container {
-        height: 250px;
-    }
-    
-    .thumbnails-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
-    
-    .thumbnail {
-        height: 60px;
-    }
-    
-    .caretaker-info {
-        flex-direction: column;
-        text-align: center;
-        gap: 12px;
-    }
-    
-    .similar-pets-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .modal-content {
-        width: 95%;
-        margin: 20px 0;
-    }
-    
-    .modal-header,
-    .modal-body {
-        padding: 16px;
-    }
-}
-
-/* ===================
-   ANIMATIONS
-   =================== */
 
 .fade-in {
     animation: fadeIn 0.6s ease-out;
@@ -1255,30 +1032,188 @@
     to { opacity: 1; transform: translateX(0); }
 }
 
+/* ===================================================================
+   =================== RESPONSIVE DESIGN (CONSOLIDATED) ===================
+   =================================================================== */
+
+/* Tablets and Small Desktops */
+@media (max-width: 1024px) {
+    .detail-grid {
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 30px;
+    }
+
+    .similar-pets-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+
+/* Mobile Landscape and Large Phones */
+@media (max-width: 768px) {
+    .pet-detail-main {
+        padding-top: 80px;
+    }
+    
+    .breadcrumb-section {
+        padding: 15px 0;
+    }
+
+    .breadcrumb {
+        font-size: 13px;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    
+    .pet-detail-content {
+        padding: 20px 0;
+    }
+    
+    .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    /* Reorder content for mobile: main info first, then sidebar */
+    .images-and-info {
+        order: 1;
+    }
+    .contact-section {
+        order: 2;
+        position: static;
+        min-width: auto;
+    }
+    
+    .pet-info-section,
+    .contact-card,
+    .application-card {
+        padding: 20px;
+    }
+    
+    .pet-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .pet-title {
+        font-size: 2rem;
+    }
+    
+    .pet-actions {
+        align-self: flex-end;
+    }
+    
+    .quick-info-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .main-image-container {
+        height: 300px;
+    }
+    
+    .thumbnails-container {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 8px;
+    }
+    
+    .thumbnail {
+        height: 80px;
+    }
+    
+    .similar-pets-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .caretaker-info {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+
+/* Mobile Portrait */
+@media (max-width: 480px) {
+    .pet-detail-content {
+        padding: 15px 0;
+    }
+    
+    .detail-grid {
+        gap: 20px;
+    }
+    
+    .pet-info-section,
+    .contact-card,
+    .application-card {
+        padding: 16px;
+    }
+    
+    .pet-title {
+        font-size: 1.8rem;
+    }
+    
+    .main-image-container {
+        height: 250px;
+    }
+    
+    .thumbnails-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+    
+    .thumbnail {
+        height: 70px; /* Adjusted for 4 columns */
+    }
+
+    .quick-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 20px 0;
+    }
+    
+    .modal-header,
+    .modal-body {
+        padding: 16px;
+    }
+}
+
+
 /* ===================
    PRINT STYLES
    =================== */
 
 @media print {
+    body {
+        background: white !important;
+    }
+
+    .header,
+    .footer,
+    .breadcrumb-section,
     .pet-actions,
     .contact-methods,
     .application-card,
-    .modal,
-    .header,
-    .footer {
+    .similar-pets-section,
+    .modal {
         display: none !important;
-    }
-    
-    .detail-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
     }
     
     .pet-detail-main {
         padding-top: 0;
     }
-    
-    body {
-        background: white !important;
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .pet-info-section, .contact-card {
+        box-shadow: none;
+        border: 1px solid #ccc;
     }
 }

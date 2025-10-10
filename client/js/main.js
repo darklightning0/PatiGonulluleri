@@ -9,6 +9,7 @@ import { CachedPetsService, CachedArticlesService } from './firebase-data-servic
 
 let currentLanguage = 'tr';
 let isScrolling = false;
+let lastScroll = 0; // For tracking scroll direction
 
 // ===================
 // INITIALIZATION
@@ -39,29 +40,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize core functionality
     initLanguageToggle(elements.langButtons);
     loadLanguagePreference();
-    initMobileNavigation(elements.mobileMenuBtn, elements.nav, elements.navLinks);
+    initMobileNavigation(elements.mobileMenuBtn, elements.nav, elements.navLinks); // Enhanced version
     initFormValidation(elements.newsletterForm, elements.emailInput);
-    initScrollEffects(elements.header, elements.scrollRevealElements);
+    initScrollEffects(elements.header, elements.scrollRevealElements); // Enhanced version
     initSmoothScrolling(elements.anchorLinks, elements.header);
     initImageLoading(elements.allImages);
-    optimizeAnimations();
+    
+    // Initialize new responsive features
+    preventHorizontalScroll();
+    initMobileFilterToggle();
+    initCollapsibleFilters();
     
     if (elements.articlesContainer) {
         await loadLatestArticles(elements.articlesContainer);
-        
-        // Reload on language change
-        document.addEventListener('languageChanged', () => {
-            loadLatestArticles(elements.articlesContainer);
-        });
+        document.addEventListener('languageChanged', () => loadLatestArticles(elements.articlesContainer));
     }
     
     if (elements.featuredPetsContainer) {
         await loadFeaturedPets(elements.featuredPetsContainer);
-        
-        // Reload on language change
-        document.addEventListener('languageChanged', () => {
-            loadFeaturedPets(elements.featuredPetsContainer);
-        });
+        document.addEventListener('languageChanged', () => loadFeaturedPets(elements.featuredPetsContainer));
     }
 
     // Initialize active nav link based on current page
@@ -122,19 +119,13 @@ function initLanguageToggle(langButtons) {
     });
 }
 
-/**
- * Switch language and notify other scripts.
- * @param {string} lang - The new language code ('tr' or 'en').
- */
 function switchLanguage(lang) {
     currentLanguage = lang;
     
-    // Update all static translatable elements
     const translatableElements = document.querySelectorAll('[data-tr][data-en]');
     translatableElements.forEach(element => {
         const text = element.getAttribute(`data-${lang}`);
         if (text) {
-            // Handle different element types
             if (element.placeholder !== undefined) {
                 element.placeholder = text;
             } else if (element.value !== undefined) {
@@ -145,27 +136,19 @@ function switchLanguage(lang) {
         }
     });
     
-    // Store language preference
     localStorage.setItem('preferredLanguage', lang);
-
-    // Update button states
     updateLanguageButtons(lang);
     
-    // Add smooth transition effect for visual feedback
     document.body.style.transition = 'opacity 0.2s ease-in-out';
     document.body.style.opacity = '0.9';
     setTimeout(() => {
         document.body.style.opacity = '1';
     }, 200);
 
-    // *** NEW IMPLEMENTATION: Notify other scripts of the language change ***
     console.log(`Language changed to ${lang}. Dispatching 'languageChanged' event.`);
-    const event = new CustomEvent('languageChanged', { 
-        detail: { lang: currentLanguage } 
-    });
+    const event = new CustomEvent('languageChanged', { detail: { lang: currentLanguage } });
     document.dispatchEvent(event);
 }
-
 
 function updateLanguageButtons(activeLang) {
     document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -181,23 +164,25 @@ function loadLanguagePreference() {
 }
 
 // ===================
-// MOBILE NAVIGATION
+// MOBILE NAVIGATION (ENHANCED)
 // ===================
 
 function initMobileNavigation(mobileMenuBtn, nav, navLinks) {
     if (!mobileMenuBtn || !nav) return;
 
+    const body = document.body;
+
     const closeMobileMenu = () => {
         mobileMenuBtn.classList.remove('active');
         nav.classList.remove('active');
-        document.body.style.overflow = '';
+        body.style.overflow = '';
     };
 
     mobileMenuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        mobileMenuBtn.classList.toggle('active');
+        const isActive = mobileMenuBtn.classList.toggle('active');
         nav.classList.toggle('active');
-        document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : '';
+        body.style.overflow = isActive ? 'hidden' : '';
     });
     
     navLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
@@ -207,7 +192,24 @@ function initMobileNavigation(mobileMenuBtn, nav, navLinks) {
             closeMobileMenu();
         }
     });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && nav.classList.contains('active')) {
+            closeMobileMenu();
+        }
+    });
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (window.innerWidth > 768 && nav.classList.contains('active')) {
+                closeMobileMenu();
+            }
+        }, 250);
+    });
 }
+
 
 // ===================
 // FORM VALIDATION & HANDLING
@@ -215,15 +217,12 @@ function initMobileNavigation(mobileMenuBtn, nav, navLinks) {
 
 function initFormValidation(newsletterForm, emailInput) {
     if (!newsletterForm) return;
-
     newsletterForm.addEventListener('submit', handleNewsletterSubmit);
-    
     if (emailInput) {
         emailInput.addEventListener('input', () => clearFormError(emailInput));
     }
 }
 
-// Line 239 in main.js - REPLACE ENTIRE FUNCTION
 function handleNewsletterSubmit(e) {
     e.preventDefault();
     const form = e.target;
@@ -242,47 +241,34 @@ function handleNewsletterSubmit(e) {
     submitBtn.disabled = true;
     submitBtn.textContent = currentLanguage === 'tr' ? 'Gönderiliyor...' : 'Sending...';
 
-    // Call Pages Function API - only send email now (no preferences)
     fetch('/api/subscribe', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email })
-})
-.then(async response => {
-    const text = await response.text();
-    console.log('Response status:', response.status);
-    console.log('Response body:', text);
-    
-    let data = null;
-    try {
-        data = text ? JSON.parse(text) : null;
-    } catch (err) {
-        console.error('Failed to parse response as JSON:', err);
-        data = null;
-    }
-
-    if (!response.ok) {
-        const message = (data && (data.error || data.message)) || text || 'Subscription failed';
-        throw new Error(message);
-    }
-
-    return data;
-})
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    })
+    .then(async response => {
+        const text = await response.text();
+        console.log('Response status:', response.status);
+        console.log('Response body:', text);
+        let data = null;
+        try { data = text ? JSON.parse(text) : null; } catch (err) { console.error('Failed to parse response as JSON:', err); }
+        if (!response.ok) {
+            const message = (data && (data.error || data.message)) || text || 'Subscription failed';
+            throw new Error(message);
+        }
+        return data;
+    })
     .then(data => {
-    if (data && data.alreadySubscribed) {
-        showSuccessMessage(currentLanguage === 'tr' ? 
-            'Bu e-posta adresi zaten listemizde kayıtlı!' : 
-            'This email is already on our list!');
-    } else {
-        showSuccessMessage(currentLanguage === 'tr' ? 
-            'E-posta listemize başarıyla kayıt oldunuz! Teşekkürler.' : 
-            'You have been subscribed to our mailing list. Thank you.');
-    }
-    form.reset();
-
-        // Additional UX: briefly disable the submit button to avoid accidental duplicate clicks
+        if (data && data.alreadySubscribed) {
+            showSuccessMessage(currentLanguage === 'tr' ? 
+                'Bu e-posta adresi zaten listemizde kayıtlı!' : 
+                'This email is already on our list!');
+        } else {
+            showSuccessMessage(currentLanguage === 'tr' ? 
+                'E-posta listemize başarıyla kayıt oldunuz! Teşekkürler.' : 
+                'You have been subscribed to our mailing list. Thank you.');
+        }
+        form.reset();
         submitBtn.disabled = true;
         setTimeout(() => { submitBtn.disabled = false; }, 3000);
     })
@@ -340,14 +326,37 @@ function showSuccessMessage(message) {
 }
 
 // ===================
-// SCROLL & UI EFFECTS
+// SCROLL & UI EFFECTS (ENHANCED)
 // ===================
 
 function initScrollEffects(header, scrollRevealElements) {
     if (!header) return;
 
     const handleScroll = debounce(() => {
-        header.classList.toggle('scrolled', window.scrollY > 50);
+        const currentScroll = window.pageYOffset;
+
+        // Original functionality: add 'scrolled' class
+        header.classList.toggle('scrolled', currentScroll > 50);
+
+        // New functionality: hide/show header on scroll
+        if (currentScroll <= 0) {
+            header.classList.remove('scroll-up', 'scroll-down');
+            return;
+        }
+        
+        if (currentScroll > lastScroll && currentScroll > header.offsetHeight) {
+            // Scrolling down
+            header.classList.remove('scroll-up');
+            header.classList.add('scroll-down');
+        } else if (currentScroll < lastScroll) {
+            // Scrolling up
+            header.classList.remove('scroll-down');
+            header.classList.add('scroll-up');
+        }
+        
+        lastScroll = currentScroll;
+
+        // Reveal elements on scroll
         revealOnScroll(scrollRevealElements);
     }, 15);
     
@@ -360,10 +369,6 @@ function revealOnScroll(elements) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('revealed');
-                if (entry.target.classList.contains('stat-number')) {
-                    const targetNumber = parseInt(entry.target.textContent.replace('+', ''));
-                    animateNumber(entry.target, 0, targetNumber);
-                }
                 observer.unobserve(entry.target);
             }
         });
@@ -398,15 +403,67 @@ function updateActiveNavLink(navLinks) {
 }
 
 // ===================
-// DYNAMIC CONTENT LOADING (for index.html)
+// NEW RESPONSIVE UTILITIES
+// ===================
+
+function initMobileFilterToggle() {
+    const filterSidebar = document.querySelector('.filter-sidebar');
+    if (!filterSidebar || window.innerWidth > 768) return;
+
+    let toggleBtn = document.querySelector('.filter-toggle-btn');
+    if (!toggleBtn) {
+        toggleBtn = document.createElement('button');
+        toggleBtn.className = 'filter-toggle-btn';
+        filterSidebar.parentNode.insertBefore(toggleBtn, filterSidebar);
+    }
+    
+    const isActive = filterSidebar.classList.contains('active');
+    toggleBtn.innerHTML = isActive ? 
+        '<i class="fas fa-times"></i> Filtreleri Gizle' : 
+        '<i class="fas fa-filter"></i> Filtreleri Göster';
+    
+    toggleBtn.addEventListener('click', () => {
+        filterSidebar.classList.toggle('active');
+        const currentlyActive = filterSidebar.classList.contains('active');
+        toggleBtn.innerHTML = currentlyActive ? 
+            '<i class="fas fa-times"></i> Filtreleri Gizle' : 
+            '<i class="fas fa-filter"></i> Filtreleri Göster';
+    });
+}
+
+function initCollapsibleFilters() {
+    if (window.innerWidth > 768) return;
+    
+    const filterSections = document.querySelectorAll('.filter-section');
+    filterSections.forEach((section, index) => {
+        const heading = section.querySelector('h3');
+        if (!heading) return;
+        
+        heading.addEventListener('click', () => {
+            section.classList.toggle('collapsed');
+        });
+        
+        // Start with first section open, others closed
+        if (index > 0) {
+            section.classList.add('collapsed');
+        } else {
+            section.classList.remove('collapsed');
+        }
+    });
+}
+
+function preventHorizontalScroll() {
+    document.documentElement.style.overflowX = 'hidden';
+    document.body.style.overflowX = 'hidden';
+}
+
+// ===================
+// DYNAMIC CONTENT LOADING
 // ===================
 
 async function loadFeaturedPets(petsContainer) {
     try {
-        // Show loading state
         petsContainer.innerHTML = '<div class="loading">Loading pets...</div>';
-        
-        // Fetch from Firebase
         const featuredPets = await CachedPetsService.getFeatured(3);
         
         if (featuredPets.length === 0) {
@@ -418,10 +475,8 @@ async function loadFeaturedPets(petsContainer) {
             const lang = currentLanguage;
             const ageText = `${pet.age} ${lang === 'tr' ? 'yaşında' : 'year' + (pet.age > 1 ? 's' : '')}`;
             const petType = pet.type === 'dog' ? (lang === 'tr' ? 'Köpek' : 'Dog') : pet.type === "cat" ? (lang === 'tr' ? 'Kedi' : 'Cat') : (lang === 'tr' ? 'Diğer' : 'Other');
-            const petSize = pet.size === 'büyük' ? (lang === 'tr' ? 'Büyük' : 'Large') : 
-                           (pet.size === 'orta' ? (lang === 'tr' ? 'Orta' : 'Medium') : (lang === 'tr' ? 'Küçük' : 'Small'));
+            const petSize = pet.size === 'büyük' ? (lang === 'tr' ? 'Büyük' : 'Large') : (pet.size === 'orta' ? (lang === 'tr' ? 'Orta' : 'Medium') : (lang === 'tr' ? 'Küçük' : 'Small'));
             const petImage = (pet.images && pet.images.length > 0) ? pet.images[0] : (pet.image || '/images/placeholder-pet.jpg');
-
 
             return `
                 <div class="pet-card">
@@ -454,10 +509,7 @@ async function loadFeaturedPets(petsContainer) {
 
 async function loadLatestArticles(articlesContainer) {
     try {
-        // Show loading state
         articlesContainer.innerHTML = '<div class="loading">Loading articles...</div>';
-        
-        // Fetch from Firebase
         const articlesToShow = window.innerWidth < 768 ? 2 : 3;
         const latestArticles = await CachedArticlesService.getLatest(articlesToShow);
         
@@ -485,6 +537,11 @@ async function loadLatestArticles(articlesContainer) {
 
 function initImageLoading(images) {
     images.forEach(img => {
+        // General responsive fix
+        img.style.maxWidth = '100%';
+        img.style.height = 'auto';
+
+        // Lazy loading class handling
         if (img.complete) {
             img.classList.add('loaded');
         } else {
@@ -492,29 +549,9 @@ function initImageLoading(images) {
         }
         img.addEventListener('error', () => {
             img.classList.add('error');
-            // A simple, inline SVG placeholder to avoid broken image icons
             img.src = 'data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27100%25%27%20height%3D%27100%25%27%20viewBox%3D%270%200%201%201%27%3E%3Crect%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F7F3E7%27/%3E%3C/svg%3E';
         });
     });
-}
-
-function optimizeAnimations() {
-    let ticking = false;
-    const scrollRevealElements = document.querySelectorAll('.scroll-reveal');
-    
-    function updateOnScroll() {
-        revealOnScroll(scrollRevealElements);
-        ticking = false;
-    }
-    
-    function requestTick() {
-        if (!ticking) {
-            requestAnimationFrame(updateOnScroll);
-            ticking = true;
-        }
-    }
-    
-    window.addEventListener('scroll', requestTick, { passive: true });
 }
 
 // ===================

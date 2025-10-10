@@ -6,6 +6,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    max-width: 100%; /* Responsive fix: Prevent horizontal scroll */
 }
 
 :root {
@@ -55,12 +56,37 @@ body {
     background-color: var(--cream-bg);
     overflow-x: hidden;
     width: 100%;
+    padding-top: 0; /* Responsive fix: Ensure content doesn't jump */
 }
 
 img {
     max-width: 100%;
     height: auto;
     display: block;
+}
+
+/* Exception for elements that need to overflow intentionally */
+.hero-background,
+.hero-overlay {
+    max-width: none;
+}
+
+/* Ensure all sections respect viewport width */
+section {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* ===================
+   TEXT OVERFLOW FIXES
+   =================== */
+h1, h2, h3, h4, h5, h6,
+p, span, div, a {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
 }
 
 /* ===================
@@ -70,8 +96,10 @@ img {
 .container {
     width: 100%;
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .btn {
@@ -159,7 +187,7 @@ img {
     z-index: 1000;
     padding: 15px 0;
     box-shadow: var(--shadow-sm);
-    transition: var(--transition);
+    transition: transform 0.3s ease, padding 0.3s ease; /* Fix: Updated for scroll behavior */
 }
 
 .header-container {
@@ -855,11 +883,22 @@ a:focus {
     outline-offset: 2px;
 }
 
-
 /* ===================
-   RESPONSIVE DESIGN
+   RESPONSIVE DESIGN & FIXES
    =================== */
 
+/* ------ Generic Responsive Fixes ------ */
+iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+.loading-container {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+/* ------ Tablet & Larger Phones (max-width: 1024px) ------ */
 @media (max-width: 1024px) {
     .pets-grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -867,7 +906,20 @@ a:focus {
     }
 }
 
+/* ------ Mobile Devices (max-width: 768px) ------ */
 @media (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* Hide header on scroll down */
+    .header.scroll-down {
+        transform: translateY(-100%);
+    }
+    .header.scroll-up {
+        transform: translateY(0);
+    }
     .header {
         padding: 10px 0;
     }
@@ -947,9 +999,18 @@ a:focus {
         gap: 15px;
         width: 100%;
     }
-    .hero-buttons .btn {
+    
+    /* Responsive Button Fixes */
+    .btn {
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+    .btn-primary,
+    .btn-secondary,
+    .btn-outline {
         width: 100%;
         max-width: 300px;
+        justify-content: center;
     }
     
     .adoptable-pets,
@@ -990,11 +1051,44 @@ a:focus {
         gap: 20px;
         align-items: center;
     }
+    
+    /* Responsive Form Fixes */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    select,
+    textarea {
+        font-size: 16px; /* Prevent zoom on iOS */
+        width: 100%;
+    }
+
+    /* Responsive Table Fixes */
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Responsive Modal/Popup Fixes */
+    .modal, .popup {
+        width: 95%;
+        max-width: 95%;
+        margin: 10px auto;
+    }
+
+    /* Responsive Loading State Fixes */
+    .loading-container {
+        padding: 30px 15px;
+    }
+    .loading-spinner {
+        width: 32px;
+        height: 32px;
+    }
 
     .footer {
         padding: 40px 0 20px;
     }
-
     .footer-content {
         grid-template-columns: 1fr;
         gap: 30px;
@@ -1016,9 +1110,11 @@ a:focus {
     }
 }
 
+/* ------ Small Mobile Devices (max-width: 480px) ------ */
 @media (max-width: 480px) {
     .container {
-        padding: 0 15px;
+        padding-left: 12px;
+        padding-right: 12px;
     }
 
     .adoptable-pets,
