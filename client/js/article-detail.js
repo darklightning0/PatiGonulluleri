@@ -538,16 +538,34 @@ renderAuthorSocial(social) {
         return String(text).replace(/[&<>"']/g, m => map[m]);
     }
 
-    sanitizeHtml(html) {
-        // Basic sanitization - for production use a library like DOMPurify
-        // This allows safe HTML tags while removing dangerous attributes
-        const div = document.createElement('div');
-        div.textContent = html;
-        return div.innerHTML;
-        
-        // Better option: Use DOMPurify if available
-        // return DOMPurify.sanitize(html, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'a'], ALLOWED_ATTR: ['href', 'target', 'rel'] });
+sanitizeHtml(html) {
+    // Use DOMPurify if available, otherwise use basic sanitization
+    if (typeof DOMPurify !== 'undefined') {
+        return DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'b', 'i', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre', 'span', 'div'],
+            ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'id'],
+            ALLOW_DATA_ATTR: false
+        });
     }
+    
+    // Fallback: basic sanitization
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    
+    const scripts = div.querySelectorAll('script, iframe, object, embed');
+    scripts.forEach(el => el.remove());
+    
+    const allElements = div.querySelectorAll('*');
+    allElements.forEach(el => {
+        Array.from(el.attributes).forEach(attr => {
+            if (attr.name.startsWith('on')) {
+                el.removeAttribute(attr.name);
+            }
+        });
+    });
+    
+    return div.innerHTML;
+}
 
     formatDate(dateString) {
         const date = new Date(dateString);

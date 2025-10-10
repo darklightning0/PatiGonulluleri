@@ -251,27 +251,8 @@
 
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
         <span data-tr="Makale yükleniyor..." data-en="Loading article...">Makale yükleniyor...</span>
-        <div class="loading-cat">
-    <div class="body"></div>
-    <div class="head">
-        <div class="face"></div>
-    </div>
-    <div class="foot">
-        <div class="tummy-end">
-        </div>
-        <div class="bottom">
-        </div>
-        <div class="legs left">
-        </div>
-        <div class="legs right">
-        </div>
-    </div>
-    <div class="hands left">
-    </div>
-    <div class="hands right">
-    </div>
-</div>
     </div>
 
     <!-- Error State -->
@@ -355,6 +336,7 @@
   
   window.db = getFirestore(window.firebaseApp);
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 <script type="module" src="js/firebase-data-service.js"></script>
 <script type="module" src="js/main.js"></script>
 <script type="module" src="js/article-detail.js"></script>
