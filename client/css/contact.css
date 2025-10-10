@@ -160,56 +160,6 @@
     }
 }
 
-/* Mobile Responsive Styles for Stepper */
-@media (max-width: 768px) {
-    .stepper-progress {
-        flex-direction: column;
-        gap: 40px;
-        padding: 0;
-        margin-bottom: 30px;
-    }
-
-    .stepper-progress::before {
-        top: 0;
-        bottom: 0;
-        left: 16px;
-        right: auto;
-        width: 2px;
-        height: auto;
-    }
-
-    .step-indicator {
-        flex-direction: row;
-        justify-content: flex-start;
-        gap: 16px;
-        width: 100%;
-        margin-bottom: 20px;
-    }
-
-    .step-title {
-        position: static;
-        transform: none;
-        text-align: left;
-        padding: 0;
-        margin: 0;
-    }
-
-    .form-step .step-title {
-        font-size: 1.3rem;
-    }
-
-    .stepper-form .form-navigation {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .stepper-form .prev-btn,
-    .stepper-form .next-btn {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
 /* ===================
    PAGE HEADER
    =================== */
@@ -351,21 +301,22 @@
 .social-links {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 12px; /* Adjusted gap */
     margin-top: 20px;
+    flex-wrap: wrap; /* Allow wrapping */
 }
 
 .social-link {
-    display: flex;
+    display: inline-flex; /* Use inline-flex */
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: var(--border-radius);
+    justify-content: center; /* Center content */
+    width: 44px; /* Fixed width */
+    height: 44px; /* Fixed height */
+    border-radius: 50%; /* Make them circular */
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 20px; /* Icon size */
     transition: var(--transition);
-    border: 2px solid transparent;
+    border: 2px solid; /* Use the color from specific class */
 }
 
 .social-link.facebook {
@@ -395,7 +346,7 @@
 
 .social-link.twitter:hover {
     background-color: #000000;
-    color: rgb(251, 251, 251);
+    color: white;
 }
 
 .social-link.youtube {
@@ -499,7 +450,7 @@
     min-height: 120px;
 }
 
-* Checkbox Groups */
+/* Checkbox Groups */
 .checkbox-group {
     display: flex;
     flex-direction: column;
@@ -713,7 +664,7 @@
 }
 
 .faq-item.active .faq-answer {
-    max-height: 200px;
+    max-height: 200px; /* Adjust as needed */
 }
 
 .faq-answer p {
@@ -862,131 +813,6 @@
 }
 
 /* ===================
-   RESPONSIVE DESIGN
-   =================== */
-
-@media (max-width: 1024px) {
-    .forms-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .newsletter-card {
-        grid-template-columns: 1fr;
-    }
-    
-    .newsletter-image {
-        order: -1;
-        height: 200px;
-    }
-}
-
-@media (max-width: 768px) {
-    .contact-main {
-        padding-top: 70px;
-    }
-    
-    .page-header {
-        padding: 30px 0;
-    }
-    
-    .contact-methods,
-    .contact-forms,
-    .contact-faq,
-    .newsletter-section {
-        padding: 60px 0;
-    }
-    
-    .methods-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .contact-card {
-        padding: 30px 20px;
-    }
-    
-    .forms-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
-    
-    .form-section {
-        padding: 30px 20px;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-    
-    .checkbox-group.multiple {
-        grid-template-columns: 1fr;
-    }
-    
-    .social-links {
-        flex-direction: column;
-        gap: 8px;
-    }
-    
-    .social-link {
-        justify-content: center;
-    }
-    
-    .newsletter-content {
-        padding: 30px 20px;
-    }
-    
-    .newsletter-row {
-        flex-direction: column;
-    }
-    
-    .newsletter-row input,
-    .newsletter-row button {
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .page-title {
-        font-size: 1.8rem;
-    }
-    
-    .page-description {
-        font-size: 1rem;
-    }
-    
-    .contact-methods,
-    .contact-forms,
-    .contact-faq,
-    .newsletter-section {
-        padding: 40px 0;
-    }
-    
-    .contact-card {
-        padding: 25px 15px;
-    }
-    
-    .form-section {
-        padding: 25px 15px;
-    }
-    
-    .faq-question {
-        padding: 20px;
-        flex-direction: column;
-        gap: 12px;
-        text-align: center;
-    }
-    
-    .faq-question span {
-        margin-right: 0;
-    }
-    
-    .faq-answer p {
-        padding: 0 20px 20px;
-    }
-}
-
-/* ===================
    ANIMATIONS
    =================== */
 
@@ -1046,3 +872,210 @@
         transform: none;
     }
 }
+
+
+/* ================================================= */
+/* ================================================= */
+/* RESPONSIVE DESIGN & MOBILE FIXES             */
+/* ================================================= */
+/* ================================================= */
+
+/* ===================
+   TABLET & LARGER SCREENS (<= 1024px)
+   =================== */
+
+@media (max-width: 1024px) {
+    .forms-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .newsletter-card {
+        grid-template-columns: 1fr;
+    }
+    
+    .newsletter-image {
+        order: -1;
+        height: 200px;
+    }
+}
+
+/* ===================
+   MOBILE & TABLET (<= 768px)
+   =================== */
+
+@media (max-width: 768px) {
+    .contact-main {
+        padding-top: 70px;
+    }
+    
+    .page-header {
+        padding: 30px 0;
+    }
+    
+    .contact-methods,
+    .contact-forms,
+    .contact-faq,
+    .newsletter-section {
+        padding: 60px 0;
+    }
+    
+    .methods-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .contact-card {
+        padding: 30px 20px;
+    }
+        
+    .forms-grid {
+        gap: 30px;
+    }
+    
+    .form-section {
+        padding: 30px 20px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .form-step .step-title {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+    
+    /* FIX: Stepper Progress - Mobile Vertical Layout */
+    .stepper-progress {
+        flex-direction: column;
+        gap: 20px;
+        padding: 0;
+        margin-bottom: 30px;
+        align-items: flex-start;
+    }
+    
+    /* FIX: Re-enabled vertical connector line */
+    .stepper-progress::before {
+        display: block;
+        top: 16px; /* Start below first dot */
+        bottom: 16px; /* End above last dot */
+        left: 15px; /* Center align with dots (32px / 2 - 1px) */
+        right: auto;
+        width: 2px;
+        height: auto;
+    }
+    
+    .step-indicator {
+        flex-direction: row;
+        width: 100%;
+        gap: 12px;
+    }
+    
+    .step-title {
+        position: static;
+        transform: none;
+        text-align: left;
+        padding: 0;
+        margin: 0;
+        max-width: none;
+    }
+
+    .step-number {
+        flex-shrink: 0;
+    }
+    
+    .stepper-form .form-navigation {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .stepper-form .prev-btn,
+    .stepper-form .next-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .checkbox-group.multiple {
+        grid-template-columns: 1fr;
+    }
+    
+    .newsletter-content {
+        padding: 30px 20px;
+    }
+    
+    .newsletter-row {
+        flex-direction: column;
+    }
+    
+    .newsletter-row input,
+    .newsletter-row button {
+        width: 100%;
+    }
+
+    /* FAQ Section */
+    .faq-question {
+        padding: 20px;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        text-align: left;
+    }
+    
+    .faq-question span {
+        margin-right: 0;
+    }
+    
+    .faq-answer p {
+        padding: 0 20px 20px;
+    }
+
+    .footer-brand .social-links {
+        justify-content: center;
+        margin-top: 15px;
+    }
+
+    /* File Input Sizing */
+    input[type="file"] {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+
+/* ===================
+   SMALL MOBILE SCREENS (<= 480px)
+   =================== */
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.6rem;
+    }
+    
+    .page-description {
+        font-size: 0.95rem;
+    }
+    
+    .contact-methods,
+    .contact-forms,
+    .contact-faq,
+    .newsletter-section {
+        padding: 40px 0;
+    }
+    
+    .contact-card {
+        padding: 25px 15px;
+    }
+    
+    .form-section {
+        padding: 25px 15px;
+    }
+    
+    .faq-question {
+        padding: 16px;
+    }
+    
+    .faq-answer p {
+        padding: 0 16px 16px;
+    }
+}
+ 

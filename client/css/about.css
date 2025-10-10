@@ -1,532 +1,12 @@
 /* ===================
-   LEGAL SECTION
+   BASE STYLES
    =================== */
-
-.legal-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-}
-
-.legal-card {
-    background-color: var(--white);
-    padding: 40px 30px;
-    border-radius: var(--border-radius-lg);
-    text-align: center;
-    box-shadow: var(--shadow-md);
-    border: 1px solid rgba(179, 187, 175, 0.2);
-    transition: var(--transition);
-    position: relative;
-    overflow: hidden;
-}
-
-.legal-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary-brown), var(--sage-green));
-}
-
-.legal-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-xl);
-}
-
-.legal-icon {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, var(--primary-brown), var(--dark-brown));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 24px;
-    font-size: 24px;
-    color: var(--white);
-    box-shadow: var(--shadow-sm);
-}
-
-.legal-card h3 {
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--primary-brown);
-    margin-bottom: 16px;
-}
-
-.legal-card p {
-    color: var(--medium-gray);
-    line-height: 1.6;
-    margin-bottom: 24px;
-}
-
-.legal-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background-color: var(--sage-green);
-    color: var(--white);
-    text-decoration: none;
-    border-radius: var(--border-radius);
-    font-weight: 500;
-    transition: var(--transition);
-}
-
-.legal-link:hover {
-    background-color: var(--dark-sage);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-/* ===================
-   CTA SECTION
-   =================== */
-
-.cta-section {
-    background: linear-gradient(135deg, var(--accent-orange), var(--light-orange));
-    padding: 80px 0;
-    text-align: center;
-}
-
-.cta-content h2 {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 4vw, 2.5rem);
-    font-weight: 700;
-    color: var(--white);
-    margin-bottom: 16px;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-.cta-content p {
-    font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.95);
-    margin-bottom: 40px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.cta-buttons {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.cta-buttons .btn {
-    padding: 16px 48px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    min-width: 160px;
-}
-
-.cta-buttons .btn-primary {
-    background-color: var(--white);
-    color: var(--accent-orange);
-    border: 2px solid var(--white);
-}
-
-.cta-buttons .btn-primary:hover {
-    background-color: var(--accent-orange);
-    color: var(--white);
-    transform: translateY(-3px);
-}
-
-.cta-buttons .btn-secondary {
-    background-color: transparent;
-    color: var(--white);
-    border: 2px solid var(--white);
-}
-
-.cta-buttons .btn-secondary:hover {
-    background-color: var(--white);
-    color: var(--accent-orange);
-    transform: translateY(-3px);
-}
-
-/* ===================
-   ANIMATIONS
-   =================== */
-
-@keyframes fade-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.scroll-reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.6s ease-out;
-}
-
-.scroll-reveal.revealed {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* ===================
-   RESPONSIVE DESIGN
-   =================== */
-
-@media (max-width: 1024px) {
-    .section-grid {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
-    
-    .section-grid.reverse {
-        direction: ltr;
-    }
-    
-    .timeline::before {
-        left: 30px;
-        transform: none;
-    }
-    
-    .timeline-item {
-        flex-direction: row !important;
-    }
-    
-    .timeline-item .timeline-content {
-        text-align: left !important;
-        margin-left: 80px !important;
-        margin-right: 0 !important;
-    }
-    
-    .timeline-year {
-        left: 30px;
-        transform: translateX(-50%);
-    }
-    
-    .values-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 25px;
-    }
-    
-    .legal-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    .about-main {
-        padding-top: 70px;
-    }
-    
-    .hero-slogan {
-        height: 60vh;
-        min-height: 400px;
-    }
-    
-    .mission-section,
-    .vision-section,
-    .values-section,
-    .impact-section,
-    .faq-section,
-    .legal-section {
-        padding: 60px 0;
-    }
-    
-    .cta-section {
-        padding: 60px 0;
-    }
-    
-    .section-grid {
-        gap: 30px;
-    }
-    
-    .section-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-    }
-    
-    .value-card,
-    .legal-card {
-        padding: 30px 20px;
-    }
-    
-    .value-icon,
-    .legal-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 22px;
-    }
-    
-    .impact-stats {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-    }
-    
-    .stat-card {
-        padding: 30px 20px;
-    }
-    
-    .stat-number {
-        font-size: 2.5rem;
-    }
-    
-    .mission-points li {
-        padding: 12px;
-    }
-    
-    .goal-item {
-        padding: 20px;
-        gap: 16px;
-    }
-    
-    .goal-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-    }
-    
-    .faq-question {
-        padding: 20px;
-    }
-    
-    .faq-answer p {
-        padding: 0 20px 20px;
-    }
-    
-    .timeline-item .timeline-content {
-        margin-left: 60px !important;
-    }
-    
-    .timeline-year {
-        width: 50px;
-        height: 50px;
-        font-size: 12px;
-        left: 25px;
-    }
-    
-    .timeline::before {
-        left: 25px;
-    }
-    
-    .cta-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .cta-buttons .btn {
-        width: 100%;
-        max-width: 280px;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero-slogan {
-        height: 50vh;
-        min-height: 350px;
-    }
-    
-    .mission-section,
-    .vision-section,
-    .values-section,
-    .impact-section,
-    .faq-section,
-    .legal-section {
-        padding: 40px 0;
-    }
-    
-    .cta-section {
-        padding: 40px 0;
-    }
-    
-    .hero-content {
-        padding: 0 15px;
-    }
-    
-    .section-image {
-        height: 250px;
-    }
-    
-    .value-card,
-    .legal-card {
-        padding: 25px 15px;
-    }
-    
-    .stat-card {
-        padding: 25px 15px;
-    }
-    
-    .stat-number {
-        font-size: 2rem;
-    }
-    
-    .mission-points li {
-        flex-direction: column;
-        text-align: center;
-        gap: 8px;
-    }
-    
-    .goal-item {
-        flex-direction: column;
-        text-align: center;
-        padding: 16px;
-    }
-    
-    .faq-question {
-        padding: 16px;
-        flex-direction: column;
-        gap: 12px;
-        text-align: center;
-    }
-    
-    .faq-question span {
-        margin-right: 0;
-    }
-    
-    .faq-answer p {
-        padding: 0 16px 16px;
-    }
-    
-    .timeline-item .timeline-content {
-        margin-left: 45px !important;
-    }
-    
-    .timeline-year {
-        width: 40px;
-        height: 40px;
-        font-size: 10px;
-        left: 20px;
-    }
-    
-    .timeline::before {
-        left: 20px;
-    }
-    
-    .impact-stats {
-        grid-template-columns: 1fr;
-    }
-    
-    .values-grid,
-    .legal-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ===================
-   PRINT STYLES
-   =================== */
-
-@media print {
-    .header,
-    .footer,
-    .cta-section,
-    .hero-slogan {
-        display: none !important;
-    }
-    
-    .about-main {
-        padding-top: 0;
-    }
-    
-    .mission-section,
-    .vision-section,
-    .values-section,
-    .impact-section,
-    .faq-section,
-    .legal-section {
-        padding: 20px 0;
-        background: white !important;
-        color: black !important;
-    }
-    
-    .section-title,
-    .hero-title,
-    .cta-content h2 {
-        color: black !important;
-    }
-    
-    .section-content,
-    .faq-answer p,
-    .value-card p,
-    .legal-card p {
-        color: black !important;
-    }
-    
-    .section-image {
-        max-width: 100%;
-        height: auto;
-    }
-    
-    .timeline::before,
-    .timeline-year {
-        display: none;
-    }
-    
-    .timeline-item .timeline-content {
-        margin: 0 !important;
-        background: transparent !important;
-        border: 1px solid #ccc !important;
-    }
-}
-
-/* ===================
-   HIGH CONTRAST MODE
-   =================== */
-
-@media (prefers-contrast: high) {
-    .value-card,
-    .legal-card,
-    .stat-card,
-    .faq-item {
-        border: 2px solid var(--primary-brown);
-    }
-    
-    .section-icon,
-    .value-icon,
-    .legal-icon,
-    .goal-icon,
-    .stat-icon {
-        border: 2px solid var(--white);
-    }
-}
-
-/* ===================
-   REDUCED MOTION
-   =================== */
-
-@media (prefers-reduced-motion: reduce) {
-    .hero-background,
-    .section-image,
-    .value-card,
-    .legal-card,
-    .stat-card,
-    .goal-item,
-    .faq-item {
-        animation: none !important;
-        transition: none !important;
-    }
-    
-    .value-card:hover,
-    .legal-card:hover,
-    .stat-card:hover,
-    .goal-item:hover {
-        transform: none;
-    }
-    
-    .scroll-reveal {
-        opacity: 1 !important;
-        transform: none !important;
-    }
-}
 
 .about-main {
     padding-top: 80px;
     min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 /* ===================
@@ -557,11 +37,6 @@
     background-position: center;
     background-blend-mode: overlay;
     animation: subtle-zoom 20s infinite alternate;
-}
-
-@keyframes subtle-zoom {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.05); }
 }
 
 .hero-overlay {
@@ -607,9 +82,8 @@
 
 .breadcrumb-section {
     background-color: var(--white);
-    padding: 40px 0;
+    padding: 20px 0; /* Adjusted padding */
     border-bottom: 1px solid rgba(179, 187, 175, 0.2);
-    height: 30px;
 }
 
 .breadcrumb {
@@ -617,6 +91,7 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
+    flex-wrap: wrap;
 }
 
 .breadcrumb a {
@@ -646,30 +121,12 @@
     padding: 80px 0;
 }
 
-.mission-section {
-    background-color: var(--white);
-}
-
-.vision-section {
-    background-color: var(--light-cream);
-}
-
-.values-section {
-    background-color: var(--white);
-}
-
-.impact-section {
-    background: linear-gradient(135deg, var(--sage-green), var(--dark-sage));
-    color: var(--white);
-}
-
-.faq-section {
-    background-color: var(--cream-bg);
-}
-
-.legal-section {
-    background-color: var(--white);
-}
+.mission-section { background-color: var(--white); }
+.vision-section { background-color: var(--light-cream); }
+.values-section { background-color: var(--white); }
+.impact-section { background-color: var(--sage-green); color: var(--white); }
+.faq-section { background-color: var(--cream-bg); }
+.legal-section { background-color: var(--white); }
 
 .section-header {
     text-align: left;
@@ -703,16 +160,9 @@
     line-height: 1.2;
 }
 
-.vision-section .section-title::after {
-    width: 0 !important;
-    display: none !important;
-    content: none !important;
-}
-
+.vision-section .section-title::after,
 .mission-section .section-title::after {
-    width: 0 !important;
     display: none !important;
-    content: none !important;
 }
 
 .impact-section .section-title {
@@ -772,13 +222,13 @@
 }
 
 /* ===================
-   MISSION SECTION
+   MISSION & VISION SPECIFIC
    =================== */
 
 .mission-points {
     list-style: none;
     padding: 0;
-    margin: 30px 0 0 0;
+    margin-top: 30px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -815,10 +265,6 @@
     flex-shrink: 0;
 }
 
-/* ===================
-   VISION GOALS
-   =================== */
-
 .vision-goals {
     display: flex;
     flex-direction: column;
@@ -828,6 +274,7 @@
 
 .goal-item {
     display: flex;
+    align-items: center;
     gap: 20px;
     padding: 24px;
     background-color: var(--white);
@@ -845,12 +292,13 @@
 .goal-icon {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, var(--sage-green), var(--dark-sage));
+    background: linear-gradient(135deg, #B3BBAF, #8a9285); /* Use hex colors directly */
     border-radius: 50%;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--white);
+    color: #ffffff; /* Direct hex instead of var */
+    box-shadow: var(--shadow-md);
     font-size: 20px;
     flex-shrink: 0;
 }
@@ -870,16 +318,18 @@
 }
 
 /* ===================
-   VALUES SECTION
+   VALUES & LEGAL CARDS
    =================== */
 
-.values-grid {
+.values-grid,
+.legal-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
 }
 
-.value-card {
+.value-card,
+.legal-card {
     background-color: var(--white);
     padding: 40px 30px;
     border-radius: var(--border-radius-lg);
@@ -891,7 +341,14 @@
     overflow: hidden;
 }
 
-.value-card::before {
+.value-card:hover,
+.legal-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+}
+
+.value-card::before,
+.legal-card::before {
     content: '';
     position: absolute;
     top: 0;
@@ -901,37 +358,71 @@
     background: linear-gradient(90deg, var(--accent-orange), var(--sage-green));
 }
 
-.value-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-xl);
-}
-
-.value-icon {
+.value-icon,
+.legal-icon {
     width: 70px;
     height: 70px;
-    background: linear-gradient(135deg, var(--accent-orange), var(--light-orange));
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 24px;
-    font-size: 28px;
-    color: var(--white);
+    background: linear-gradient(135deg, #725037, #5a3f2b); /* Use hex colors directly */
+    font-size: 24px;
+    color: #ffffff; /* Direct hex instead of var */
     box-shadow: var(--shadow-sm);
 }
 
-.value-card h3 {
+.value-icon {
+    background: linear-gradient(135deg, var(--accent-orange), var(--light-orange));
+    font-size: 28px;
+}
+
+.legal-icon {
+    background: linear-gradient(135deg, var(--primary-brown), var(--dark-brown));
+    font-size: 24px;
+    color: var(--white);
+}
+
+.value-card h3,
+.legal-card h3 {
     font-family: var(--font-display);
-    font-size: 1.4rem;
     font-weight: 600;
     color: var(--primary-brown);
     margin-bottom: 16px;
 }
 
-.value-card p {
+.value-card h3 { font-size: 1.4rem; }
+.legal-card h3 { font-size: 1.3rem; }
+
+
+.value-card p,
+.legal-card p {
     color: var(--medium-gray);
     line-height: 1.6;
-    margin: 0;
+}
+
+.legal-card p {
+    margin-bottom: 24px;
+}
+
+.legal-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background-color: var(--sage-green);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.legal-link:hover {
+    background-color: var(--dark-sage);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 /* ===================
@@ -1000,9 +491,9 @@
    TIMELINE
    =================== */
 
-.impact-timeline {
-    margin-top: 40px;
-}
+/* ===================
+   TIMELINE
+   =================== */
 
 .timeline-title {
     font-family: var(--font-display);
@@ -1015,8 +506,9 @@
 
 .timeline {
     position: relative;
-    max-width: 2000px;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 20px 0;
 }
 
 .timeline::before {
@@ -1027,6 +519,7 @@
     width: 2px;
     height: 100%;
     background: rgba(255, 255, 255, 0.3);
+    top: 0;
 }
 
 .timeline-item {
@@ -1034,21 +527,15 @@
     align-items: center;
     margin-bottom: 40px;
     position: relative;
+    width: 100%;
 }
 
 .timeline-item:nth-child(odd) {
-    flex-direction: row-reverse;
+    justify-content: flex-end;
 }
 
-.timeline-item:nth-child(odd) .timeline-content {
-    text-align: right;
-    margin-left: 500px;
-    margin-right: 50px;
-}
-
-.timeline-item:nth-child(even) .timeline-content {
-    margin-right: 500px;
-    margin-left: 50px;
+.timeline-item:nth-child(even) {
+    justify-content: flex-start;
 }
 
 .timeline-year {
@@ -1070,12 +557,23 @@
 }
 
 .timeline-content {
-    flex: 1;
     background: rgba(255, 255, 255, 0.1);
     padding: 24px;
     border-radius: var(--border-radius);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    width: calc(50% - 50px);
+    max-width: 450px;
+}
+
+.timeline-item:nth-child(odd) .timeline-content {
+    margin-right: 50px;
+    text-align: right;
+}
+
+.timeline-item:nth-child(even) .timeline-content {
+    margin-left: 50px;
+    text-align: left;
 }
 
 .timeline-content h4 {
@@ -1087,7 +585,7 @@
 }
 
 .timeline-content p {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--white);
     line-height: 1.5;
     margin: 0;
 }
@@ -1142,7 +640,7 @@
 .faq-question i {
     color: var(--accent-orange);
     font-size: 16px;
-    transition: var(--transition);
+    transition: transform 0.3s ease;
 }
 
 .faq-item.active .faq-question i {
@@ -1156,13 +654,481 @@
     background-color: var(--light-cream);
 }
 
-.faq-item.active .faq-answer {
-    max-height: 200px;
-}
-
 .faq-answer p {
     padding: 0 24px 24px;
     color: var(--deep-plum);
     line-height: 1.6;
     margin: 0;
 }
+
+/* ===================
+   CTA SECTION
+   =================== */
+
+.cta-section {
+    background: linear-gradient(135deg, var(--accent-orange), var(--light-orange));
+    padding: 80px 0;
+    text-align: center;
+}
+
+.cta-content h2 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 16px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cta-content p {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-buttons .btn {
+    padding: 16px 48px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    min-width: 160px;
+    border: 2px solid transparent;
+}
+
+.cta-buttons .btn-primary {
+    background-color: transparent;
+    border: 2px solid var(--white);
+    color: var(--white);
+}
+
+.cta-buttons .btn-primary:hover {
+    background-color: var(--white);
+    color: var(--accent-orange);
+}
+
+.cta-section .btn.btn-primary {
+    background-color: transparent;
+    border: 2px solid var(--white);
+    color: var(--white);
+}
+
+.cta-section .btn.btn-primary:hover {
+    background-color: var(--white);
+    color: var(--accent-orange);
+}
+
+
+/* ===================
+   ANIMATIONS
+   =================== */
+
+@keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes subtle-zoom {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease-out;
+}
+
+.scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===================
+   RESPONSIVE DESIGN
+   =================== */
+
+@media (max-width: 1024px) {
+    .section-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .section-grid.reverse {
+        direction: ltr;
+    }
+
+    .section-image {
+        order: -1;
+    }
+    
+    .timeline::before {
+        left: 30px;
+    }
+    
+    .timeline-item,
+    .timeline-item:nth-child(odd),
+    .timeline-item:nth-child(even) {
+        justify-content: flex-start;
+        width: 100%;
+    }
+    
+    .timeline-content,
+    .timeline-item:nth-child(odd) .timeline-content,
+    .timeline-item:nth-child(even) .timeline-content {
+        width: calc(100% - 80px);
+        max-width: none;
+        margin-left: 70px;
+        margin-right: 0;
+        text-align: left;
+    }
+    
+    .timeline-year {
+        left: 0;
+        transform: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-main {
+        padding-top: 70px;
+    }
+    
+    .hero-slogan {
+        height: 60vh;
+        min-height: 400px;
+    }
+    
+    .hero-content {
+        padding: 0 20px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .mission-section,
+    .vision-section,
+    .values-section,
+    .impact-section,
+    .faq-section,
+    .legal-section,
+    .cta-section {
+        padding: 60px 0;
+    }
+    
+    .section-grid {
+        gap: 30px;
+    }
+
+    .section-image {
+        height: 350px;
+    }
+    
+    .section-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .values-grid,
+    .legal-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .value-card,
+    .legal-card {
+        padding: 30px 20px;
+    }
+    
+    .value-icon,
+    .legal-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 22px;
+    }
+
+    .impact-stats {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    
+    .stat-card {
+        padding: 30px 20px;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+    }
+    
+    .mission-points li {
+        padding: 14px;
+        font-size: 15px;
+    }
+
+    .goal-item {
+        padding: 20px;
+        gap: 16px;
+    }
+    
+    .goal-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+
+    .faq-container {
+        padding: 0;
+    }
+
+    .faq-question {
+        padding: 20px 15px;
+        text-align: left;
+    }
+
+    .faq-question span {
+        text-align: left;
+        font-size: 1rem;
+    }
+
+    .faq-answer p {
+        padding: 0 15px 20px;
+    }
+
+    .timeline::before {
+        left: 25px;
+    }
+    
+    .timeline-item,
+    .timeline-item:nth-child(even),
+    .timeline-item:nth-child(odd) {
+        padding-left: 60px;
+    }
+    
+    .timeline-year {
+        width: 50px;
+        height: 50px;
+        font-size: 11px;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .cta-buttons .btn {
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .breadcrumb-section {
+        padding: 15px 0;
+    }
+    
+    .breadcrumb {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-slogan {
+        height: 50vh;
+        min-height: 350px;
+    }
+    
+    .hero-content {
+        padding: 0 15px;
+    }
+    
+    .mission-section,
+    .vision-section,
+    .values-section,
+    .impact-section,
+    .faq-section,
+    .legal-section,
+    .cta-section {
+        padding: 40px 0;
+    }
+    
+    .section-image {
+        height: 280px;
+    }
+    
+    .value-card,
+    .legal-card {
+        padding: 25px 15px;
+    }
+    
+    .stat-card {
+        padding: 25px 15px;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .mission-points li {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+        padding: 12px;
+    }
+    
+    .mission-points li::before {
+        align-self: center;
+    }
+    
+    .goal-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 16px;
+    }
+
+    .goal-icon {
+        align-self: center;
+    }
+
+    .faq-question {
+        padding: 16px 12px;
+    }
+
+    .faq-question span {
+        font-size: 0.95rem;
+    }
+
+    .faq-answer p {
+        padding: 0 12px 16px;
+        font-size: 0.9rem;
+    }
+
+    .timeline::before {
+        left: 20px;
+    }
+    
+    .timeline-item,
+    .timeline-item:nth-child(even),
+    .timeline-item:nth-child(odd) {
+        padding-left: 55px;
+    }
+    
+    .timeline-year {
+        width: 45px;
+        height: 45px;
+        font-size: 10px;
+    }
+
+    .timeline-content h4 {
+        font-size: 1rem;
+    }
+
+    .timeline-content p {
+        font-size: 0.9rem;
+    }
+    
+    .impact-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===================
+   ACCESSIBILITY & PRINT
+   =================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .scroll-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .value-card,
+    .legal-card,
+    .stat-card,
+    .faq-item {
+        border: 2px solid;
+    }
+    
+    .section-icon,
+    .value-icon,
+    .legal-icon,
+    .goal-icon,
+    .stat-icon {
+        border: 2px solid;
+    }
+}
+
+@media print {
+    .header,
+    .footer,
+    .cta-section,
+    .hero-slogan,
+    .breadcrumb-section {
+        display: none !important;
+    }
+    
+    .about-main {
+        padding-top: 0;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .mission-section,
+    .vision-section,
+    .values-section,
+    .impact-section,
+    .faq-section,
+    .legal-section {
+        padding: 20px 0;
+        background: transparent !important;
+        color: black !important;
+    }
+    
+    .section-title,
+    .hero-title,
+    .cta-content h2,
+    .section-subtitle,
+    .timeline-content,
+    .value-card p,
+    .legal-card p {
+        color: black !important;
+    }
+    
+    .section-image,
+    .timeline::before,
+    .timeline-year {
+        display: none;
+    }
+    
+    .timeline-item .timeline-content {
+        margin: 0 !important;
+        background: transparent !important;
+        border: 1px solid #ccc !important;
+    }
+}
+
+

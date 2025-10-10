@@ -3,11 +3,6 @@
  * Handles FAQ interactions, statistics animations, and scroll effects
  */
 
-// ===================
-// GLOBAL VARIABLES
-// ===================
-
-let statsAnimated = false;
 
 // ===================
 // INITIALIZATION
@@ -16,7 +11,6 @@ let statsAnimated = false;
 document.addEventListener('DOMContentLoaded', () => {
     // Ensure DOM is fully loaded
     if (document.readyState === 'loading') {
-        // Still loading, wait for DOMContentLoaded
         return;
     }
     
@@ -34,23 +28,26 @@ document.addEventListener('DOMContentLoaded', () => {
         initLazyLoading();
         trackUserInteractions();
         
-        // Listen for language changes
-        window.addEventListener('languageChanged', updateLanguageContent);
+        // CRITICAL: Debounce language changes to prevent interrupting animations
+        let languageChangeTimeout;
+        window.addEventListener('languageChanged', () => {
+            clearTimeout(languageChangeTimeout);
+            languageChangeTimeout = setTimeout(updateLanguageContent, 100);
+        });
         
         console.log('🎉 About Us Page Fully Loaded');
     });
 });
 
 function initAboutPage() {
-    console.log('ðŸ¾ Initializing About Us Page');
+    console.log('🎾 Initializing About Us Page');
     
-    // Initialize components
+    // Initialize components in correct order
     initFAQ();
     initScrollAnimations();
-    initStatisticsAnimation();
     initTimelineAnimation();
     
-    console.log('âœ… About Us Page Initialized');
+    console.log('✅ About Us Page Initialized');
 }
 
 // ===================
@@ -153,65 +150,13 @@ function initScrollAnimations() {
 // STATISTICS ANIMATION
 // ===================
 
-function initStatisticsAnimation() {
-    const statsSection = document.querySelector('.impact-stats');
-    if (!statsSection) return;
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && !statsAnimated) {
-                animateStatistics();
-                statsAnimated = true;
-                observer.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.3
-    });
-    
-    observer.observe(statsSection);
-}
-
-function animateStatistics() {
-    const statNumbers = document.querySelectorAll('.stat-number');
-    
-    statNumbers.forEach(statNumber => {
-        const target = parseInt(statNumber.dataset.target);
-        animateNumber(statNumber, 0, target, 2000);
-    });
-}
-
-function animateNumber(element, start, end, duration) {
-    const startTime = performance.now();
-    const range = end - start;
-    
-    // Store the target value as a data attribute for later use
-    element.setAttribute('data-current-value', end);
-    
-    function updateNumber(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-        const currentNumber = Math.round(start + (range * easeOutQuart));
-        
-        element.textContent = formatNumber(currentNumber);
-        
-        if (progress < 1) {
-            requestAnimationFrame(updateNumber);
-        } else {
-            element.textContent = formatNumber(end);
-            element.setAttribute('data-current-value', end);
-        }
-    }
-    
-    requestAnimationFrame(updateNumber);
-}
-
 function formatNumber(num) {
+    const currentLang = getCurrentLanguage();
+    const locale = currentLang === 'tr' ? 'tr-TR' : 'en-US';
+    
     // Add thousand separators for large numbers
     if (num >= 1000) {
-        return num.toLocaleString('tr-TR');
+        return num.toLocaleString(locale);
     }
     return num.toString();
 }
@@ -251,19 +196,6 @@ function getCurrentLanguage() {
     return window.currentLanguage || 'tr';
 }
 
-function updateLanguageContent() {
-    const currentLang = getCurrentLanguage();
-    
-    const statNumbers = document.querySelectorAll('.stat-number');
-    statNumbers.forEach(statNumber => {
-        // Use the stored current value instead of parsing text
-        const currentValue = parseInt(statNumber.getAttribute('data-current-value') || statNumber.dataset.target);
-        if (!isNaN(currentValue) && currentValue > 0) {
-            const locale = currentLang === 'tr' ? 'tr-TR' : 'en-US';
-            statNumber.textContent = currentValue.toLocaleString(locale);
-        }
-    });
-}
 
 // ===================
 // SMOOTH SCROLLING FOR ANCHOR LINKS
@@ -326,16 +258,6 @@ function optimizeAnimations() {
             element.classList.add('revealed');
             element.style.transition = 'none';
         });
-        
-        // Show statistics immediately without animation
-        if (!statsAnimated) {
-            const statNumbers = document.querySelectorAll('.stat-number');
-            statNumbers.forEach(statNumber => {
-                const target = parseInt(statNumber.dataset.target);
-                statNumber.textContent = formatNumber(target);
-            });
-            statsAnimated = true;
-        }
     }
 }
 
@@ -351,13 +273,6 @@ function initIntersectionObserverPolyfill() {
         revealElements.forEach(element => {
             element.classList.add('revealed');
         });
-        
-        // Animate statistics immediately
-        if (!statsAnimated) {
-            setTimeout(() => {
-                animateStatistics();
-            }, 1000);
-        }
     }
 }
 
@@ -388,13 +303,6 @@ function initPageVisibilityHandling() {
             console.log('Page hidden - pausing animations');
         } else {
             console.log('Page visible - resuming animations');
-            
-            // Only animate if NOT already animated
-            const impactSection = document.querySelector('.impact-section');
-            if (impactSection && isElementInViewport(impactSection) && !statsAnimated) {
-                animateStatistics();
-                statsAnimated = true;
-            }
         }
     });
 }
@@ -501,7 +409,6 @@ window.addEventListener('resize', () => {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         toggleFAQ,
-        animateStatistics,
         formatNumber,
         getCurrentLanguage
     };
