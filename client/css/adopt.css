@@ -6,8 +6,26 @@
     padding-top: 80px;
     min-height: 100vh;
     background-color: var(--cream-bg);
-    overflow-x: hidden; /* Prevents horizontal scrolling */
+    /* Responsive Fix: Prevent horizontal overflow */
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
+
+/* Responsive Fix: Ensure all direct children respect box-sizing */
+.adopt-main * {
+    box-sizing: border-box;
+}
+
+/* Responsive Fix: A general container for consistent padding */
+.container {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    box-sizing: border-box;
+}
+
 
 /* ===================
    PAGE HEADER
@@ -177,12 +195,12 @@
     flex-shrink: 0;
 }
 
-.filter-option input[type="checkbox"]:checked + .checkmark {
+.filter-option input[type="checkbox"]:checked+.checkmark {
     background-color: var(--accent-orange);
     border-color: var(--accent-orange);
 }
 
-.filter-option input[type="checkbox"]:checked + .checkmark::after {
+.filter-option input[type="checkbox"]:checked+.checkmark::after {
     content: '';
     position: absolute;
     left: 6px;
@@ -492,7 +510,8 @@
     align-items: center;
     padding-top: 16px;
     border-top: 1px solid rgba(179, 187, 175, 0.2);
-    margin-top: auto; /* Pushes footer to the bottom */
+    margin-top: auto;
+    /* Pushes footer to the bottom */
 }
 
 .pet-date {
@@ -557,14 +576,16 @@
 }
 
 .list-view .pet-card-description {
-    display: none; /* Hidden in list view for compactness */
+    display: none;
+    /* Hidden in list view for compactness */
 }
 
 .list-view .pet-card-details {
     display: flex;
     gap: 24px;
     margin-bottom: 12px;
-    grid-template-columns: none; /* Override grid styles */
+    grid-template-columns: none;
+    /* Override grid styles */
 }
 
 .list-view .pet-card-tags {
@@ -572,7 +593,8 @@
 }
 
 .list-view .pet-card-footer {
-    display: none; /* Footer content is moved to -side */
+    display: none;
+    /* Footer content is moved to -side */
 }
 
 .list-view .pet-card-side {
@@ -607,8 +629,13 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .empty-state {
@@ -695,21 +722,74 @@
    ANIMATIONS
    =================== */
 
-.fade-in-up { animation: fadeInUp 0.6s ease-out; }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
 
-.slide-in { animation: slideIn 0.4s ease-out; }
-@keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
 
-@keyframes cardEntrance { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
 /* Staggered animation delay for cards */
-.adopt-pet-card:nth-child(1) { animation-delay: 0.1s; }
-.adopt-pet-card:nth-child(2) { animation-delay: 0.2s; }
-.adopt-pet-card:nth-child(3) { animation-delay: 0.3s; }
-.adopt-pet-card:nth-child(4) { animation-delay: 0.4s; }
-.adopt-pet-card:nth-child(5) { animation-delay: 0.5s; }
-.adopt-pet-card:nth-child(6) { animation-delay: 0.6s; }
+.adopt-pet-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.adopt-pet-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.adopt-pet-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.adopt-pet-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.adopt-pet-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.adopt-pet-card:nth-child(6) {
+    animation-delay: 0.6s;
+}
 
 
 /* ===================
@@ -731,18 +811,27 @@
 }
 
 @media (prefers-contrast: high) {
-    .adopt-pet-card { border: 2px solid var(--primary-brown); }
-    .pet-tag { border: 2px solid var(--primary-brown); }
+    .adopt-pet-card {
+        border: 2px solid var(--primary-brown);
+    }
+
+    .pet-tag {
+        border: 2px solid var(--primary-brown);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .adopt-pet-card,
     .pet-card-image img,
     .loading-spinner {
         animation: none !important;
         transition: none !important;
     }
-    .adopt-pet-card:hover { transform: none; }
+
+    .adopt-pet-card:hover {
+        transform: none;
+    }
 }
 
 
@@ -755,9 +844,11 @@
         grid-template-columns: 260px 1fr;
         gap: 30px;
     }
+
     .filters-container {
         padding: 20px;
     }
+
     .pets-container.grid-view {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 20px;
@@ -768,74 +859,64 @@
     .adopt-main {
         padding-top: 70px;
     }
+
+    /* Responsive Fix: Ensure header elements don't overflow */
     .page-header {
         padding: 30px 0;
+        width: 100%;
+        max-width: 100%;
     }
+
     .page-title {
         font-size: 1.8rem;
+        width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
+
     .page-description {
         font-size: 1rem;
+        width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
+
     .results-summary {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
-    }
-    .content-grid {
-        /* The grid is now always a single column on mobile */
-        grid-template-columns: 1fr;
-        gap: 20px;
+        width: 100%;
+        max-width: 100%;
     }
 
-    /* Hide the original sidebar container on mobile, as we are moving the filters */
+    /* Responsive Fix: Single column grid, full width */
+    .content-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .main-content {
+        order: unset;
+        /* Important for flexbox children */
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
     .filters-sidebar {
         display: none;
     }
 
-    /* The main content takes up the full width */
-    .main-content {
-        order: unset; /* Remove the order property */
-    }
-
-    /* --- ACCORDION STYLES FOR FILTERS --- */
-    .filters-container {
-        /* Add a smooth transition for sliding open/closed */
-        transition: max-height 0.4s ease-out, padding 0.4s ease-out, margin 0.4s ease-out, border-width 0.1s ease-out;
-        margin-bottom: 24px;
-        max-height: 2000px; /* A large value to allow it to expand fully */
-    }
-    .filters-container.collapsed {
-        /* When collapsed, shrink it to nothing */
-        max-height: 0;
-        overflow: hidden;
-        padding-top: 0;
-        padding-bottom: 0;
-        margin-bottom: 0;
-        border-width: 0;
-    }
-    /* --- END ACCORDION STYLES --- */
-
-    .sort-controls {
-        flex-direction: column;
-        gap: 16px;
-        align-items: stretch;
-        margin-bottom: 16px;
-    }
-    .sort-options {
-        justify-content: space-between;
-    }
-    .view-options {
-        justify-content: center;
-    }
-    
-    /* --- FIX FOR THE FILTER TOGGLE BUTTON --- */
+    /* Responsive Fix: Mobile filter toggle button */
     .filters-toggle {
-        display: flex; /* Use flexbox to align text and icon */
+        display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px; /* Space between text and icon */
+        gap: 8px;
         width: 100%;
+        max-width: 100%;
         padding: 12px 20px;
         background-color: var(--accent-orange);
         color: var(--white);
@@ -844,41 +925,119 @@
         font-size: 16px;
         font-weight: 500;
         cursor: pointer;
-        margin-bottom: 5px; /* Margin will be handled by the container now */
+        margin-bottom: 12px;
         transition: var(--transition);
+        box-sizing: border-box;
     }
+
     .filters-toggle:hover {
         background-color: var(--light-orange);
     }
+
     .filters-toggle i {
-        margin-left: 0; /* Remove old margin */
         transition: transform 0.3s ease-in-out;
     }
+
     .filters-toggle.active i {
         transform: rotate(180deg);
     }
-    /* --- END BUTTON FIX --- */
 
+    /* Accordion styles for filters container on mobile */
+    .filters-container {
+        transition: max-height 0.4s ease-out, padding 0.4s ease-out, margin 0.4s ease-out, border-width 0.1s ease-out;
+        margin-bottom: 24px;
+        max-height: 2000px;
+        /* Responsive Fix: Full width */
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .filters-container.collapsed {
+        max-height: 0;
+        overflow: hidden;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-bottom: 0;
+        border-width: 0;
+    }
+
+    /* Responsive Fix: Sort controls overflow fix */
+    .sort-controls {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+        margin-bottom: 16px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 16px 12px;
+    }
+
+    .sort-controls-left {
+        width: 100%;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .sort-options {
+        justify-content: space-between;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    #sort-select {
+        width: 100%;
+        min-width: auto;
+        max-width: 100%;
+    }
+
+    .post-ad-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .view-options {
+        justify-content: center;
+    }
+
+    /* Responsive Fix: Pet cards and container overflow fix */
+    .pets-container {
+        width: 100%;
+        max-width: 100%;
+    }
+    
     .pets-container.grid-view {
         grid-template-columns: 1fr;
     }
+    
+    .adopt-pet-card {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
     /* List View adjustments for mobile */
     .list-view .adopt-pet-card {
         flex-direction: column;
         height: auto;
     }
+
     .list-view .pet-card-image {
         width: 100%;
         height: 200px;
     }
+
     .list-view .pet-card-content {
         grid-template-columns: 1fr;
         gap: 16px;
     }
+
     .list-view .pet-card-details {
         flex-wrap: wrap;
         gap: 12px;
     }
+
     .list-view .pet-card-side {
         flex-direction: row;
         justify-content: space-between;
@@ -887,44 +1046,64 @@
     }
 }
 
+/* Hide mobile filter toggle on desktop */
 @media (min-width: 769px) {
-    /* Hide mobile filter toggle on desktop */
     .filters-toggle {
         display: none;
     }
 }
 
+/* Additional fixes for very small screens */
 @media (max-width: 480px) {
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
     .page-header {
         padding: 20px 0;
     }
+
     .page-title {
         font-size: 1.8rem;
     }
+
     .page-description {
         font-size: 1rem;
     }
+
     .filters-container {
         padding: 16px;
     }
+
     .sort-controls {
-        padding: 16px;
+        padding: 12px 10px;
     }
+
     .pet-card-content {
         padding: 16px;
     }
+    
+    .adopt-pet-card {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
     .pet-card-details {
         grid-template-columns: 1fr;
         gap: 6px;
     }
+
     .pagination {
         gap: 6px;
     }
+
     .page-btn {
         padding: 6px 10px;
         font-size: 13px;
         min-width: 32px;
     }
+
     .empty-state h3 {
         font-size: 1.3rem;
     }
